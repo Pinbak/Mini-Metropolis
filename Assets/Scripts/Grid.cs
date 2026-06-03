@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Grid
 {
-    private NodeType[,] _grid;
+    private Node[,] _grid;
     private int _width;
     private int _height;
 
@@ -10,10 +11,15 @@ public class Grid
     {
         _width = width;
         _height = height;
-        _grid = new NodeType[width, height];
+        _grid = new Node[width, height];
+        
+        // populate the grid with empty nodes
+        for (var x = 0; x < width; x++)
+            for (var y = 0; y < height; y++)
+                _grid[x, y] = new Node();
     }
 
-    public NodeType this[int x, int y]
+    public Node this[int x, int y]
     {
         get => _grid[x, y];
         set => _grid[x, y] = value;
@@ -22,14 +28,24 @@ public class Grid
     public List<(int x, int y)> GetAdjacentCells(int startingX, int startingY)
     {
         var cells = new List<(int x, int y)>();
+
+        var currentNode = _grid[startingX, startingY];
         if (startingX > 0)
-            cells.Add((startingX - 1, startingY));
+            if (_grid[startingX - 1, startingY].Type is NodeType.Empty ||
+                (_grid[startingX - 1, startingY].Type is NodeType.Road && !_grid[startingX - 1, startingY].Neighbours.Contains(currentNode)))
+                cells.Add((startingX - 1, startingY));
         if (startingX < _width - 1)
-            cells.Add((startingX + 1, startingY));
+            if (_grid[startingX + 1, startingY].Type is NodeType.Empty ||
+                (_grid[startingX + 1, startingY].Type is NodeType.Road && !_grid[startingX + 1, startingY].Neighbours.Contains(currentNode)))
+                cells.Add((startingX + 1, startingY));
         if (startingY > 0)
-            cells.Add((startingX, startingY - 1));
+            if (_grid[startingX, startingY - 1].Type is NodeType.Empty ||
+                (_grid[startingX, startingY - 1].Type is NodeType.Road && !_grid[startingX, startingY - 1].Neighbours.Contains(currentNode)))
+                cells.Add((startingX, startingY - 1));
         if (startingY < _height - 1)
-            cells.Add((startingX, startingY + 1));
+            if (_grid[startingX, startingY + 1].Type is NodeType.Empty ||
+                (_grid[startingX, startingY + 1].Type is NodeType.Road && !_grid[startingX, startingY + 1].Neighbours.Contains(currentNode)))
+                cells.Add((startingX, startingY + 1));
 
         return cells;
     }

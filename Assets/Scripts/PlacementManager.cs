@@ -81,6 +81,22 @@ public class PlacementManager : MonoBehaviour
     private void EndRoadPlacement()
     {
         // only gets called when the final placement is valid
+
+        var startGridPosition = WorldToGrid(new Vector3Int((int)_startingNode.transform.position.x,
+            (int)_startingNode.transform.position.y, (int)_startingNode.transform.position.z));
+        var endGridPosition = WorldToGrid(_currentMousePosition);
+
+        var startNode = _grid[startGridPosition.x, startGridPosition.y];
+        var endNode = _grid[endGridPosition.x, endGridPosition.y];
+
+        // change to road if not already
+        if (startNode.Type is NodeType.Empty) startNode.Type = NodeType.Road;
+        if (endNode.Type is NodeType.Empty) endNode.Type = NodeType.Road;
+        
+        // add the neighbours for the connection
+        startNode.Neighbours.Add(endNode);
+        endNode.Neighbours.Add(startNode);
+        
         Instantiate(roadStructure, _startingNode.transform.position, Quaternion.identity);
         Instantiate(roadStructure, _currentMousePosition, Quaternion.identity);
 
@@ -111,14 +127,15 @@ public class PlacementManager : MonoBehaviour
     private void PlaceNode(Vector3Int position, NodeType type)
     {
         var gridPosition = WorldToGrid(position);
-        _grid[gridPosition.x, gridPosition.y] = type;
+        _grid[gridPosition.x, gridPosition.y].Type = type;
         var newStructure = Instantiate(roadStructure, position, Quaternion.identity); // todo change roadStructure to be more generic
     }
 
     private bool IsPositionFree(Vector3Int position)
     {
         var gridPosition = WorldToGrid(position);
-        return _grid[gridPosition.x, gridPosition.y] == NodeType.Empty;
+        return _grid[gridPosition.x, gridPosition.y].Type == NodeType.Empty ||
+               _grid[gridPosition.x, gridPosition.y].Type == NodeType.Road;
     }
 
     private bool IsPositionInBound(Vector3Int position)
