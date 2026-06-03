@@ -15,11 +15,12 @@ public class InputManager : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     [SerializeField] private LayerMask ground;
     private Vector2 _cameraMovementVector;
+    private bool _isMouseBeingHeld;
 
     private void OnEnable()
     {
         leftMouseButton.action.started += IsPointerDown;
-        leftMouseButton.action.performed += IsPointerHold;
+        // leftMouseButton.action.performed += IsPointerHold;
         leftMouseButton.action.canceled += IsPointerUp;
         leftMouseButton.action.Enable();
     }
@@ -27,9 +28,15 @@ public class InputManager : MonoBehaviour
     private void OnDisable()
     {
         leftMouseButton.action.started -= IsPointerDown;
-        leftMouseButton.action.performed -= IsPointerHold;
+        // leftMouseButton.action.performed -= IsPointerHold;
         leftMouseButton.action.canceled -= IsPointerUp;
         leftMouseButton.action.Disable();
+    }
+
+    private void Update()
+    {
+        if (_isMouseBeingHeld)
+            IsPointerHold();
     }
 
     private void GetInputs()
@@ -37,7 +44,7 @@ public class InputManager : MonoBehaviour
         _cameraMovementVector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
     }
     
-    private void IsPointerHold(InputAction.CallbackContext _)
+    private void IsPointerHold()
     {
         // if (EventSystem.current.IsPointerOverGameObject()) return;
         var position = RaycastGround();
@@ -48,12 +55,14 @@ public class InputManager : MonoBehaviour
     private void IsPointerUp(InputAction.CallbackContext _)
     {
         // if (EventSystem.current.IsPointerOverGameObject()) return;
+        _isMouseBeingHeld = false;
         OnMouseUp?.Invoke();
     }
 
     private void IsPointerDown(InputAction.CallbackContext _)
     {
         // if (EventSystem.current.IsPointerOverGameObject()) return;
+        _isMouseBeingHeld = true;
         var position = RaycastGround();
         if (position.HasValue)
             OnMouseDown?.Invoke(position.Value);
