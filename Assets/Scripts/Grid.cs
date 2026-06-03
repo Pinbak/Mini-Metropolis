@@ -31,22 +31,57 @@ public class Grid
         var cells = new List<(int x, int y)>();
 
         var currentNode = _grid[startingX, startingY];
+        // todo clear up
         if (startingX > 0)
+        {
             if (_grid[startingX - 1, startingY].Type is NodeType.Empty ||
-                (_grid[startingX - 1, startingY].Type is NodeType.Road && !_grid[startingX - 1, startingY].Neighbours.Contains(currentNode)))
+                (_grid[startingX - 1, startingY].Type is NodeType.Road &&
+                 !_grid[startingX - 1, startingY].Neighbours.Contains(currentNode)))
                 cells.Add((startingX - 1, startingY));
+            if (startingY > 0)
+                if (_grid[startingX - 1, startingY - 1].Type is NodeType.Empty ||
+                    (_grid[startingX - 1, startingY - 1].Type is NodeType.Road &&
+                     !_grid[startingX - 1, startingY - 1].Neighbours.Contains(currentNode)))
+                    cells.Add((startingX - 1, startingY - 1));
+            if (startingY < _height - 1)
+                if (_grid[startingX - 1, startingY + 1].Type is NodeType.Empty ||
+                    (_grid[startingX - 1, startingY + 1].Type is NodeType.Road &&
+                     !_grid[startingX - 1, startingY + 1].Neighbours.Contains(currentNode)))
+                    cells.Add((startingX - 1, startingY + 1));
+        }
+            
         if (startingX < _width - 1)
+        {
             if (_grid[startingX + 1, startingY].Type is NodeType.Empty ||
-                (_grid[startingX + 1, startingY].Type is NodeType.Road && !_grid[startingX + 1, startingY].Neighbours.Contains(currentNode)))
+                (_grid[startingX + 1, startingY].Type is NodeType.Road &&
+                 !_grid[startingX + 1, startingY].Neighbours.Contains(currentNode)))
                 cells.Add((startingX + 1, startingY));
+            if (startingY > 0)
+                if (_grid[startingX + 1, startingY - 1].Type is NodeType.Empty ||
+                    (_grid[startingX + 1, startingY - 1].Type is NodeType.Road && 
+                     !_grid[startingX + 1, startingY - 1].Neighbours.Contains(currentNode)))
+                    cells.Add((startingX + 1, startingY - 1));
+            if (startingY < _height - 1)
+                if (_grid[startingX + 1, startingY + 1].Type is NodeType.Empty ||
+                    (_grid[startingX + 1, startingY + 1].Type is NodeType.Road &&
+                     !_grid[startingX + 1, startingY + 1].Neighbours.Contains(currentNode)))
+                    cells.Add((startingX + 1, startingY + 1));
+        }
         if (startingY > 0)
+        {
             if (_grid[startingX, startingY - 1].Type is NodeType.Empty ||
-                (_grid[startingX, startingY - 1].Type is NodeType.Road && !_grid[startingX, startingY - 1].Neighbours.Contains(currentNode)))
+                (_grid[startingX, startingY - 1].Type is NodeType.Road &&
+                 !_grid[startingX, startingY - 1].Neighbours.Contains(currentNode)))
                 cells.Add((startingX, startingY - 1));
+        }
         if (startingY < _height - 1)
+        {
             if (_grid[startingX, startingY + 1].Type is NodeType.Empty ||
-                (_grid[startingX, startingY + 1].Type is NodeType.Road && !_grid[startingX, startingY + 1].Neighbours.Contains(currentNode)))
+                (_grid[startingX, startingY + 1].Type is NodeType.Road &&
+                 !_grid[startingX, startingY + 1].Neighbours.Contains(currentNode)))
                 cells.Add((startingX, startingY + 1));
+        }
+        
 
         return cells;
     }
