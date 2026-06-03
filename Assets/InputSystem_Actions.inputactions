@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "InputSystem_Actions",
     "maps": [
         {
@@ -986,6 +987,34 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Main",
+            "id": "5d801f47-a730-423f-982a-15372e1dd8da",
+            "actions": [
+                {
+                    "name": "LeftMouse",
+                    "type": "Button",
+                    "id": "b7f2bcbd-3cd4-46f4-a328-b04112c3b70f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "558fe8df-61ce-47d4-91b6-1a8336716b94",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftMouse",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
