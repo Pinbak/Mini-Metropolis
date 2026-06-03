@@ -4,7 +4,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private InputManager inputManager;
-
+    [SerializeField] private PlacementManager placementManager;
 
     private void Start()
     {
@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleMouseClick(Vector3Int position)
     {
-        Debug.Log(position);
+        placementManager.PlaceRoad(position);
     }
 
     private void Update()

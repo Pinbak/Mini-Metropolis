@@ -10,6 +10,10 @@ public class Grid
         _height = height;
         _grid = new NodeType[width, height];
     }
-    
-    
+
+    public NodeType this[int x, int y]
+    {
+        get => _grid[x, y];
+        set => _grid[x, y] = value;
+    }
 }
