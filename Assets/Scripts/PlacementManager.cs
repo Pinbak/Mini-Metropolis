@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,12 +8,15 @@ public class PlacementManager : MonoBehaviour
 {
     [SerializeField] private int width;
     [SerializeField] private int height;
+    [SerializeField] private GameObject roadStructure;
+    [SerializeField] private GameObject potentialPlacementIndicator;
     private int _offsetX;
     private int _offsetY;
-    [SerializeField] private GameObject roadStructure;
     private Grid _grid;
     private GameObject _startingNode;
-    private GameObject _endingNode;
+    private List<(int x, int y)> _validNeighbourNodes = new();
+    private readonly List<GameObject> _placementIndicators = new();
+    private Vector3Int _currentMousePosition;
     
     private void Start()
     {
@@ -29,29 +33,76 @@ public class PlacementManager : MonoBehaviour
             );
     }
 
+    private Vector3Int GridToWorld(Vector2Int gridPosition)
+    {
+        return new Vector3Int(
+            gridPosition.x - _offsetX,
+            0,
+            gridPosition.y - _offsetY);
+    }
+
     public void StartRoadPlacement(Vector3Int position)
     {
         if (!IsPositionInBound(position)) return;
         if (!IsPositionFree(position)) return;
+
+        RemoveIndicators();
+        
+        var gridPosition = WorldToGrid(position);
+        _validNeighbourNodes = _grid.GetAdjacentCells(gridPosition.x, gridPosition.y);
         PlaceStartingNode(position);
+
+        foreach (var validNeighbourNode in _validNeighbourNodes)
+        {
+            var indicatorPosition = GridToWorld(new Vector2Int(validNeighbourNode.x, validNeighbourNode.y));
+            var placementIndicator = Instantiate(potentialPlacementIndicator, indicatorPosition, Quaternion.identity);
+            var placementHelper = placementIndicator.GetComponent<PlacementHelper>();
+            placementHelper.HoverEnter += EndRoadPlacement;
+            _placementIndicators.Add(placementIndicator);
+        }
+    }
+
+    private void RemoveIndicators()
+    {
+        foreach (var placementIndicator in _placementIndicators)
+        {
+            var placementHelper = placementIndicator.GetComponent<PlacementHelper>();
+            placementHelper.HoverEnter -= EndRoadPlacement; // todo garbage collector might be doing this anyway
+            Destroy(placementIndicator.gameObject);
+        }
+        _placementIndicators.Clear();
     }
 
     public void MouseDown(Vector3Int position)
     {
-        // throw new NotImplementedException();
+        _currentMousePosition = position;
     }
 
-    public void EndRoadPlacement()
+    private void EndRoadPlacement()
     {
+        // only gets called when the final placement is valid
+        Instantiate(roadStructure, _startingNode.transform.position, Quaternion.identity);
+        Instantiate(roadStructure, _currentMousePosition, Quaternion.identity);
+
+        RemovePlanning();
+    }
+
+    public void ReleasedMouse()
+    {
+        RemovePlanning();
+    }
+
+    private void RemovePlanning()
+    {
+        RemoveIndicators();
         Destroy(_startingNode?.gameObject);
-        Destroy(_endingNode?.gameObject);
     }
 
     private void PlaceStartingNode(Vector3Int position)
     {
         _startingNode = Instantiate(roadStructure, position, Quaternion.identity);
     }
-    
+
     public void PlaceRoad(Vector3Int position)
     {
         PlaceNode(position, NodeType.Road);
