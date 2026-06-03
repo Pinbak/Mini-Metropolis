@@ -99,7 +99,7 @@ public class PlacementManager : MonoBehaviour
         
         Instantiate(roadStructure, _startingNode.transform.position, Quaternion.identity);
         Instantiate(roadStructure, _currentMousePosition, Quaternion.identity);
-
+        
         RemovePlanning();
     }
 
@@ -142,5 +142,26 @@ public class PlacementManager : MonoBehaviour
     {
         var gridPosition = WorldToGrid(position);
         return gridPosition.x >= 0 && gridPosition.x < width && gridPosition.y >= 0 && gridPosition.y < height;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (_grid is null) return;
+        Gizmos.color = Color.red;
+        
+        for (var x = 0; x < 10; x++)
+        for (var y = 0; y < 10; y++)
+        {
+            var node = _grid[x, y];
+            if (node.Type is NodeType.Empty) continue;
+            if (node.Neighbours.Count == 0) continue;
+            var position = GridToWorld(new Vector2Int(x, y));
+            Gizmos.DrawSphere(position, 0.2f);
+            foreach (var nodeNeighbour in node.Neighbours)
+            {
+                var neighbourPosition = GridToWorld(new Vector2Int(nodeNeighbour.X, nodeNeighbour.Y));
+                Gizmos.DrawLine(position, neighbourPosition);
+            }
+        }
     }
 }

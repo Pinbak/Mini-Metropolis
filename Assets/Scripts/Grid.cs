@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Grid
@@ -15,8 +16,8 @@ public class Grid
         
         // populate the grid with empty nodes
         for (var x = 0; x < width; x++)
-            for (var y = 0; y < height; y++)
-                _grid[x, y] = new Node();
+        for (var y = 0; y < height; y++)
+            _grid[x, y] = new Node(x, y);
     }
 
     public Node this[int x, int y]
@@ -49,4 +50,5 @@ public class Grid
 
         return cells;
     }
+    
 }
