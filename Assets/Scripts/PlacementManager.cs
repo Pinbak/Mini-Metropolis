@@ -116,7 +116,7 @@ public class PlacementManager : MonoBehaviour
 
     private void PlaceStartingNode(Vector3Int position)
     {
-        _startingNode = Instantiate(roadStructure, position, Quaternion.identity);
+        _startingNode = Instantiate(potentialPlacementIndicator, position, Quaternion.identity);
     }
 
     public void PlaceRoad(Vector3Int position)
