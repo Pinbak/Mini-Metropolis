@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleMouseRelease()
     {
-        placementManager.ReleasedMouse();
+        // placementManager.ReleasedMouse();
     }
 
     private void Update()
