@@ -9,6 +9,7 @@ public class PlacementManager : MonoBehaviour
     private int _offsetX;
     private int _offsetY;
     private Grid _grid;
+    private GameObject _startingNode;
     private Vector3Int _startingPosition;
     private Vector3Int _lastSuccessfulPosition;
     private List<(int x, int y)> _validNeighbourNodes = new();
@@ -40,6 +41,8 @@ public class PlacementManager : MonoBehaviour
     {
         if (!IsPositionInBound(position)) return;
         if (!IsPositionFree(position)) return;
+        
+        RemoveStartingNode();
 
         var gridPosition = WorldToGrid(position);
         _validNeighbourNodes = _grid.GetAdjacentCells(gridPosition.x, gridPosition.y);
@@ -94,6 +97,7 @@ public class PlacementManager : MonoBehaviour
 
     private void PlaceStartingNode(Vector3Int position)
     {
+        _startingNode = Instantiate(roadStructure, position, Quaternion.identity);
         _startingPosition = position;
         _lastSuccessfulPosition = position;
     }
@@ -109,6 +113,13 @@ public class PlacementManager : MonoBehaviour
     {
         var gridPosition = WorldToGrid(position);
         return gridPosition.x >= 0 && gridPosition.x < width && gridPosition.y >= 0 && gridPosition.y < height;
+    }
+
+    public void RemoveStartingNode()
+    {
+        if (_startingNode is null) return;
+        Destroy(_startingNode.gameObject);
+        _startingNode = null;
     }
 
     private void OnDrawGizmos()
