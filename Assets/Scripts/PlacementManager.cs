@@ -101,6 +101,7 @@ public class PlacementManager : MonoBehaviour
         Instantiate(roadStructure, _currentMousePosition, Quaternion.identity);
         
         RemovePlanning();
+        StartRoadPlacement(_currentMousePosition);
     }
 
     public void ReleasedMouse()
