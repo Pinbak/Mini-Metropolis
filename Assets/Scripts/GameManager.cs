@@ -13,14 +13,14 @@ public class GameManager : MonoBehaviour
         inputManager.OnMouseHold += HandleMouseHeldDown;
     }
 
-    private void HandleMouseHeldDown(Vector3Int position)
+    private void HandleMouseHeldDown(Vector3 position)
     {
         placementManager.MouseDown(position);
     }
 
-    private void HandleMouseClick(Vector3Int position)
+    private void HandleMouseClick(Vector3 position)
     {
-        placementManager.StartRoadPlacement(position);
+        placementManager.StartRoadPlacement(Vector3Int.RoundToInt(position));
     }
 
     private void HandleMouseRelease()

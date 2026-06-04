@@ -14,6 +14,7 @@ public class PlacementManager : MonoBehaviour
     private int _offsetY;
     private Grid _grid;
     private GameObject _startingNode;
+    private Vector3Int _startingPosition;
     private List<(int x, int y)> _validNeighbourNodes = new();
     private readonly List<GameObject> _placementIndicators = new();
     private Vector3Int _currentMousePosition;
@@ -46,20 +47,20 @@ public class PlacementManager : MonoBehaviour
         if (!IsPositionInBound(position)) return;
         if (!IsPositionFree(position)) return;
 
-        RemoveIndicators();
+        // RemoveIndicators();
         
         var gridPosition = WorldToGrid(position);
         _validNeighbourNodes = _grid.GetAdjacentCells(gridPosition.x, gridPosition.y);
         PlaceStartingNode(position);
 
-        foreach (var validNeighbourNode in _validNeighbourNodes)
-        {
-            var indicatorPosition = GridToWorld(new Vector2Int(validNeighbourNode.x, validNeighbourNode.y));
-            var placementIndicator = Instantiate(potentialPlacementIndicator, indicatorPosition, Quaternion.identity);
-            var placementHelper = placementIndicator.GetComponent<PlacementHelper>();
-            placementHelper.HoverEnter += EndRoadPlacement;
-            _placementIndicators.Add(placementIndicator);
-        }
+        // foreach (var validNeighbourNode in _validNeighbourNodes)
+        // {
+        //     var indicatorPosition = GridToWorld(new Vector2Int(validNeighbourNode.x, validNeighbourNode.y));
+        //     var placementIndicator = Instantiate(potentialPlacementIndicator, indicatorPosition, Quaternion.identity);
+        //     var placementHelper = placementIndicator.GetComponent<PlacementHelper>();
+        //     placementHelper.HoverEnter += EndRoadPlacement;
+        //     _placementIndicators.Add(placementIndicator);
+        // }
     }
 
     private void RemoveIndicators()
@@ -67,24 +68,42 @@ public class PlacementManager : MonoBehaviour
         foreach (var placementIndicator in _placementIndicators)
         {
             var placementHelper = placementIndicator.GetComponent<PlacementHelper>();
-            placementHelper.HoverEnter -= EndRoadPlacement; // todo garbage collector might be doing this anyway
+            // placementHelper.HoverEnter -= EndRoadPlacement; // todo garbage collector might be doing this anyway
             Destroy(placementIndicator.gameObject);
         }
         _placementIndicators.Clear();
     }
 
-    public void MouseDown(Vector3Int position)
+    public void MouseDown(Vector3 position)
     {
-        _currentMousePosition = position;
+        _currentMousePosition = Vector3Int.RoundToInt(position); // the mouse position on the physical grid
+        var distance = Vector3.Distance(_startingPosition, position);
+        if (distance > 1)
+        {
+            var direction = position - _startingPosition;
+            direction.Normalize();
+            var targetPosition = _startingPosition + new Vector3Int(
+                Mathf.RoundToInt(direction.x), 0, Mathf.RoundToInt(direction.z));
+
+            var gridTargetPosition = WorldToGrid(targetPosition);
+
+            foreach (var validNeighbourNode in _validNeighbourNodes)
+            {
+                if (validNeighbourNode == (gridTargetPosition.x, gridTargetPosition.y))
+                {
+                    EndRoadPlacement(gridTargetPosition);
+                    return;
+                }
+            }
+        }
+        
     }
 
-    private void EndRoadPlacement()
+    private void EndRoadPlacement(Vector2Int endGridPosition)
     {
         // only gets called when the final placement is valid
-
         var startGridPosition = WorldToGrid(new Vector3Int((int)_startingNode.transform.position.x,
             (int)_startingNode.transform.position.y, (int)_startingNode.transform.position.z));
-        var endGridPosition = WorldToGrid(_currentMousePosition);
 
         var startNode = _grid[startGridPosition.x, startGridPosition.y];
         var endNode = _grid[endGridPosition.x, endGridPosition.y];
@@ -111,13 +130,14 @@ public class PlacementManager : MonoBehaviour
 
     private void RemovePlanning()
     {
-        RemoveIndicators();
+        // RemoveIndicators();
         Destroy(_startingNode?.gameObject);
     }
 
     private void PlaceStartingNode(Vector3Int position)
     {
         _startingNode = Instantiate(potentialPlacementIndicator, position, Quaternion.identity);
+        _startingPosition = position;
     }
 
     public void PlaceRoad(Vector3Int position)

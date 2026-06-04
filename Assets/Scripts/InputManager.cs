@@ -7,8 +7,8 @@ using UnityEngine.Serialization;
 
 public class InputManager : MonoBehaviour
 {
-    public Action<Vector3Int> OnMouseDown { get; set; }
-    public Action<Vector3Int> OnMouseHold { get; set; }
+    public Action<Vector3> OnMouseDown { get; set; }
+    public Action<Vector3> OnMouseHold { get; set; }
     public Action OnMouseUp { get; set; }
 
     [SerializeField] private InputActionReference leftMouseButton;
@@ -71,11 +71,11 @@ public class InputManager : MonoBehaviour
     /// <summary>
     ///     Get position where the mouse touches the ground layer
     /// </summary>
-    private Vector3Int? RaycastGround()
+    private Vector3? RaycastGround()
     {
         var ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ground))
-            return Vector3Int.RoundToInt(hit.point);
+            return hit.point;
         return null;
     }
 }
