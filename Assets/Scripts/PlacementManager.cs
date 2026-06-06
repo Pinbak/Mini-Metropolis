@@ -6,6 +6,8 @@ public class PlacementManager : MonoBehaviour
     [SerializeField] private int width;
     [SerializeField] private int height;
     [SerializeField] private GameObject roadStructure;
+    [SerializeField] private float roadLength;
+    [SerializeField] private float meshVertexSize = .2f;
     private int _offsetX;
     private int _offsetY;
     private Grid _grid;
@@ -121,6 +123,46 @@ public class PlacementManager : MonoBehaviour
         Destroy(_startingNode.gameObject);
         _startingNode = null;
     }
+    
+    // todo move
+    public List<Vector3> CalculateMeshPoints(Node node, float roadWidth, float resolution = 0.1f)
+    {
+        var nodeCentre = new Vector2Int(node.X, node.Y);
+        Vector3 nodeCentreInWorld = GridToWorld(nodeCentre);
+        var points = new List<Vector3>();
+        foreach (var neighbour in node.Neighbours)
+        {
+            var neighbourPosition = new Vector2Int(neighbour.X, neighbour.Y);
+            Vector3 neighbourWorldPosition = GridToWorld(neighbourPosition);
+            var direction = neighbourWorldPosition - nodeCentreInWorld;
+            direction.Normalize();
+            var perpendicular = Vector3.Cross(Vector3.up, direction);
+            var left = nodeCentreInWorld - perpendicular * (roadWidth * .5f);
+            left = direction * roadLength + left;
+            var right = nodeCentreInWorld + perpendicular * (roadWidth * .5f);
+            right = direction * roadLength + right;
+            points.Add(left);
+            points.Add(right);
+        }
+
+        // sort by angle to centre so mesh doesn't overlap
+        points.Sort((x, y) =>
+        {
+            var xDir = x - nodeCentreInWorld;
+            var yDir = y - nodeCentreInWorld;
+
+            var angleA = Vector3.SignedAngle(nodeCentreInWorld.normalized, xDir.normalized, Vector3.up);
+            var angleB = Vector3.SignedAngle(nodeCentreInWorld.normalized, yDir.normalized, Vector3.up);
+
+            if (angleA > angleB)
+                return 1;
+            if (angleA < angleB)
+                return -1;
+            return 0;
+        });
+
+        return points;
+    }
 
     private void OnDrawGizmos()
     {
@@ -134,11 +176,18 @@ public class PlacementManager : MonoBehaviour
             if (node.Type is NodeType.Empty) continue;
             if (node.Neighbours.Count == 0) continue;
             var position = GridToWorld(new Vector2Int(x, y));
-            Gizmos.DrawSphere(position, 0.2f);
+            Gizmos.DrawSphere(position, meshVertexSize);
+            var meshPoints = CalculateMeshPoints(node, .5f);
             foreach (var nodeNeighbour in node.Neighbours)
             {
                 var neighbourPosition = GridToWorld(new Vector2Int(nodeNeighbour.X, nodeNeighbour.Y));
                 Gizmos.DrawLine(position, neighbourPosition);
+            }
+            
+            foreach (var meshPoint in meshPoints)
+            {
+                Gizmos.DrawSphere(meshPoint, meshVertexSize);
+                Gizmos.DrawLine(position, meshPoint);
             }
         }
     }
