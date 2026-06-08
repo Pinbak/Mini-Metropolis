@@ -151,8 +151,10 @@ MonoBehaviour:
   width: 10
   height: 10
   roadStructure: {fileID: 7854964659052726570, guid: a1ff29ef38a1cfc499f3ea2e63d4227c, type: 3}
-  roadLength: 0.4
-  meshVertexSize: 0.1
+  meshVertexSize: 0
+  diagonalRoadLength: 0.7071
+  straightRoadLength: 0.5
+  globalRoadWidth: 0.3
 --- !u!4 &267754612
 Transform:
   m_ObjectHideFlags: 0

@@ -6,8 +6,10 @@ public class PlacementManager : MonoBehaviour
     [SerializeField] private int width;
     [SerializeField] private int height;
     [SerializeField] private GameObject roadStructure;
-    [SerializeField] private float roadLength;
     [SerializeField] private float meshVertexSize = .2f;
+    [SerializeField] private float diagonalRoadLength = .7071f;
+    [SerializeField] private float straightRoadLength = .5f;
+    [SerializeField] private float globalRoadWidth = .5f;
     private int _offsetX;
     private int _offsetY;
     private Grid _grid;
@@ -137,6 +139,8 @@ public class PlacementManager : MonoBehaviour
             Vector3 neighbourWorldPosition = GridToWorld(neighbourPosition);
             var direction = neighbourWorldPosition - nodeCentreInWorld;
             direction.Normalize();
+            var isDiagonal = direction.x != 0 && direction.z != 0;
+            var roadLength = isDiagonal ? diagonalRoadLength : straightRoadLength;
             var perpendicular = Vector3.Cross(Vector3.up, direction);
             var left = nodeCentreInWorld - perpendicular * (roadWidth * .5f);
             left = direction * roadLength + left;
@@ -188,12 +192,12 @@ public class PlacementManager : MonoBehaviour
             if (node.Type is NodeType.Empty) continue;
             if (node.Neighbours.Count == 0) continue;
             var position = GridToWorld(new Vector2Int(x, y));
-            Gizmos.DrawSphere(position, meshVertexSize);
-            var triangles = CalculateMeshPoints(node, .5f);
+            // Gizmos.DrawSphere(position, meshVertexSize);
+            var triangles = CalculateMeshPoints(node, globalRoadWidth);
             foreach (var nodeNeighbour in node.Neighbours)
             {
                 var neighbourPosition = GridToWorld(new Vector2Int(nodeNeighbour.X, nodeNeighbour.Y));
-                Gizmos.DrawLine(position, neighbourPosition);
+                // Gizmos.DrawLine(position, neighbourPosition);
             }
             
             foreach (var triangle in triangles)
