@@ -125,11 +125,12 @@ public class PlacementManager : MonoBehaviour
     }
     
     // todo move
-    public List<Vector3> CalculateMeshPoints(Node node, float roadWidth, float resolution = 0.1f)
+    public List<Triangle> CalculateMeshPoints(Node node, float roadWidth, float resolution = 0.1f)
     {
         var nodeCentre = new Vector2Int(node.X, node.Y);
         Vector3 nodeCentreInWorld = GridToWorld(nodeCentre);
         var points = new List<Vector3>();
+        var tris = new List<Triangle>();
         foreach (var neighbour in node.Neighbours)
         {
             var neighbourPosition = new Vector2Int(neighbour.X, neighbour.Y);
@@ -143,16 +144,17 @@ public class PlacementManager : MonoBehaviour
             right = direction * roadLength + right;
             points.Add(left);
             points.Add(right);
+            tris.Add(new Triangle(nodeCentreInWorld, left, right));
         }
-
-        // sort by angle to centre so mesh doesn't overlap
-        points.Sort((x, y) =>
+        
+        tris.Sort((a, b) =>
         {
-            var xDir = x - nodeCentreInWorld;
-            var yDir = y - nodeCentreInWorld;
-
-            var angleA = Vector3.SignedAngle(nodeCentreInWorld.normalized, xDir.normalized, Vector3.up);
-            var angleB = Vector3.SignedAngle(nodeCentreInWorld.normalized, yDir.normalized, Vector3.up);
+            var aDir = a.Centre - nodeCentreInWorld;
+            var bDir = b.Centre - nodeCentreInWorld;
+            
+            
+            var angleA = Vector3.SignedAngle(nodeCentreInWorld.normalized, aDir.normalized, Vector3.up);
+            var angleB = Vector3.SignedAngle(nodeCentreInWorld.normalized, bDir.normalized, Vector3.up);
 
             if (angleA > angleB)
                 return 1;
@@ -161,7 +163,17 @@ public class PlacementManager : MonoBehaviour
             return 0;
         });
 
-        return points;
+        if (tris.Count <= 1) return tris;
+
+        var numberOfTriangles = tris.Count;
+        var gapFillTris = new List<Triangle>();
+        for (var i = 0; i < numberOfTriangles; i++)
+        {
+            gapFillTris.Add(new Triangle(nodeCentreInWorld, tris[(i + 1) % numberOfTriangles].A2, tris[i].A3));
+        }
+
+        tris.AddRange(gapFillTris);
+        return tris;
     }
 
     private void OnDrawGizmos()
@@ -177,17 +189,24 @@ public class PlacementManager : MonoBehaviour
             if (node.Neighbours.Count == 0) continue;
             var position = GridToWorld(new Vector2Int(x, y));
             Gizmos.DrawSphere(position, meshVertexSize);
-            var meshPoints = CalculateMeshPoints(node, .5f);
+            var triangles = CalculateMeshPoints(node, .5f);
             foreach (var nodeNeighbour in node.Neighbours)
             {
                 var neighbourPosition = GridToWorld(new Vector2Int(nodeNeighbour.X, nodeNeighbour.Y));
                 Gizmos.DrawLine(position, neighbourPosition);
             }
             
-            foreach (var meshPoint in meshPoints)
+            foreach (var triangle in triangles)
             {
-                Gizmos.DrawSphere(meshPoint, meshVertexSize);
-                Gizmos.DrawLine(position, meshPoint);
+                // Gizmos.DrawSphere(triangle, meshVertexSize);
+                Gizmos.DrawLine(triangle.A1, triangle.A2);
+                Gizmos.DrawLine(triangle.A1, triangle.A3);
+                Gizmos.DrawLine(triangle.A2, triangle.A3);
+                Gizmos.color = Color.green;
+                Gizmos.DrawSphere(triangle.A2, meshVertexSize);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawSphere(triangle.A3, meshVertexSize);
+                Gizmos.color = Color.red;
             }
         }
     }
