@@ -185,8 +185,8 @@ public class PlacementManager : MonoBehaviour
         if (_grid is null) return;
         Gizmos.color = Color.red;
         
-        for (var x = 0; x < 10; x++)
-        for (var y = 0; y < 10; y++)
+        for (var x = 0; x < width; x++)
+        for (var y = 0; y < height; y++)
         {
             var node = _grid[x, y];
             if (node.Type is NodeType.Empty) continue;
