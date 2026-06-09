@@ -11,6 +11,7 @@ public class RoadMeshGenerator : MonoBehaviour
     [SerializeField] private float globalRoadWidth = .3f;
     [SerializeField] private float capLength = .3f;
     [SerializeField] private float curviness = .3f;
+    [SerializeField] private float cornerLength = .3f;
     [Range(.1f, .5f)]
     [SerializeField] private float meshResolution = .3f;
     [SerializeField] private GridManager gridManager;
@@ -59,6 +60,85 @@ public class RoadMeshGenerator : MonoBehaviour
             var right = nodeCentreInWorld + perpendicular * (globalRoadWidth * .5f);
             right = direction * roadLength + right;
             tris.Add(new Triangle(nodeCentreInWorld, left, right));
+        }
+        
+        tris.Sort((a, b) =>
+        {
+            var aDir = a.Centre - nodeCentreInWorld;
+            var bDir = b.Centre - nodeCentreInWorld;
+            
+            var angleA = Vector3.SignedAngle(nodeCentreInWorld.normalized, aDir.normalized, Vector3.up);
+            var angleB = Vector3.SignedAngle(nodeCentreInWorld.normalized, bDir.normalized, Vector3.up);
+
+            if (angleA > angleB)
+                return 1;
+            if (angleA < angleB)
+                return -1;
+            return 0;
+        });
+        
+        if (tris.Count > 1)
+        {
+            var averagePosition = new Vector3();
+            foreach (var triangle in tris)
+            {
+                averagePosition += triangle.Centre;
+            }
+            averagePosition /= tris.Count;
+            
+            // not a straight piece or 8 connections
+            if (averagePosition != nodeCentreInWorld)
+            {
+                var direction = averagePosition - nodeCentreInWorld;
+                direction.Normalize();
+                direction *= -1;
+                var cornerPosition = nodeCentreInWorld + direction * cornerLength;
+                var angle = Vector3.SignedAngle(nodeCentreInWorld.normalized, direction, Vector3.up);
+
+                var insertIndex = 0;
+                while(insertIndex < tris.Count)
+                {
+                    var triDirection = tris[insertIndex].Centre - nodeCentreInWorld;
+                    var triAngle = Vector3.SignedAngle(nodeCentreInWorld.normalized, triDirection.normalized,
+                        Vector3.up);
+                    if (angle < triAngle)
+                        break;
+                    insertIndex++;
+                }
+
+                var previous = (insertIndex - 1 + tris.Count) % tris.Count;
+                var next = insertIndex % tris.Count;
+
+                var prevTri = tris[previous];
+                var nextTri = tris[next];
+
+                var bezierPoints = new List<Vector3>();
+                for (var t = meshResolution; t < 1f; t += meshResolution)
+                {
+                    var point = BezierCurve.EvaluateQuadratic(prevTri.A3, cornerPosition, nextTri.A2, t);
+                    bezierPoints.Add(point);
+                }
+                
+                for (var i = 0; i < bezierPoints.Count; i++)
+                {
+                    // start of the bezier
+                    if (i == 0)
+                    {
+                        tris.Add(new Triangle(nodeCentreInWorld, prevTri.A3, bezierPoints[i]));
+                    }
+                    // all points in the bezier
+                    if (i != bezierPoints.Count - 1)
+                    {
+                        tris.Add(new Triangle(nodeCentreInWorld, bezierPoints[i], bezierPoints[i + 1]));
+                    }
+                    // last point of the bezier
+                    else if (i == bezierPoints.Count - 1)
+                    {
+                        tris.Add(new Triangle(nodeCentreInWorld, bezierPoints[i], nextTri.A2));
+                    }
+                }
+            }
+            
         }
         
         tris.Sort((a, b) =>
@@ -154,7 +234,7 @@ public class RoadMeshGenerator : MonoBehaviour
             }
             
             
-            // gapFillTris.Add(new Triangle(nodeCentreInWorld, a, b));
+            // gapFillTris.Add(new Triangle(nodeCentreInWorld, a, b)); // todo needed still for straight roads
         }
         
 
