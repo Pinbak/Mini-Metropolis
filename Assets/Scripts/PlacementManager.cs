@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
 {
+    public Action<Node> FinishedBuildingRoads { get; set; } 
+    
     [SerializeField] private int width;
     [SerializeField] private int height;
     [SerializeField] private GameObject roadStructure;
@@ -96,5 +99,6 @@ public class PlacementManager : MonoBehaviour
         if (_startingNode is null) return;
         Destroy(_startingNode.gameObject);
         _startingNode = null;
+        // FinishedBuildingRoads?.Invoke();
     }
 }
