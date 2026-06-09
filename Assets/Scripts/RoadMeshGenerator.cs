@@ -9,6 +9,9 @@ public class RoadMeshGenerator : MonoBehaviour
     [SerializeField] private float diagonalRoadLength = .7071f;
     [SerializeField] private float straightRoadLength = .5f;
     [SerializeField] private float globalRoadWidth = .3f;
+    [SerializeField] private float capLength = .3f;
+    [Range(.1f, .5f)]
+    [SerializeField] private float meshResolution = .3f;
     [SerializeField] private GridManager gridManager;
     [SerializeField] private PlacementManager placementManager;
     [SerializeField] private bool regenerateMesh;
@@ -62,7 +65,6 @@ public class RoadMeshGenerator : MonoBehaviour
             var aDir = a.Centre - nodeCentreInWorld;
             var bDir = b.Centre - nodeCentreInWorld;
             
-            
             var angleA = Vector3.SignedAngle(nodeCentreInWorld.normalized, aDir.normalized, Vector3.up);
             var angleB = Vector3.SignedAngle(nodeCentreInWorld.normalized, bDir.normalized, Vector3.up);
 
@@ -72,9 +74,51 @@ public class RoadMeshGenerator : MonoBehaviour
                 return -1;
             return 0;
         });
+        
+        // it's not possible to have a road with no neighbours
+        // if we are at a dead-end
+        if (tris.Count == 1)
+        {
+            // todo repeating the same as from above
+            var neighbourPosition = new Vector2Int(node.Neighbours[0].X, node.Neighbours[0].Y);
+            Vector3 neighbourWorldPosition = gridManager.GridToWorld(neighbourPosition);
+            var direction = neighbourWorldPosition - nodeCentreInWorld;
+            direction.Normalize();
+            direction *= -1; // flip the direction
+            var perpendicular = Vector3.Cross(Vector3.up, direction);
+            var a = nodeCentreInWorld - perpendicular * (globalRoadWidth * .5f);
+            var b = nodeCentreInWorld + perpendicular * (globalRoadWidth * .5f);
+            var c = nodeCentreInWorld + direction * capLength;
 
-        if (tris.Count <= 1) return tris;
+            var bezierPoints = new List<Vector3>();
+            for (var t = meshResolution; t < 1f; t += meshResolution)
+            {
+                var point = BezierCurve.EvaluateQuadratic(a, c, b, t);
+                bezierPoints.Add(point);
+            }
 
+            for (var i = 0; i < bezierPoints.Count; i++)
+            {
+                // start of the bezier
+                if (i == 0)
+                {
+                    tris.Add(new Triangle(nodeCentreInWorld, a, bezierPoints[i]));
+                }
+                // all points in the bezier
+                if (i != bezierPoints.Count - 1)
+                {
+                    tris.Add(new Triangle(nodeCentreInWorld, bezierPoints[i], bezierPoints[i + 1]));
+                }
+                // last point of the bezier
+                else if (i == bezierPoints.Count - 1)
+                {
+                    tris.Add(new Triangle(nodeCentreInWorld, bezierPoints[i], b));
+                }
+            }
+        }
+
+        // filling in the gaps
+        
         var numberOfTriangles = tris.Count;
         var gapFillTris = new List<Triangle>();
         for (var i = 0; i < numberOfTriangles; i++)
@@ -146,11 +190,11 @@ public class RoadMeshGenerator : MonoBehaviour
                 Gizmos.DrawLine(triangle.A1, triangle.A2);
                 Gizmos.DrawLine(triangle.A1, triangle.A3);
                 Gizmos.DrawLine(triangle.A2, triangle.A3);
-                Gizmos.color = Color.green;
-                Gizmos.DrawSphere(triangle.A2, meshVertexSize);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawSphere(triangle.A3, meshVertexSize);
-                Gizmos.color = Color.red;
+                // Gizmos.color = Color.green;
+                // Gizmos.DrawSphere(triangle.A2, meshVertexSize);
+                // Gizmos.color = Color.blue;
+                // Gizmos.DrawSphere(triangle.A3, meshVertexSize);
+                // Gizmos.color = Color.red;
             }
         }
     }

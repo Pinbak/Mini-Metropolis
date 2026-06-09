@@ -466,6 +466,8 @@ MonoBehaviour:
   diagonalRoadLength: 0.7071
   straightRoadLength: 0.5
   globalRoadWidth: 0.3
+  capLength: 0.3
+  meshResolution: 0.2
   gridManager: {fileID: 1487683637}
   placementManager: {fileID: 267754611}
   regenerateMesh: 0
