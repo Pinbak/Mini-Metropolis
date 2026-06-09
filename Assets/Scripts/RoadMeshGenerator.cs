@@ -105,15 +105,13 @@ public class RoadMeshGenerator : MonoBehaviour
 
             foreach (var tri in tris)
             {
-                var leftIndex = vertices.Count;
+                var localStartingIndex = vertices.Count; // starting index of specific local tri
                 vertices.Add(tri.A2); // add the left point
-                
-                var rightIndex = vertices.Count;
                 vertices.Add(tri.A3); // add the right point
                 
                 triangles.Add(startingIndex);
-                triangles.Add(leftIndex);
-                triangles.Add(rightIndex);
+                triangles.Add(localStartingIndex);
+                triangles.Add(localStartingIndex + 1);
             }
         }
         _mesh.Clear();
