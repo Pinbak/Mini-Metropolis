@@ -10,6 +10,7 @@ public class RoadMeshGenerator : MonoBehaviour
     [SerializeField] private float straightRoadLength = .5f;
     [SerializeField] private float globalRoadWidth = .3f;
     [SerializeField] private float capLength = .3f;
+    [SerializeField] private float curviness = .3f;
     [Range(.1f, .5f)]
     [SerializeField] private float meshResolution = .3f;
     [SerializeField] private GridManager gridManager;
@@ -116,15 +117,46 @@ public class RoadMeshGenerator : MonoBehaviour
                 }
             }
         }
-
-        // filling in the gaps
         
+        // filling in the gaps
         var numberOfTriangles = tris.Count;
         var gapFillTris = new List<Triangle>();
         for (var i = 0; i < numberOfTriangles; i++)
         {
-            gapFillTris.Add(new Triangle(nodeCentreInWorld, tris[i].A3, tris[(i + 1) % numberOfTriangles].A2));
+            var a = tris[i].A3;
+            var b = tris[(i + 1) % numberOfTriangles].A2;
+            var bezierPoints = new List<Vector3>();
+            for (var t = meshResolution; t < 1f; t += meshResolution)
+            {
+                var movedCentre = Vector3.Lerp((a + b) / 2, nodeCentreInWorld, curviness);
+                var point = BezierCurve.EvaluateQuadratic(a, movedCentre, b, t);
+                bezierPoints.Add(point); 
+                // Gizmos.DrawSphere(point, .05f);
+            }
+            
+            for (var j = 0; j < bezierPoints.Count; j++)
+            {
+                // start of the bezier
+                if (j == 0)
+                {
+                    tris.Add(new Triangle(nodeCentreInWorld, a, bezierPoints[j]));
+                }
+                // all points in the bezier
+                if (j != bezierPoints.Count - 1)
+                {
+                    tris.Add(new Triangle(nodeCentreInWorld, bezierPoints[j], bezierPoints[j + 1]));
+                }
+                // last point of the bezier
+                else if (j == bezierPoints.Count - 1)
+                {
+                    tris.Add(new Triangle(nodeCentreInWorld, bezierPoints[j], b));
+                }
+            }
+            
+            
+            // gapFillTris.Add(new Triangle(nodeCentreInWorld, a, b));
         }
+        
 
         tris.AddRange(gapFillTris);
         return tris;
