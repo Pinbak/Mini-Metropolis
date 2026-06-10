@@ -4,7 +4,9 @@
     {
         DeadEnd,
         Straight,
-        Corner,
+        AcuteCorner,
+        RightAngleCorner,
+        ObtuseCorner,
         Complex
     }
 }

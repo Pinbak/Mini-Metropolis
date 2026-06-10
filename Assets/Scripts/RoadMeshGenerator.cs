@@ -255,8 +255,8 @@ public class RoadMeshGenerator : MonoBehaviour
             if (node.Type is NodeType.Empty) continue;
             if (node.Neighbours.Count == 0) continue;
 
-            var junction = new NodeMesh(node, gridManager);
-            var tris = junction.Triangles;
+            var nodeMesh = new NodeMesh(node, gridManager, cornerLength);
+            var tris = nodeMesh.Triangles;
             
             var startingIndex = vertices.Count;
             vertices.Add(tris[0].A1); // add the centre point
@@ -291,12 +291,25 @@ public class RoadMeshGenerator : MonoBehaviour
             if (node.Neighbours.Count == 0) continue;
             var position = gridManager.GridToWorld(new Vector2Int(x, y));
             // Gizmos.DrawSphere(position, meshVertexSize);
-            var triangles = CalculateMeshPoints(node);
+            var nodeMesh = new NodeMesh(node, gridManager, cornerLength);
+            var triangles = nodeMesh.Triangles;
             foreach (var nodeNeighbour in node.Neighbours)
             {
                 var neighbourPosition = gridManager.GridToWorld(new Vector2Int(nodeNeighbour.X, nodeNeighbour.Y));
                 // Gizmos.DrawLine(position, neighbourPosition);
             }
+
+            Gizmos.color = nodeMesh.Type switch
+            {
+                JunctionType.DeadEnd => Color.green,
+                JunctionType.Straight => Color.red,
+                JunctionType.AcuteCorner => Color.blue,
+                JunctionType.RightAngleCorner => Color.lightBlue,
+                JunctionType.ObtuseCorner => Color.cadetBlue,
+                JunctionType.Complex => Color.purple,
+                _ => Gizmos.color
+            };
+            Gizmos.DrawSphere(position, meshVertexSize);
             
             foreach (var triangle in triangles)
             {

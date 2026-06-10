@@ -468,6 +468,7 @@ MonoBehaviour:
   globalRoadWidth: 0.3
   capLength: 0.3
   curviness: 0.3
+  cornerLength: 0.25
   meshResolution: 0.2
   gridManager: {fileID: 1487683637}
   placementManager: {fileID: 267754611}

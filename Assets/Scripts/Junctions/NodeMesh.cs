@@ -8,11 +8,11 @@ namespace Junctions
     /// </summary>
     public class NodeMesh
     {
-        public List<Triangle> Triangles { get; set; }
-        private JunctionType Type => GetJunctionType();
-        private bool IsEquilateral => AveragePosition == _nodeCentreInWorld; // if the junction is straight or has connections evenly spaced
-        private Vector3 AveragePosition => UpdateAveragePosition(); // the average position of all the triangles
-
+        public List<Triangle> Triangles { get; private set; }
+        public JunctionType Type { get; private set; }
+        private bool IsEquilateral => _averagePosition == _nodeCentreInWorld; // if the junction is straight or has connections evenly spaced
+        
+        private Vector3 _averagePosition; // the average position of all the triangles
         private readonly Node _node;
         private readonly GridManager _gridManager; // reference to the grid manager for spacial related information
         private readonly Vector2Int _nodeCentre;
@@ -20,18 +20,19 @@ namespace Junctions
         
         private readonly float _straightRoadLength = .5f;
         private readonly float _diagonalRoadLength = .7071f;
-        private readonly float _globalRoadWidth = .3f;
-        private readonly float _cornerLength = .3f;
+        private readonly float _globalRoadWidth = .4f;
+        private float _cornerLength = .25f;
         private readonly float _meshResolution = .2f;
         private readonly float _capLength = .3f;
-        private readonly float _curviness = .3f;
+        private readonly float _curviness = .25f;
 
-        public NodeMesh(Node node, GridManager gridManager)
+        public NodeMesh(Node node, GridManager gridManager, float cornerLength)
         {
             _node = node;
             _nodeCentre = new Vector2Int(node.X, node.Y);
             _gridManager = gridManager;
             _nodeCentreInWorld = _gridManager.GridToWorld(_nodeCentre);
+            _cornerLength = cornerLength;
             CalculateTriangles();
         }
         
@@ -54,8 +55,9 @@ namespace Junctions
                 Triangles.Add(new Triangle(_nodeCentreInWorld, left, right));
             }
             SortTriangles();
-            var junctionType = Type;
-            if (junctionType == JunctionType.Corner)
+            var junctionType = GetJunctionType();
+            Type = junctionType;
+            if (junctionType is JunctionType.RightAngleCorner or JunctionType.AcuteCorner or JunctionType.ObtuseCorner)
                 Triangles.AddRange(CreateSmoothCorners());
             
             SortTriangles();
@@ -63,13 +65,12 @@ namespace Junctions
                 Triangles.AddRange(CreateDeadEndCap());
 
             SortTriangles();
-            Triangles.AddRange(CreateMissingTriangles());
+            Triangles.AddRange(junctionType is JunctionType.Straight or JunctionType.DeadEnd
+                ? FillTheRemainingGaps(false)
+                : FillTheRemainingGaps(true));
         }
 
-        /// <summary>
-        ///     Fills in the gaps
-        /// </summary>
-        private List<Triangle> CreateMissingTriangles()
+        private List<Triangle> FillTheRemainingGaps(bool useBezier)
         {
             var triangles = new List<Triangle>();
             var numberOfTriangles = Triangles.Count;
@@ -77,8 +78,16 @@ namespace Junctions
             {
                 var a = Triangles[i].A3;
                 var b = Triangles[(i + 1) % numberOfTriangles].A2;
-                var movedCentre = Vector3.Lerp((a + b) / 2, _nodeCentreInWorld, _curviness);
-                triangles.AddRange(GenerateTrianglesFromBezierPoints(a, b, movedCentre));
+                if (useBezier)
+                {
+                    var movedCentre = Vector3.Lerp((a + b) / 2, _nodeCentreInWorld, _curviness);
+                    triangles.AddRange(GenerateTrianglesFromBezierPoints(a, b, movedCentre));
+                }
+                else
+                {
+                    triangles.Add(new Triangle(_nodeCentreInWorld, a, b));
+                }
+                
             }
 
             return triangles;
@@ -101,12 +110,20 @@ namespace Junctions
 
         private List<Triangle> CreateSmoothCorners()
         {
-            var direction = AveragePosition - _nodeCentreInWorld;
+            var direction = _averagePosition - _nodeCentreInWorld;
             direction.Normalize();
             direction *= -1;
+            
+            if (Type is JunctionType.AcuteCorner)
+                _cornerLength = .6f; // todo put as constants
+            if (Type is JunctionType.RightAngleCorner)
+                _cornerLength = .45f;
+            if (Type is JunctionType.ObtuseCorner)
+                _cornerLength = .25f;
+            
             var cornerPosition = _nodeCentreInWorld + direction * _cornerLength;
             var angle = Vector3.SignedAngle(_nodeCentreInWorld.normalized, direction, Vector3.up);
-
+            
             // getting where this position is within the fan of triangles
             var insertIndex = 0;
             while(insertIndex < Triangles.Count)
@@ -125,7 +142,10 @@ namespace Junctions
             var prevTri = Triangles[previous];
             var nextTri = Triangles[next];
 
-            return GenerateTrianglesFromBezierPoints(prevTri.A3, nextTri.A2, cornerPosition);
+            var a = prevTri.A3;
+            var b = nextTri.A2;
+
+            return GenerateTrianglesFromBezierPoints(a, b, cornerPosition);
         }
 
         /// <summary>
@@ -191,18 +211,37 @@ namespace Junctions
         /// <remarks>Requires triangles count to be accurate</remarks>
         private JunctionType GetJunctionType()
         {
+            UpdateAveragePosition();
             return Triangles.Count switch
             {
                 1 => JunctionType.DeadEnd,
-                2 => IsEquilateral ? JunctionType.Straight : JunctionType.Corner,
+                2 => IsEquilateral ? JunctionType.Straight : GetCornerType(),
                 _ => JunctionType.Complex
             };
         }
 
+        private JunctionType GetCornerType()
+        {
+            var aPosition = new Vector2Int(_node.Neighbours[0].X, _node.Neighbours[0].Y);
+            Vector3 aPositionInWorld = _gridManager.GridToWorld(aPosition);
+            var bPosition = new Vector2Int(_node.Neighbours[1].X, _node.Neighbours[1].Y);
+            Vector3 bPositionInWorld = _gridManager.GridToWorld(bPosition);
+            var ac = (_nodeCentreInWorld - aPositionInWorld).normalized;
+            var bc = (_nodeCentreInWorld - bPositionInWorld).normalized;
+            var dot = Vector3.Dot(ac, bc);
+
+            if (dot > 0)
+                return JunctionType.AcuteCorner;
+            else if (dot == 0)
+                return JunctionType.RightAngleCorner;
+            else
+                return JunctionType.ObtuseCorner;
+        }
+
         /// <summary>
-        ///     Updates <see cref="AveragePosition"/> to be the average of all the <see cref="Triangles"/> centre
+        ///     Updates <see cref="_averagePosition"/> to be the average of all the <see cref="Triangles"/> centre
         /// </summary>
-        private Vector3 UpdateAveragePosition()
+        private void UpdateAveragePosition()
         {
             var averagePosition = new Vector3();
             foreach (var triangle in Triangles)
@@ -210,8 +249,7 @@ namespace Junctions
                 averagePosition += triangle.Centre;
             }
             averagePosition /= Triangles.Count;
-            return averagePosition;
+            _averagePosition = averagePosition;
         }
-        
     }
 }
