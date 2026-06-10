@@ -255,7 +255,7 @@ public class RoadMeshGenerator : MonoBehaviour
             if (node.Type is NodeType.Empty) continue;
             if (node.Neighbours.Count == 0) continue;
 
-            var junction = new Junction(node, gridManager);
+            var junction = new NodeMesh(node, gridManager);
             var tris = junction.Triangles;
             
             var startingIndex = vertices.Count;

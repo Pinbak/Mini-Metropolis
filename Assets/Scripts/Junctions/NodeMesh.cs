@@ -6,25 +6,26 @@ namespace Junctions
     /// <summary>
     ///     The visual mesh part of node
     /// </summary>
-    public class Junction
+    public class NodeMesh
     {
         public List<Triangle> Triangles { get; set; }
         private JunctionType Type => GetJunctionType();
-        private bool IsEquilateral => AveragePosition != _nodeCentreInWorld; // if the junction is straight or has connections evenly spaced
+        private bool IsEquilateral => AveragePosition == _nodeCentreInWorld; // if the junction is straight or has connections evenly spaced
         private Vector3 AveragePosition => UpdateAveragePosition(); // the average position of all the triangles
 
         private readonly Node _node;
-        private List<MeshPositions> _meshPositions = new();
         private readonly GridManager _gridManager; // reference to the grid manager for spacial related information
         private readonly Vector2Int _nodeCentre;
         private readonly Vector3 _nodeCentreInWorld;
-
-        private readonly float _roadWidth = .3f;
+        
+        private readonly float _straightRoadLength = .5f;
+        private readonly float _diagonalRoadLength = .7071f;
+        private readonly float _globalRoadWidth = .3f;
         private readonly float _cornerLength = .3f;
         private readonly float _meshResolution = .2f;
         private readonly float _capLength = .3f;
 
-        public Junction(Node node, GridManager gridManager)
+        public NodeMesh(Node node, GridManager gridManager)
         {
             _node = node;
             _nodeCentre = new Vector2Int(node.X, node.Y);
@@ -40,9 +41,16 @@ namespace Junctions
             {
                 var neighbourPosition = new Vector2Int(neighbour.X, neighbour.Y);
                 Vector3 neighbourWorldPosition = _gridManager.GridToWorld(neighbourPosition);
-                var relativePosition = new MeshPositions(_nodeCentreInWorld, neighbourWorldPosition, _roadWidth);
-                _meshPositions.Add(relativePosition);
-                Triangles.Add(new Triangle(_nodeCentreInWorld, relativePosition.ForwardLeft, relativePosition.ForwardRight));
+                var direction = neighbourWorldPosition - _nodeCentreInWorld;
+                direction.Normalize();
+                var isDiagonal = direction.x != 0 && direction.z != 0;
+                var roadLength = isDiagonal ? _diagonalRoadLength : _straightRoadLength;
+                var perpendicular = Vector3.Cross(Vector3.up, direction);
+                var left = _nodeCentreInWorld - perpendicular * (_globalRoadWidth * .5f);
+                left = direction * roadLength + left;
+                var right = _nodeCentreInWorld + perpendicular * (_globalRoadWidth * .5f);
+                right = direction * roadLength + right;
+                Triangles.Add(new Triangle(_nodeCentreInWorld, left, right));
             }
             SortTriangles();
             var junctionType = Type;
@@ -58,11 +66,17 @@ namespace Junctions
 
         private List<Triangle> CreateDeadEndCap()
         {
-            var relativePosition = _meshPositions[0];
-            var bezierCentreControl = _nodeCentreInWorld + relativePosition.Direction * _capLength;
+            var neighbourPosition = new Vector2Int(_node.Neighbours[0].X, _node.Neighbours[0].Y);
+            Vector3 neighbourWorldPosition = _gridManager.GridToWorld(neighbourPosition);
+            var direction = neighbourWorldPosition - _nodeCentreInWorld;
+            direction.Normalize();
+            direction *= -1; // flip the direction
+            var perpendicular = Vector3.Cross(Vector3.up, direction);
+            var a = _nodeCentreInWorld - perpendicular * (_globalRoadWidth * .5f);
+            var b = _nodeCentreInWorld + perpendicular * (_globalRoadWidth * .5f);
+            var c = _nodeCentreInWorld + direction * _capLength;
 
-            return GenerateTrianglesFromBezierPoints(relativePosition.OppositePerpendicularLeft, relativePosition.OppositePerpendicularRight,
-                bezierCentreControl);
+            return GenerateTrianglesFromBezierPoints(a, b, c);
         }
 
         private List<Triangle> CreateSmoothCorners()
