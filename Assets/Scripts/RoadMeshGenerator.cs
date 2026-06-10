@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Junctions;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -77,7 +78,7 @@ public class RoadMeshGenerator : MonoBehaviour
             return 0;
         });
         
-        if (tris.Count > 1)
+        if (tris.Count == 2)
         {
             var averagePosition = new Vector3();
             foreach (var triangle in tris)
@@ -253,8 +254,9 @@ public class RoadMeshGenerator : MonoBehaviour
             var node = gridManager.Grid[x, y];
             if (node.Type is NodeType.Empty) continue;
             if (node.Neighbours.Count == 0) continue;
-            
-            var tris = CalculateMeshPoints(node);
+
+            var junction = new Junction(node, gridManager);
+            var tris = junction.Triangles;
             
             var startingIndex = vertices.Count;
             vertices.Add(tris[0].A1); // add the centre point
