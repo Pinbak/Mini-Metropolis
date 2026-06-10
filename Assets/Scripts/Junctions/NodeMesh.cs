@@ -21,18 +21,19 @@ namespace Junctions
         private readonly float _straightRoadLength = .5f;
         private readonly float _diagonalRoadLength = .7071f;
         private readonly float _globalRoadWidth = .4f;
-        private float _cornerLength = .25f;
+        private float _acuteCornerLength = .6f;
+        private float _rightAngleCornerLength = .45f;
+        private float _obtuseCornerLength = .25f;
         private readonly float _meshResolution = .2f;
         private readonly float _capLength = .3f;
         private readonly float _curviness = .25f;
 
-        public NodeMesh(Node node, GridManager gridManager, float cornerLength)
+        public NodeMesh(Node node, GridManager gridManager)
         {
             _node = node;
             _nodeCentre = new Vector2Int(node.X, node.Y);
             _gridManager = gridManager;
             _nodeCentreInWorld = _gridManager.GridToWorld(_nodeCentre);
-            _cornerLength = cornerLength;
             CalculateTriangles();
         }
         
@@ -113,15 +114,14 @@ namespace Junctions
             var direction = _averagePosition - _nodeCentreInWorld;
             direction.Normalize();
             direction *= -1;
+            var cornerLength = _obtuseCornerLength;
             
             if (Type is JunctionType.AcuteCorner)
-                _cornerLength = .6f; // todo put as constants
+                cornerLength = _acuteCornerLength;
             if (Type is JunctionType.RightAngleCorner)
-                _cornerLength = .45f;
-            if (Type is JunctionType.ObtuseCorner)
-                _cornerLength = .25f;
+                cornerLength = _rightAngleCornerLength;
             
-            var cornerPosition = _nodeCentreInWorld + direction * _cornerLength;
+            var cornerPosition = _nodeCentreInWorld + direction * cornerLength;
             var angle = Vector3.SignedAngle(_nodeCentreInWorld.normalized, direction, Vector3.up);
             
             // getting where this position is within the fan of triangles
