@@ -24,6 +24,7 @@ namespace Junctions
         private readonly float _cornerLength = .3f;
         private readonly float _meshResolution = .2f;
         private readonly float _capLength = .3f;
+        private readonly float _curviness = .3f;
 
         public NodeMesh(Node node, GridManager gridManager)
         {
@@ -60,8 +61,27 @@ namespace Junctions
             SortTriangles();
             if (junctionType == JunctionType.DeadEnd)
                 Triangles.AddRange(CreateDeadEndCap());
-            
-            // todo fill in the gaps
+
+            SortTriangles();
+            Triangles.AddRange(CreateMissingTriangles());
+        }
+
+        /// <summary>
+        ///     Fills in the gaps
+        /// </summary>
+        private List<Triangle> CreateMissingTriangles()
+        {
+            var triangles = new List<Triangle>();
+            var numberOfTriangles = Triangles.Count;
+            for (var i = 0; i < numberOfTriangles; i++)
+            {
+                var a = Triangles[i].A3;
+                var b = Triangles[(i + 1) % numberOfTriangles].A2;
+                var movedCentre = Vector3.Lerp((a + b) / 2, _nodeCentreInWorld, _curviness);
+                triangles.AddRange(GenerateTrianglesFromBezierPoints(a, b, movedCentre));
+            }
+
+            return triangles;
         }
 
         private List<Triangle> CreateDeadEndCap()
@@ -85,7 +105,7 @@ namespace Junctions
             direction.Normalize();
             direction *= -1;
             var cornerPosition = _nodeCentreInWorld + direction * _cornerLength;
-            var angle = Vector3.SignedAngle(_nodeCentreInWorld.normalized, direction, Vector3.up); // todo maybe create a position class
+            var angle = Vector3.SignedAngle(_nodeCentreInWorld.normalized, direction, Vector3.up);
 
             // getting where this position is within the fan of triangles
             var insertIndex = 0;

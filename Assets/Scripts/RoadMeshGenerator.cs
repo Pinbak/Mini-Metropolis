@@ -207,9 +207,9 @@ public class RoadMeshGenerator : MonoBehaviour
             var a = tris[i].A3;
             var b = tris[(i + 1) % numberOfTriangles].A2;
             var bezierPoints = new List<Vector3>();
+            var movedCentre = Vector3.Lerp((a + b) / 2, nodeCentreInWorld, curviness);
             for (var t = meshResolution; t < 1f; t += meshResolution)
             {
-                var movedCentre = Vector3.Lerp((a + b) / 2, nodeCentreInWorld, curviness);
                 var point = BezierCurve.EvaluateQuadratic(a, movedCentre, b, t);
                 bezierPoints.Add(point); 
                 // Gizmos.DrawSphere(point, .05f);
