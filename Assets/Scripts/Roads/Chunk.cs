@@ -10,6 +10,8 @@ namespace Roads
         [field:SerializeField] public int ChunkWidth { get; set; } = 10;
         [field:SerializeField] public int ChunkHeight { get; set; }= 10;
 
+        [SerializeField] private float meshResolution = .2f;
+
         // bounds of the chunk
         private int _xStart;
         private int _xEnd;
@@ -57,7 +59,7 @@ namespace Roads
                 if (node.Type is NodeType.Empty) continue;
                 if (node.Neighbours.Count == 0) continue;
                 
-                var nodeMesh = new NodeMesh(node, _gridManager);
+                var nodeMesh = new NodeMesh(node, _gridManager, meshResolution);
                 var tris = nodeMesh.Triangles;
 
                 var startingIndex = vertices.Count;
@@ -79,60 +81,6 @@ namespace Roads
             _mesh.vertices = vertices.ToArray();
             _mesh.triangles = triangles.ToArray();
             _mesh.RecalculateNormals();
-        }
-
-        public void RegenerateNeighboursMeshes()
-        {
-            // var x = _nodeMesh.X;
-            // var y = _nodeMesh.Y;
-            // if (x + 1 < _gridManager.Width)
-            //     if (_gridManager.Chunks[x + 1, y] is not null)
-            //         _gridManager.Chunks[x + 1, y].RegenerateMesh();
-            // if (x - 1 >= 0)
-            //     if (_gridManager.Chunks[x - 1, y] is not null)
-            //         _gridManager.Chunks[x - 1, y].RegenerateMesh();
-            // if (y + 1 < _gridManager.Height)
-            //     if (_gridManager.Chunks[x, y + 1] is not null)
-            //         _gridManager.Chunks[x, y + 1].RegenerateMesh();
-            // if (y - 1 >= 0)
-            //     if (_gridManager.Chunks[x, y - 1] is not null)
-            //         _gridManager.Chunks[x, y - 1].RegenerateMesh();
-            
-        }
-
-        private void RegenerateMeshes()
-        {
-            // var vertices = new List<Vector3>();
-            // var triangles = new List<int>();
-            // // var currentVertex = 0
-            // for (var x = 0; x < gridManager.Width; x++)
-            // for (var y = 0; y < gridManager.Height; y++)
-            // {
-            //     var node = gridManager.Grid[x, y];
-            //     if (node.Type is NodeType.Empty) continue;
-            //     if (node.Neighbours.Count == 0) continue;
-            //
-            //     var nodeMesh = new NodeMesh(node, gridManager, meshResolution);
-            //     var tris = nodeMesh.Triangles;
-            //
-            //     var startingIndex = vertices.Count;
-            //     vertices.Add(tris[0].A1); // add the centre point
-            //
-            //     foreach (var tri in tris)
-            //     {
-            //         var localStartingIndex = vertices.Count; // starting index of specific local tri
-            //         vertices.Add(tri.A2); // add the left point
-            //         vertices.Add(tri.A3); // add the right point
-            //     
-            //         triangles.Add(startingIndex);
-            //         triangles.Add(localStartingIndex);
-            //         triangles.Add(localStartingIndex + 1);
-            //     }
-            // }
-            // _mesh.Clear();
-            // _mesh.vertices = vertices.ToArray();
-            // _mesh.triangles = triangles.ToArray();
-            // _mesh.RecalculateNormals();
         }
     
         // private void OnDrawGizmos()

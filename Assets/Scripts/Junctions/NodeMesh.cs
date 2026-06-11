@@ -61,7 +61,8 @@ namespace Junctions
             SortTriangles();
             var junctionType = GetJunctionType();
             Type = junctionType;
-            if (junctionType is JunctionType.RightAngleCorner or JunctionType.AcuteCorner or JunctionType.ObtuseCorner)
+            if (junctionType is JunctionType.RightAngleCorner or JunctionType.AcuteCorner or JunctionType.ObtuseCorner
+                or JunctionType.ComplexCorner)
                 Triangles.AddRange(CreateSmoothCorners());
             
             SortTriangles();
@@ -123,7 +124,7 @@ namespace Junctions
             
             if (Type is JunctionType.AcuteCorner)
                 cornerLength = AcuteCornerLength;
-            if (Type is JunctionType.RightAngleCorner)
+            if (Type is JunctionType.RightAngleCorner or JunctionType.ComplexCorner)
                 cornerLength = RightAngleCornerLength;
             
             var cornerPosition = _nodeCentreInWorld + direction * cornerLength;
@@ -221,8 +222,28 @@ namespace Junctions
             {
                 1 => JunctionType.DeadEnd,
                 2 => IsEquilateral ? JunctionType.Straight : GetCornerType(),
+                3 => GetComplexType(),
                 _ => JunctionType.Complex
             };
+        }
+
+        private JunctionType GetComplexType()
+        {
+            var aPosition = new Vector2Int(_node.Neighbours[0].X, _node.Neighbours[0].Y);
+            Vector3 aPositionInWorld = _gridManager.GridToWorld(aPosition);
+            var bPosition = new Vector2Int(_node.Neighbours[1].X, _node.Neighbours[1].Y);
+            Vector3 bPositionInWorld = _gridManager.GridToWorld(bPosition);
+            var cPosition = new Vector2Int(_node.Neighbours[2].X, _node.Neighbours[2].Y);
+            Vector3 cPositionInWorld = _gridManager.GridToWorld(cPosition);
+            var ad = (_nodeCentreInWorld - aPositionInWorld).normalized;
+            var bd = (_nodeCentreInWorld - bPositionInWorld).normalized;
+            var cd = (_nodeCentreInWorld - cPositionInWorld).normalized;
+            var adBd = Vector3.Dot(ad, bd);
+            var bdCd= Vector3.Dot(bd, cd);
+            var adCd= Vector3.Dot(ad, cd);
+            if (adBd >= 0 && bdCd >= 0 && adCd >= 0)
+                return JunctionType.ComplexCorner;
+            return JunctionType.Complex;
         }
 
         private JunctionType GetCornerType()

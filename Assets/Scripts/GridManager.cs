@@ -63,7 +63,6 @@ public class GridManager : MonoBehaviour
         
         // regenerate the mesh and update neighbours mesh
         Chunks[chunkX, chunkY].RegenerateMesh();
-        Chunks[chunkX, chunkY].RegenerateNeighboursMeshes();
     }
 
     private (int x, int y) GetChunkFromGridPosition(int gridX, int gridY)

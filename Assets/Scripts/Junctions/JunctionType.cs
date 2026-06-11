@@ -7,6 +7,7 @@
         AcuteCorner,
         RightAngleCorner,
         ObtuseCorner,
+        ComplexCorner,
         Complex
     }
 }
