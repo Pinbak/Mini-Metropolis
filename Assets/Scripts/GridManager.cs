@@ -23,11 +23,13 @@ public class GridManager : MonoBehaviour
         Grid = new Grid(width, height);
         _chunkWidth = chunk.ChunkWidth;
         _chunkHeight = chunk.ChunkHeight;
-        Chunks = new Chunk[width / _chunkWidth, height / _chunkHeight];
+        var chunkArrayWidth = Mathf.CeilToInt((float)width / _chunkWidth); // round up to allow for chunks that might not fit into grid perfectly
+        var chunkArrayHeight = Mathf.CeilToInt((float)height / _chunkHeight);
+        Chunks = new Chunk[chunkArrayWidth, chunkArrayHeight];
         _offsetX = width / 2;
         _offsetY = height / 2;
-        for (var x = 0; x < width / _chunkWidth; x++)
-        for (var y = 0; y < height / _chunkHeight; y++)
+        for (var x = 0; x < chunkArrayWidth; x++)
+        for (var y = 0; y < chunkArrayHeight; y++)
         {
             Chunks[x, y] =
                 Instantiate(chunk, new Vector3(0, 0.01f, 0), Quaternion.identity, meshContainer.transform); // todo position is always 0
