@@ -746,7 +746,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
   width: 20
   height: 10
-  road: {fileID: 7539325027982749056, guid: 203c8ae36b7b3c642aa0b84f98de20f4, type: 3}
+  road: {fileID: 774982762316549038, guid: 203c8ae36b7b3c642aa0b84f98de20f4, type: 3}
 --- !u!4 &1487683638
 Transform:
   m_ObjectHideFlags: 0

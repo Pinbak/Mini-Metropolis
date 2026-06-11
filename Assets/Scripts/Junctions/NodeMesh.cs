@@ -8,10 +8,12 @@ namespace Junctions
     /// </summary>
     public class NodeMesh
     {
+        public int X => _node.X;
+        public int Y => _node.Y;
         public List<Triangle> Triangles { get; private set; }
         public JunctionType Type { get; private set; }
         private bool IsEquilateral => _averagePosition == _nodeCentreInWorld; // if the junction is straight or has connections evenly spaced
-        
+
         private Vector3 _averagePosition; // the average position of all the triangles
         private readonly Node _node;
         private readonly GridManager _gridManager; // reference to the grid manager for spacial related information
@@ -35,7 +37,6 @@ namespace Junctions
             _gridManager = gridManager;
             _nodeCentreInWorld = _gridManager.GridToWorld(_nodeCentre);
             _meshResolution = resolution;
-            CalculateTriangles();
         }
         
         public void CalculateTriangles()

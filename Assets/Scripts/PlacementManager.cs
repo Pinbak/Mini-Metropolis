@@ -65,7 +65,8 @@ public class PlacementManager : MonoBehaviour
         startNode.Neighbours.Add(endNode);
         endNode.Neighbours.Add(startNode);
         
-        gridManager.CreateRoad(startGridPosition.x, startGridPosition.y, startNode);
+        gridManager.BuildRoadMesh(startGridPosition.x, startGridPosition.y, startNode);
+        gridManager.BuildRoadMesh(endGridPosition.x, endGridPosition.y, endNode);
         
         // Instantiate(roadStructure, _startingPosition, Quaternion.identity);
         // Instantiate(roadStructure, _lastSuccessfulPosition, Quaternion.identity);

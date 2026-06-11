@@ -31,6 +31,7 @@ namespace Roads
             if (_mesh is null) return;
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
+            _nodeMesh.CalculateTriangles();
             var tris = _nodeMesh.Triangles;
         
             var startingIndex = vertices.Count;
@@ -51,7 +52,25 @@ namespace Roads
             _mesh.vertices = vertices.ToArray();
             _mesh.triangles = triangles.ToArray();
             _mesh.RecalculateNormals();
+        }
 
+        public void RegenerateNeighboursMeshes()
+        {
+            var x = _nodeMesh.X;
+            var y = _nodeMesh.Y;
+            if (x + 1 < _gridManager.Width)
+                if (_gridManager.Roads[x + 1, y] is not null)
+                    _gridManager.Roads[x + 1, y].RegenerateMesh();
+            if (x - 1 >= 0)
+                if (_gridManager.Roads[x - 1, y] is not null)
+                    _gridManager.Roads[x - 1, y].RegenerateMesh();
+            if (y + 1 < _gridManager.Height)
+                if (_gridManager.Roads[x, y + 1] is not null)
+                    _gridManager.Roads[x, y + 1].RegenerateMesh();
+            if (y - 1 >= 0)
+                if (_gridManager.Roads[x, y - 1] is not null)
+                    _gridManager.Roads[x, y - 1].RegenerateMesh();
+            
         }
 
         private void RegenerateMeshes()
