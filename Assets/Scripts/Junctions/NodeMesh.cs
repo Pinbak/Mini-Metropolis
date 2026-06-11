@@ -37,6 +37,7 @@ namespace Junctions
             _gridManager = gridManager;
             _nodeCentreInWorld = _gridManager.GridToWorld(_nodeCentre);
             _meshResolution = resolution;
+            CalculateTriangles();
         }
         
         public void CalculateTriangles()

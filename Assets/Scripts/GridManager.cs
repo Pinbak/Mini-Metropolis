@@ -5,22 +5,36 @@ public class GridManager : MonoBehaviour
 {
     [SerializeField] private int width;
     [SerializeField] private int height;
-    [SerializeField] private Road road;
+    [SerializeField] private Chunk chunk;
+    [SerializeField] private GameObject meshContainer;
+    private int _chunkWidth;
+    private int _chunkHeight;
     private int _offsetX;
     private int _offsetY;
 
     public Grid Grid { get; private set; }
     public int Width => width;
     public int Height => height;
-    
-    public Road[,] Roads { get; set; } // the visual road mesh part
+
+    private Chunk[,] Chunks { get; set; } // the visual road mesh part
 
     private void Start()
     {
         Grid = new Grid(width, height);
-        Roads = new Road[width, height];
+        _chunkWidth = chunk.ChunkWidth;
+        _chunkHeight = chunk.ChunkHeight;
+        Chunks = new Chunk[width / _chunkWidth, height / _chunkHeight];
         _offsetX = width / 2;
         _offsetY = height / 2;
+        for (var x = 0; x < width / _chunkWidth; x++)
+        for (var y = 0; y < height / _chunkHeight; y++)
+        {
+            Chunks[x, y] =
+                Instantiate(chunk, new Vector3(0, 0.01f, 0), Quaternion.identity, meshContainer.transform); // todo position is always 0
+            var (start, end) = GetGridPositionFromChunk(x, y);
+            Chunks[x, y].Initialise(this, start, end);
+        }
+        
     }
     
     public Vector2Int WorldToGrid(Vector3Int worldPosition)
@@ -41,15 +55,22 @@ public class GridManager : MonoBehaviour
 
     public bool GridExists() => Grid is not null;
 
-    public void BuildRoadMesh(int x, int y, Node startNode)
+    public void BuildRoadMesh(int x, int y)
     {
-        if (Roads[x, y] is null)
-        {
-            Roads[x, y] = Instantiate(road, new Vector3(0, 0.01f, 0), Quaternion.identity);
-            Roads[x, y].Initialise(startNode, this);
-        }
+        var (chunkX, chunkY) = GetChunkFromGridPosition(x, y);
+        
+        // regenerate the mesh and update neighbours mesh
+        Chunks[chunkX, chunkY].RegenerateMesh();
+        Chunks[chunkX, chunkY].RegenerateNeighboursMeshes();
+    }
 
-        Roads[x, y].RegenerateMesh();
-        Roads[x, y].RegenerateNeighboursMeshes();
+    private (int x, int y) GetChunkFromGridPosition(int gridX, int gridY)
+    {
+        return (gridX / _chunkWidth, gridY / _chunkHeight);
+    }
+
+    private (int x, int y) GetGridPositionFromChunk(int chunkX, int chunkY)
+    {
+        return (chunkX * _chunkWidth, chunkY * _chunkHeight);
     }
 }
