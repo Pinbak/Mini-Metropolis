@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 public class Grid
 {
-    private Node[,] _grid;
-    private int _width;
-    private int _height;
+    private readonly Node[,] _grid;
+    private readonly int _width;
+    private readonly int _height;
 
     public Grid(int width, int height)
     {

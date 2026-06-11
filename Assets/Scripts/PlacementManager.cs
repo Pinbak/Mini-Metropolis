@@ -6,11 +6,9 @@ public class PlacementManager : MonoBehaviour
 {
     public Action FinishedBuildingRoads { get; set; } 
     
-    [SerializeField] private int width;
-    [SerializeField] private int height;
     [SerializeField] private GameObject roadStructure;
     [SerializeField] private GridManager gridManager;
-
+    
     private GameObject _startingNode;
     private Vector3Int _startingPosition;
     private Vector3Int _lastSuccessfulPosition;
@@ -67,8 +65,10 @@ public class PlacementManager : MonoBehaviour
         startNode.Neighbours.Add(endNode);
         endNode.Neighbours.Add(startNode);
         
-        Instantiate(roadStructure, _startingPosition, Quaternion.identity);
-        Instantiate(roadStructure, _lastSuccessfulPosition, Quaternion.identity);
+        gridManager.CreateRoad(startGridPosition.x, startGridPosition.y, startNode);
+        
+        // Instantiate(roadStructure, _startingPosition, Quaternion.identity);
+        // Instantiate(roadStructure, _lastSuccessfulPosition, Quaternion.identity);
         
         // RemovePlanning();
         StartRoadPlacement(_lastSuccessfulPosition);
@@ -91,7 +91,7 @@ public class PlacementManager : MonoBehaviour
     private bool IsPositionInBound(Vector3Int position)
     {
         var gridPosition = gridManager.WorldToGrid(position);
-        return gridPosition.x >= 0 && gridPosition.x < width && gridPosition.y >= 0 && gridPosition.y < height;
+        return gridPosition.x >= 0 && gridPosition.x < gridManager.Width && gridPosition.y >= 0 && gridPosition.y < gridManager.Height;
     }
 
     public void RemoveStartingNode()
