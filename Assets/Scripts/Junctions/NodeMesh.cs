@@ -17,23 +17,24 @@ namespace Junctions
         private readonly GridManager _gridManager; // reference to the grid manager for spacial related information
         private readonly Vector2Int _nodeCentre;
         private readonly Vector3 _nodeCentreInWorld;
-        
-        private readonly float _straightRoadLength = .5f;
-        private readonly float _diagonalRoadLength = .7071f;
-        private readonly float _globalRoadWidth = .4f;
-        private float _acuteCornerLength = .6f;
-        private float _rightAngleCornerLength = .45f;
-        private float _obtuseCornerLength = .25f;
-        private readonly float _meshResolution = .2f;
-        private readonly float _capLength = .3f;
-        private readonly float _curviness = .25f;
 
-        public NodeMesh(Node node, GridManager gridManager)
+        private const float StraightRoadLength = .5f;
+        private const float DiagonalRoadLength = .7071f;
+        private const float GlobalRoadWidth = .4f;
+        private const float AcuteCornerLength = .6f;
+        private const float RightAngleCornerLength = .45f;
+        private const float ObtuseCornerLength = .25f;
+        private const float CapLength = .3f;
+        private const float Curviness = .25f;
+        private readonly float _meshResolution;
+
+        public NodeMesh(Node node, GridManager gridManager, float resolution = .2f)
         {
             _node = node;
             _nodeCentre = new Vector2Int(node.X, node.Y);
             _gridManager = gridManager;
             _nodeCentreInWorld = _gridManager.GridToWorld(_nodeCentre);
+            _meshResolution = resolution;
             CalculateTriangles();
         }
         
@@ -47,11 +48,11 @@ namespace Junctions
                 var direction = neighbourWorldPosition - _nodeCentreInWorld;
                 direction.Normalize();
                 var isDiagonal = direction.x != 0 && direction.z != 0;
-                var roadLength = isDiagonal ? _diagonalRoadLength : _straightRoadLength;
+                var roadLength = isDiagonal ? DiagonalRoadLength : StraightRoadLength;
                 var perpendicular = Vector3.Cross(Vector3.up, direction);
-                var left = _nodeCentreInWorld - perpendicular * (_globalRoadWidth * .5f);
+                var left = _nodeCentreInWorld - perpendicular * (GlobalRoadWidth * .5f);
                 left = direction * roadLength + left;
-                var right = _nodeCentreInWorld + perpendicular * (_globalRoadWidth * .5f);
+                var right = _nodeCentreInWorld + perpendicular * (GlobalRoadWidth * .5f);
                 right = direction * roadLength + right;
                 Triangles.Add(new Triangle(_nodeCentreInWorld, left, right));
             }
@@ -79,9 +80,11 @@ namespace Junctions
             {
                 var a = Triangles[i].A3;
                 var b = Triangles[(i + 1) % numberOfTriangles].A2;
+                if (a == b)
+                    continue;
                 if (useBezier)
                 {
-                    var movedCentre = Vector3.Lerp((a + b) / 2, _nodeCentreInWorld, _curviness);
+                    var movedCentre = Vector3.Lerp((a + b) / 2, _nodeCentreInWorld, Curviness);
                     triangles.AddRange(GenerateTrianglesFromBezierPoints(a, b, movedCentre));
                 }
                 else
@@ -102,9 +105,9 @@ namespace Junctions
             direction.Normalize();
             direction *= -1; // flip the direction
             var perpendicular = Vector3.Cross(Vector3.up, direction);
-            var a = _nodeCentreInWorld - perpendicular * (_globalRoadWidth * .5f);
-            var b = _nodeCentreInWorld + perpendicular * (_globalRoadWidth * .5f);
-            var c = _nodeCentreInWorld + direction * _capLength;
+            var a = _nodeCentreInWorld - perpendicular * (GlobalRoadWidth * .5f);
+            var b = _nodeCentreInWorld + perpendicular * (GlobalRoadWidth * .5f);
+            var c = _nodeCentreInWorld + direction * CapLength;
 
             return GenerateTrianglesFromBezierPoints(a, b, c);
         }
@@ -114,12 +117,12 @@ namespace Junctions
             var direction = _averagePosition - _nodeCentreInWorld;
             direction.Normalize();
             direction *= -1;
-            var cornerLength = _obtuseCornerLength;
+            var cornerLength = ObtuseCornerLength;
             
             if (Type is JunctionType.AcuteCorner)
-                cornerLength = _acuteCornerLength;
+                cornerLength = AcuteCornerLength;
             if (Type is JunctionType.RightAngleCorner)
-                cornerLength = _rightAngleCornerLength;
+                cornerLength = RightAngleCornerLength;
             
             var cornerPosition = _nodeCentreInWorld + direction * cornerLength;
             var angle = Vector3.SignedAngle(_nodeCentreInWorld.normalized, direction, Vector3.up);

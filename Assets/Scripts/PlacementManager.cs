@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
 {
-    public Action<Node> FinishedBuildingRoads { get; set; } 
+    public Action FinishedBuildingRoads { get; set; } 
     
     [SerializeField] private int width;
     [SerializeField] private int height;
@@ -99,6 +99,6 @@ public class PlacementManager : MonoBehaviour
         if (_startingNode is null) return;
         Destroy(_startingNode.gameObject);
         _startingNode = null;
-        // FinishedBuildingRoads?.Invoke();
+        FinishedBuildingRoads?.Invoke();
     }
 }
