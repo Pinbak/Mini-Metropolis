@@ -10,8 +10,6 @@ namespace Roads
         [field:SerializeField] public int ChunkWidth { get; set; } = 10;
         [field:SerializeField] public int ChunkHeight { get; set; }= 10;
 
-        [SerializeField] private float meshResolution = .2f;
-
         // bounds of the chunk
         private int _xStart;
         private int _xEnd;
@@ -20,7 +18,7 @@ namespace Roads
         
         private GridManager _gridManager;
         private Mesh _mesh;
-        private Vector3[] _vertices;
+        private Vector3[] _vertices; // todo not used at all
         private int[] _triangles;
 
         // because can't have constructor in MonoBehaviour
@@ -59,7 +57,7 @@ namespace Roads
                 if (node.Type is NodeType.Empty) continue;
                 if (node.Neighbours.Count == 0) continue;
                 
-                var nodeMesh = new NodeMesh(node, _gridManager, meshResolution);
+                var nodeMesh = new NodeMesh(node, _gridManager, _gridManager.MeshResolution);
                 var tris = nodeMesh.Triangles;
 
                 var startingIndex = vertices.Count;

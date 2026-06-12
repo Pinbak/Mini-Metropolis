@@ -19,11 +19,11 @@ namespace Junctions
         {
             _node = node;
             var meshCentre = new Vector2Int(node.X, node.Y);
-            meshCentreInWorld = base.gridManager.GridToWorld(meshCentre);
+            meshCentreInWorld = gridManager.GridToWorld(meshCentre);
             CalculateTriangles();
         }
-        
-        public void CalculateTriangles()
+
+        private void CalculateTriangles()
         {
             Triangles = new List<Triangle>();
             foreach (var neighbour in _node.Neighbours)

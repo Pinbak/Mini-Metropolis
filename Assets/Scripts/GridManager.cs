@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
+    [field:SerializeField] public float MeshResolution { get; set; } = .2f;
     [SerializeField] private int width;
     [SerializeField] private int height;
     [SerializeField] private Chunk chunk;

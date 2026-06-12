@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Roads;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
@@ -8,6 +9,7 @@ public class PlacementManager : MonoBehaviour
     
     [SerializeField] private GameObject roadStructure;
     [SerializeField] private GridManager gridManager;
+    [SerializeField] private PlacementIndicator placementIndicator;
     
     private GameObject _startingNode;
     private Vector3Int _startingPosition;
@@ -29,6 +31,7 @@ public class PlacementManager : MonoBehaviour
 
     public void MouseDown(Vector3 position)
     {
+        placementIndicator.RegenerateMesh(position);
         var distance = Vector3.Distance(_startingPosition, position);
         if (!(distance > 1)) return;
         
@@ -81,6 +84,7 @@ public class PlacementManager : MonoBehaviour
         _startingNode = Instantiate(roadStructure, position, Quaternion.identity);
         _startingPosition = position;
         _lastSuccessfulPosition = position;
+        placementIndicator.UpdateStartPosition(_startingPosition);
     }
 
     private void RemoveIllegalPlacements(Vector3Int position)
@@ -130,5 +134,6 @@ public class PlacementManager : MonoBehaviour
         Destroy(_startingNode.gameObject);
         _startingNode = null;
         FinishedBuildingRoads?.Invoke();
+        placementIndicator.RemoveMesh();
     }
 }
