@@ -23,6 +23,7 @@ public class PlacementManager : MonoBehaviour
 
         var gridPosition = gridManager.WorldToGrid(position);
         _validNeighbourNodes = gridManager.Grid.GetAdjacentCells(gridPosition.x, gridPosition.y);
+        RemoveIllegalPlacements(position); // removes the ability to cross an existing road
         PlaceStartingNode(position);
     }
 
@@ -80,6 +81,34 @@ public class PlacementManager : MonoBehaviour
         _startingNode = Instantiate(roadStructure, position, Quaternion.identity);
         _startingPosition = position;
         _lastSuccessfulPosition = position;
+    }
+
+    private void RemoveIllegalPlacements(Vector3Int position)
+    {
+        var gridPosition = gridManager.WorldToGrid(position); // todo make into field
+        var diagonals = gridManager.Grid.GetDiagonalCells(gridPosition.x, gridPosition.y);
+        var illegalPlacements = new List<(int x, int y)>();
+
+        foreach (var (dX, dY) in diagonals)
+        {
+            var sharedNeighbours = gridManager.Grid.GetSharedNeighbours(gridPosition.x, gridPosition.y, dX, dY);
+            // check if any of the shared neighbours are connected
+            foreach (var sharedNeighbour in sharedNeighbours)
+            foreach (var sharedNeighbour2 in sharedNeighbours)
+            {
+                if (sharedNeighbour == sharedNeighbour2) continue;
+                var sharedNeighbourNode = gridManager.Grid[sharedNeighbour.x, sharedNeighbour.y];
+                var sharedNeighbour2Node = gridManager.Grid[sharedNeighbour2.x, sharedNeighbour2.y];
+                if (sharedNeighbourNode.Neighbours.Contains(sharedNeighbour2Node))
+                    illegalPlacements.Add((dX, dY));
+            }
+        }
+
+        foreach (var illegalPlacement in illegalPlacements)
+        {
+            _validNeighbourNodes.Remove(illegalPlacement);
+        }
+        
     }
 
     private bool IsPositionFree(Vector3Int position)
