@@ -30,8 +30,8 @@ public class Grid
     /// </summary>
     public List<(int x, int y)> GetSharedNeighbours(int x1, int y1, int x2, int y2)
     {
-        var adjacent1 = GetAdjacentCells(x1, y1);
-        var adjacent2 = GetAdjacentCells(x2, y2);
+        var adjacent1 = GetAdjacentCells(x1, y1, true);
+        var adjacent2 = GetAdjacentCells(x2, y2, true);
         var overlap = adjacent1.Intersect(adjacent2);
         return overlap.ToList();
     }
@@ -57,62 +57,30 @@ public class Grid
         return cells;
     }
 
-    public List<(int x, int y)> GetAdjacentCells(int startingX, int startingY)
+    public List<(int x, int y)> GetAdjacentCells(int startingX, int startingY, bool ignoreStructures = false)
     {
         var cells = new List<(int x, int y)>();
-        var currentNode = _grid[startingX, startingY];
-        // todo clear up
-        if (startingX > 0)
-        {
-            if (_grid[startingX - 1, startingY].Type is NodeType.Empty ||
-                (_grid[startingX - 1, startingY].Type is NodeType.Road &&
-                 !_grid[startingX - 1, startingY].Neighbours.Contains(currentNode)))
-                cells.Add((startingX - 1, startingY));
-            if (startingY > 0)
-                if (_grid[startingX - 1, startingY - 1].Type is NodeType.Empty ||
-                    (_grid[startingX - 1, startingY - 1].Type is NodeType.Road &&
-                     !_grid[startingX - 1, startingY - 1].Neighbours.Contains(currentNode)))
-                    cells.Add((startingX - 1, startingY - 1));
-            if (startingY < _height - 1)
-                if (_grid[startingX - 1, startingY + 1].Type is NodeType.Empty ||
-                    (_grid[startingX - 1, startingY + 1].Type is NodeType.Road &&
-                     !_grid[startingX - 1, startingY + 1].Neighbours.Contains(currentNode)))
-                    cells.Add((startingX - 1, startingY + 1));
-        }
-            
-        if (startingX < _width - 1)
-        {
-            if (_grid[startingX + 1, startingY].Type is NodeType.Empty ||
-                (_grid[startingX + 1, startingY].Type is NodeType.Road &&
-                 !_grid[startingX + 1, startingY].Neighbours.Contains(currentNode)))
-                cells.Add((startingX + 1, startingY));
-            if (startingY > 0)
-                if (_grid[startingX + 1, startingY - 1].Type is NodeType.Empty ||
-                    (_grid[startingX + 1, startingY - 1].Type is NodeType.Road && 
-                     !_grid[startingX + 1, startingY - 1].Neighbours.Contains(currentNode)))
-                    cells.Add((startingX + 1, startingY - 1));
-            if (startingY < _height - 1)
-                if (_grid[startingX + 1, startingY + 1].Type is NodeType.Empty ||
-                    (_grid[startingX + 1, startingY + 1].Type is NodeType.Road &&
-                     !_grid[startingX + 1, startingY + 1].Neighbours.Contains(currentNode)))
-                    cells.Add((startingX + 1, startingY + 1));
-        }
-        if (startingY > 0)
-        {
-            if (_grid[startingX, startingY - 1].Type is NodeType.Empty ||
-                (_grid[startingX, startingY - 1].Type is NodeType.Road &&
-                 !_grid[startingX, startingY - 1].Neighbours.Contains(currentNode)))
-                cells.Add((startingX, startingY - 1));
-        }
-        if (startingY < _height - 1)
-        {
-            if (_grid[startingX, startingY + 1].Type is NodeType.Empty ||
-                (_grid[startingX, startingY + 1].Type is NodeType.Road &&
-                 !_grid[startingX, startingY + 1].Neighbours.Contains(currentNode)))
-                cells.Add((startingX, startingY + 1));
-        }
+        var node = _grid[startingX, startingY];
+        var positions = new List<(int x, int y)>
+            { (1, 0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1) };
         
-
+        foreach (var (x, y) in positions)
+        {
+            var currentX = x + startingX;
+            var currentY = y + startingY;
+            // if out of range, continue
+            if (currentX <= 0 || currentX >= _width - 1 || currentY <= 0 || currentY >= _height - 1) continue;
+            var currentNode = _grid[currentX, currentY];
+            // if the cell is valid, add
+            if (ignoreStructures)
+            {
+                cells.Add((currentX, currentY));
+                continue;
+            }
+            if (currentNode.Type is NodeType.Empty ||
+                currentNode.Type is NodeType.Road && !currentNode.Neighbours.Contains(node))
+                cells.Add((currentX, currentY));
+        }
         return cells;
     }
     
