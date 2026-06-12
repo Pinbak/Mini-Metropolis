@@ -6,6 +6,7 @@
         Straight,
         AcuteCorner,
         RightAngleCorner,
+        RightAngleDiagonalCorner,
         ObtuseCorner,
         ComplexCorner,
         Complex

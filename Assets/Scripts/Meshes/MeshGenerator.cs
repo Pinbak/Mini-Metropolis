@@ -19,7 +19,8 @@ namespace Meshes
         protected const float DiagonalRoadLength = .7071f;
         protected const float GlobalRoadWidth = .4f;
         private const float AcuteCornerLength = .6f;
-        private const float RightAngleCornerLength = .45f;
+        private const float RightAngleCornerDiagonalLength = .45f;
+        private const float RightAngleCornerLength = .3f;
         private const float ObtuseCornerLength = .25f;
         private const float CapLength = .3f;
         private const float Curviness = .25f;
@@ -78,8 +79,10 @@ namespace Meshes
             
             if (junctionType is JunctionType.AcuteCorner)
                 cornerLength = AcuteCornerLength;
-            if (junctionType is JunctionType.RightAngleCorner or JunctionType.ComplexCorner)
+            if (junctionType is JunctionType.RightAngleCorner)
                 cornerLength = RightAngleCornerLength;
+            if (junctionType is JunctionType.RightAngleDiagonalCorner or JunctionType.ComplexCorner)
+                cornerLength = RightAngleCornerDiagonalLength;
             
             var cornerPosition = meshCentreInWorld + direction * cornerLength;
             var angle = Vector3.SignedAngle(Vector3.right, direction, Vector3.up);

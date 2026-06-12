@@ -45,7 +45,7 @@ namespace Junctions
             var junctionType = GetJunctionType();
             Type = junctionType;
             if (junctionType is JunctionType.RightAngleCorner or JunctionType.AcuteCorner or JunctionType.ObtuseCorner
-                or JunctionType.ComplexCorner)
+                or JunctionType.ComplexCorner or JunctionType.RightAngleDiagonalCorner)
                 Triangles.AddRange(CreateSmoothCorners(Type));
             
             SortTriangles();
@@ -107,10 +107,15 @@ namespace Junctions
 
             if (dot > 0)
                 return JunctionType.AcuteCorner;
-            else if (dot == 0)
+            if (dot < 0)
+                return JunctionType.ObtuseCorner;
+
+            // if the distance is 1, it must be non-diagonal as the cell is 1x1 in size
+            if (Mathf.Approximately(Vector3.Distance(meshCentreInWorld, aPositionInWorld), 1))
                 return JunctionType.RightAngleCorner;
             else
-                return JunctionType.ObtuseCorner;
+                return JunctionType.RightAngleDiagonalCorner;
+
         }
     }
 }
