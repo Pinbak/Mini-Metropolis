@@ -105,4 +105,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Roads.Chunk
   <ChunkWidth>k__BackingField: 10
   <ChunkHeight>k__BackingField: 10
-  meshResolution: 0.2

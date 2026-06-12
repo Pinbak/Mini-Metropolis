@@ -38,8 +38,9 @@ public class PlacementManager : MonoBehaviour
 
     private void RemoveNode(Vector3 position)
     {
-        var gridPosition = gridManager.WorldToGrid(new Vector3Int(
-            Mathf.RoundToInt(position.x), 0, Mathf.RoundToInt(position.z)));
+        var intPosition = new Vector3Int(Mathf.RoundToInt(position.x), 0, Mathf.RoundToInt(position.z));
+        if (!IsPositionInBound(intPosition)) return;
+        var gridPosition = gridManager.WorldToGrid(intPosition);
         var nodeToRemove = gridManager.Grid[gridPosition.x, gridPosition.y];
         if (nodeToRemove.Type is not NodeType.Road) return;
 
