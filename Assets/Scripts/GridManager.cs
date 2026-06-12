@@ -1,4 +1,6 @@
-﻿using Roads;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Roads;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour
@@ -63,7 +65,27 @@ public class GridManager : MonoBehaviour
         var (chunkX, chunkY) = GetChunkFromGridPosition(x, y);
         
         // regenerate the mesh and update neighbours mesh
+        BuildChunk(chunkX, chunkY);
+    }
+
+    public void BuildChunk(int chunkX, int chunkY)
+    {
         Chunks[chunkX, chunkY].RegenerateMesh();
+    }
+
+    /// <summary>
+    ///     Given a list of positions, returns all unique chunks
+    /// </summary>
+    public List<(int chunkX, int chunkY)> GetUniqueChunksFromPositions(List<(int x, int y)> positions)
+    {
+        var uniqueChunks = new HashSet<(int, int)>();
+        foreach (var (x, y) in positions)
+        {
+            var chunkPosition = GetChunkFromGridPosition(x, y);
+            uniqueChunks.Add(chunkPosition);
+        }
+
+        return uniqueChunks.ToList();
     }
 
     private (int x, int y) GetChunkFromGridPosition(int gridX, int gridY)

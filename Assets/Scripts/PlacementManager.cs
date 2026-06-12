@@ -14,9 +14,11 @@ public class PlacementManager : MonoBehaviour
     private Vector3Int _startingPosition;
     private Vector3Int _lastSuccessfulPosition;
     private List<(int x, int y)> _validNeighbourNodes = new();
+    private BuildingMode _mode;
 
     public void StartRoadPlacement(Vector3Int position)
     {
+        if (_mode == BuildingMode.Bulldozing) return;
         if (!IsPositionInBound(position)) return;
         if (!IsPositionFree(position)) return;
         
@@ -29,6 +31,51 @@ public class PlacementManager : MonoBehaviour
     }
 
     public void MouseDown(Vector3 position)
+    {
+        if (_mode == BuildingMode.Bulldozing) RemoveNode(position);
+        if (_mode == BuildingMode.Road) CheckPlacingRoad(position);
+    }
+
+    private void RemoveNode(Vector3 position)
+    {
+        var gridPosition = gridManager.WorldToGrid(new Vector3Int(
+            Mathf.RoundToInt(position.x), 0, Mathf.RoundToInt(position.z)));
+        var nodeToRemove = gridManager.Grid[gridPosition.x, gridPosition.y];
+        if (nodeToRemove.Type is not NodeType.Road) return;
+
+        var toRemove = new List<Node>{nodeToRemove};
+        var toUpdate = new List<(int, int)> {(nodeToRemove.X, nodeToRemove.Y)};
+        foreach (var neighbour in nodeToRemove.Neighbours)
+        {
+            // have to delete dependent nodes
+            if (neighbour.Neighbours.Count == 1)
+            {
+                toRemove.Add(neighbour);
+                toUpdate.Add((neighbour.X, neighbour.Y));
+            }
+        }
+
+        foreach (var node in toRemove)
+        {
+            foreach (var neighbour in node.Neighbours)
+            {
+                neighbour.Neighbours.Remove(node);
+                toUpdate.Add((neighbour.X, neighbour.Y));
+            }
+
+            node.Neighbours = new List<Node>();
+            node.Type = NodeType.Empty;
+        }
+
+        var chunksToRefresh = gridManager.GetUniqueChunksFromPositions(toUpdate);
+        foreach (var (chunkX, chunkY) in chunksToRefresh)
+        {
+            gridManager.BuildChunk(chunkX, chunkY);
+        }
+        
+    }
+
+    private void CheckPlacingRoad(Vector3 position)
     {
         var distance = Vector3.Distance(_startingPosition, position);
         if (!(distance > 1)) return;
@@ -47,7 +94,6 @@ public class PlacementManager : MonoBehaviour
             EndRoadPlacement(gridTargetPosition);
             return;
         }
-
     }
 
     private void EndRoadPlacement(Vector2Int endGridPosition)
@@ -127,9 +173,19 @@ public class PlacementManager : MonoBehaviour
 
     public void RemoveStartingNode()
     {
+        if (_mode == BuildingMode.Bulldozing) return;
         if (_startingNode is null) return;
         Destroy(_startingNode.gameObject);
         _startingNode = null;
         FinishedBuildingRoads?.Invoke();
+    }
+
+    public void ChangeMode()
+    {
+        if (_mode == BuildingMode.Road)
+            _mode = BuildingMode.Bulldozing;
+        else if (_mode == BuildingMode.Bulldozing)
+            _mode = BuildingMode.Road;
+        Debug.Log($"Changed mode to {_mode}");
     }
 }
