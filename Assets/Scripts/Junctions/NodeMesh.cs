@@ -128,14 +128,14 @@ namespace Junctions
                 cornerLength = RightAngleCornerLength;
             
             var cornerPosition = _nodeCentreInWorld + direction * cornerLength;
-            var angle = Vector3.SignedAngle(_nodeCentreInWorld.normalized, direction, Vector3.up);
+            var angle = Vector3.SignedAngle(Vector3.right, direction, Vector3.up);
             
             // getting where this position is within the fan of triangles
             var insertIndex = 0;
             while(insertIndex < Triangles.Count)
             {
                 var triDirection = Triangles[insertIndex].Centre - _nodeCentreInWorld;
-                var triAngle = Vector3.SignedAngle(_nodeCentreInWorld.normalized, triDirection.normalized,
+                var triAngle = Vector3.SignedAngle(Vector3.right, triDirection.normalized,
                     Vector3.up);
                 if (angle < triAngle)
                     break;
@@ -200,8 +200,8 @@ namespace Junctions
                 var aDir = a.Centre - _nodeCentreInWorld;
                 var bDir = b.Centre - _nodeCentreInWorld;
 
-                var angleA = Vector3.SignedAngle(_nodeCentreInWorld.normalized, aDir.normalized, Vector3.up);
-                var angleB = Vector3.SignedAngle(_nodeCentreInWorld.normalized, bDir.normalized, Vector3.up);
+                var angleA = Vector3.SignedAngle(Vector3.right, aDir.normalized, Vector3.up);
+                var angleB = Vector3.SignedAngle(Vector3.right, bDir.normalized, Vector3.up);
 
                 if (angleA > angleB)
                     return 1;
