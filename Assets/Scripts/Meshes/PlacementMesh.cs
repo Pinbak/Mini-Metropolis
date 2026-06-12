@@ -17,12 +17,14 @@ namespace Meshes
             Triangles = new List<Triangle>();
             var direction = currentPosition - meshCentreInWorld;
             direction.Normalize();
+            var distance = Vector3.Distance(meshCentreInWorld, currentPosition);
             var perpendicular = Vector3.Cross(Vector3.up, direction);
             var left = meshCentreInWorld - perpendicular * (GlobalRoadWidth * .5f);
-            left = direction * StraightRoadLength + left;
+            left = direction * distance + left;
             var right = meshCentreInWorld + perpendicular * (GlobalRoadWidth * .5f);
-            right = direction * StraightRoadLength + right;
+            right = direction * distance + right;
             Triangles.Add(new Triangle(meshCentreInWorld, left, right));
+            CreateDeadEndCap(currentPosition);
         }
     }
 }
