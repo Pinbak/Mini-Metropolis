@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Meshes;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ namespace Junctions
             var junctionType = GetJunctionType();
             Type = junctionType;
             if (junctionType is JunctionType.RightAngleCorner or JunctionType.AcuteCorner or JunctionType.ObtuseCorner
-                or JunctionType.ComplexCorner or JunctionType.RightAngleDiagonalCorner)
+                or JunctionType.ComplexAcuteCorner or JunctionType.RightAngleDiagonalCorner or JunctionType.ComplexCorner)
                 Triangles.AddRange(CreateSmoothCorners(Type));
             
             SortTriangles();
@@ -71,26 +72,36 @@ namespace Junctions
             {
                 1 => JunctionType.DeadEnd,
                 2 => IsEquilateral ? JunctionType.Straight : GetCornerType(),
-                3 => GetComplexType(),
+                3 or 4 => GetComplexType(),
                 _ => JunctionType.Complex
             };
         }
 
         private JunctionType GetComplexType()
         {
-            var aPosition = new Vector2Int(_node.Neighbours[0].X, _node.Neighbours[0].Y);
-            Vector3 aPositionInWorld = gridManager.GridToWorld(aPosition);
-            var bPosition = new Vector2Int(_node.Neighbours[1].X, _node.Neighbours[1].Y);
-            Vector3 bPositionInWorld = gridManager.GridToWorld(bPosition);
-            var cPosition = new Vector2Int(_node.Neighbours[2].X, _node.Neighbours[2].Y);
-            Vector3 cPositionInWorld = gridManager.GridToWorld(cPosition);
-            var ad = (meshCentreInWorld - aPositionInWorld).normalized;
-            var bd = (meshCentreInWorld - bPositionInWorld).normalized;
-            var cd = (meshCentreInWorld - cPositionInWorld).normalized;
-            var adBd = Vector3.Dot(ad, bd);
-            var bdCd= Vector3.Dot(bd, cd);
-            var adCd= Vector3.Dot(ad, cd);
-            if (adBd >= 0 && bdCd >= 0 && adCd >= 0)
+
+            var neighbourDirections = new List<Vector3>();
+            var neighbourAngles = new List<float>();
+            foreach (var nodeNeighbour in _node.Neighbours)
+            {
+                var position = new Vector2Int(nodeNeighbour.X, nodeNeighbour.Y);
+                Vector3 positionInWorld = gridManager.GridToWorld(position);
+                var direction = (meshCentreInWorld - positionInWorld).normalized;
+                neighbourDirections.Add(direction);
+            }
+            
+            for (var i = 0; i < neighbourDirections.Count; i++)
+            for (var j = i + 1; j < neighbourDirections.Count; j++)
+            {
+                var dotProduct = Vector3.Dot(neighbourDirections[i], neighbourDirections[j]);
+                neighbourAngles.Add(dotProduct);
+            }
+
+            var rightAngleCount = neighbourAngles.Count(a => a >= 0);
+            
+            if (rightAngleCount == neighbourAngles.Count)
+                return JunctionType.ComplexAcuteCorner;
+            else if (rightAngleCount == neighbourAngles.Count - 1)
                 return JunctionType.ComplexCorner;
             return JunctionType.Complex;
         }

@@ -81,7 +81,7 @@ namespace Meshes
                 cornerLength = AcuteCornerLength;
             if (junctionType is JunctionType.RightAngleCorner)
                 cornerLength = RightAngleCornerLength;
-            if (junctionType is JunctionType.RightAngleDiagonalCorner or JunctionType.ComplexCorner)
+            if (junctionType is JunctionType.RightAngleDiagonalCorner or JunctionType.ComplexAcuteCorner)
                 cornerLength = RightAngleCornerDiagonalLength;
             
             var cornerPosition = meshCentreInWorld + direction * cornerLength;
