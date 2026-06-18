@@ -57,7 +57,7 @@ namespace Meshes
             return triangles;
         }
 
-        protected List<Triangle> CreateDeadEndCap(Vector3 neighbourPosition)
+        protected List<Triangle> CreateDeadEndCap(Vector3 neighbourPosition, bool isPointed = true)
         {
             var direction = neighbourPosition - meshCentreInWorld;
             direction.Normalize();
@@ -67,7 +67,16 @@ namespace Meshes
             var b = meshCentreInWorld + perpendicular * (GlobalRoadWidth * .5f);
             var c = meshCentreInWorld + direction * CapLength;
 
-            return GenerateTrianglesFromBezierPoints(a, b, c);
+            // creates a rounded Bezier end cap
+            if (!isPointed) return GenerateTrianglesFromBezierPoints(a, b, c);
+            
+            // creates a simple pointed end cap
+            var tris = new List<Triangle>
+            {
+                new(meshCentreInWorld, a, c),
+                new(meshCentreInWorld, c, b)
+            };
+            return tris;
         }
 
         protected List<Triangle> CreateSmoothCorners(JunctionType junctionType)
