@@ -35,42 +35,49 @@ namespace Needs
 
         public List<Node> FindPath(Node start, Node goal)
         {
-            var open = new List<Node> { start };
+            // A* is defined as f(n) = g(n) + h(n)
+            // g(n) is the total cost of transitions, which in our case is 1 per transition
+            // h(n) is the heuristic which is the measured by the remaining Manhattan distance to the goal position
+
+            var open = new Dictionary<Node, float> { [start] = 0f }; // items waiting to be expanded with their corresponding f(n)
+            var closed = new List<Node>(); // items that have already been explored
             var cameFrom = new Dictionary<Node, Node>();
-
-            var gs = new Dictionary<Node, float> { [start] = 0f };
-            var fs = new Dictionary<Node, float> { [start] = Heuristic(start, goal) };
+            var costSoFar = new Dictionary<Node, float> { [start] = 0f };
             var c = 0;
-
             while (open.Count != 0)
             {
                 c++;
-                var current = fs.OrderBy(node => node.Value).First(); // todo inefficient
-                if (current.Key == goal)
+                var current = open.OrderBy(node => node.Value).First();
+                var currentNode = current.Key;
+                if (currentNode == goal)
                 {
-                    Debug.Log("Found path");
-                    return ReconstructPath(start, current.Key, cameFrom);
+                    Debug.Log("Found path!");
+                    return ReconstructPath(start, currentNode, cameFrom);
                 }
 
-                open.Remove(current.Key);
-                foreach (var neighbour in current.Key.Neighbours)
+                open.Remove(currentNode);
+                closed.Add(currentNode);
+                
+                foreach (var neighbour in currentNode.Neighbours)
                 {
-                    var newCost = gs[current.Key] + 10; // todo weight of the edge is arbitrarily 10 for now
-                    if (gs.ContainsKey(neighbour) && !(newCost < gs[neighbour])) continue;
-                    cameFrom[neighbour] = current.Key;
-                    gs[neighbour] = newCost;
-                    fs[neighbour] = newCost + Heuristic(neighbour, goal);
-                    if (!open.Contains(neighbour)) open.Add(neighbour);
+                    if (closed.Contains(neighbour)) continue;
+                    var gScore = costSoFar[currentNode] + 1;
+                    costSoFar[neighbour] = gScore;
+                    var hScore = Heuristic(neighbour, goal);
+                    var fScore = gScore + hScore;
+                    open[neighbour] = fScore;
+                    cameFrom[neighbour] = currentNode;
+                    
                 }
 
                 if (c > 500)
                 {
-                    Debug.Log("Exceeded maximum tries");
+                    Debug.Log("Got stuck");
                     return new List<Node>();
                 }
             }
 
-            Debug.Log("Cannot find path");
+            Debug.Log("Could not find a path!");
             return new List<Node>();
         }
     }
