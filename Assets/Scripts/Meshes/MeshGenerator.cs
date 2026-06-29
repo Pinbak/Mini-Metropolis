@@ -57,7 +57,7 @@ namespace Meshes
             return triangles;
         }
 
-        protected List<Triangle> CreateDeadEndCap(Vector3 neighbourPosition, bool isPointed = true)
+        protected List<Triangle> CreateDeadEndCap(Vector3 neighbourPosition, bool isPointed = false)
         {
             var direction = neighbourPosition - meshCentreInWorld;
             direction.Normalize();
