@@ -22,6 +22,7 @@ namespace Meshes
         private const float RightAngleCornerDiagonalLength = .45f;
         private const float RightAngleCornerLength = .3f;
         private const float ObtuseCornerLength = .25f;
+        private const float ComplexCornerLength = .2f;
         private const float CapLength = .3f;
         private const float Curviness = .25f;
         private readonly float _meshResolution;
@@ -92,6 +93,8 @@ namespace Meshes
                 cornerLength = RightAngleCornerLength;
             if (junctionType is JunctionType.RightAngleDiagonalCorner or JunctionType.ComplexAcuteCorner)
                 cornerLength = RightAngleCornerDiagonalLength;
+            if (junctionType is JunctionType.ComplexCorner)
+                cornerLength = ComplexCornerLength;
             
             var cornerPosition = meshCentreInWorld + direction * cornerLength;
             var angle = Vector3.SignedAngle(Vector3.right, direction, Vector3.up);

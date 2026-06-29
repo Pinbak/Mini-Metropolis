@@ -13,7 +13,7 @@ namespace Junctions
         public int X => _node.X;
         public int Y => _node.Y;
 
-        private JunctionType Type { get; set; }
+        public JunctionType Type { get; private set; }
         private readonly Node _node;
         
         public NodeMesh(Node node, GridManager gridManager, float resolution = .2f) : base(gridManager, resolution)

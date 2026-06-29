@@ -80,7 +80,46 @@ namespace Roads
             _mesh.triangles = triangles.ToArray();
             _mesh.RecalculateNormals();
         }
-    
+
+        // private void OnDrawGizmos()
+        // {
+        //     if (!_gridManager.GridExists()) return;
+        //     for (var x = 0; x < _gridManager.Width; x++)
+        //     for (var y = 0; y < _gridManager.Height; y++)
+        //     {
+        //         var node = _gridManager.Grid[x, y];
+        //         if (node.Type is NodeType.Empty) continue;
+        //         if (node.Neighbours.Count == 0) continue;
+        //         var nodeMesh = new NodeMesh(node, _gridManager, _gridManager.MeshResolution);
+        //         var triangles = nodeMesh.Triangles;
+        //         Gizmos.color = nodeMesh.Type switch
+        //         {
+        //             JunctionType.DeadEnd => Color.green,
+        //             JunctionType.Straight => Color.red,
+        //             JunctionType.AcuteCorner => Color.blue,
+        //             JunctionType.RightAngleCorner => Color.lightBlue,
+        //             JunctionType.RightAngleDiagonalCorner => Color.aquamarine,
+        //             JunctionType.ObtuseCorner => Color.cadetBlue,
+        //             JunctionType.ComplexAcuteCorner => Color.lavenderBlush,
+        //             JunctionType.ComplexCorner => Color.darkSlateBlue,
+        //             JunctionType.Complex => Color.purple,
+        //             _ => Gizmos.color
+        //         };
+        //         foreach (var triangle in triangles)
+        //         {
+        //             // Gizmos.DrawSphere(triangle, meshVertexSize);
+        //             Gizmos.DrawLine(triangle.A1, triangle.A2);
+        //             Gizmos.DrawLine(triangle.A1, triangle.A3);
+        //             Gizmos.DrawLine(triangle.A2, triangle.A3);
+        //             // Gizmos.color = Color.green;
+        //             // Gizmos.DrawSphere(triangle.A2, meshVertexSize);
+        //             // Gizmos.color = Color.blue;
+        //             // Gizmos.DrawSphere(triangle.A3, meshVertexSize);
+        //             // Gizmos.color = Color.red;
+        //         }
+        //     }
+        // }
+
         // private void OnDrawGizmos()
         // {
         //     if (!gridManager.GridExists()) return;
