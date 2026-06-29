@@ -42,6 +42,14 @@ public class GridManager : MonoBehaviour
         
     }
     
+    public Vector2Int WorldToGrid(Vector3 worldPosition)
+    {
+        return new Vector2Int(
+            (int)worldPosition.x + _offsetX,
+            (int)worldPosition.z + _offsetY
+        );
+    } 
+    
     public Vector2Int WorldToGrid(Vector3Int worldPosition)
     {
         return new Vector2Int(

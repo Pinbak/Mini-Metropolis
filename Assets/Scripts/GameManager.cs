@@ -1,10 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private InputManager inputManager;
     [SerializeField] private PlacementManager placementManager;
+    [SerializeField] private CarManager carManager;
 
     private void Start()
     {
@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     private void HandleKeyboardPress(KeyboardKeys key)
     {
         placementManager.ChangeMode();
+        carManager.CreateTestPath();
     }
 
     private void HandleMouseHeldDown(Vector3 position)
