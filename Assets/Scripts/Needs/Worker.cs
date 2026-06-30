@@ -4,11 +4,16 @@ namespace Needs
 {
     public class Worker : MonoBehaviour
     {
+        [SerializeField] private float movementSpeed = 1f;
         private Pathfinding _pathfinding;
         private Vector3Path _vector3Path;
-        private Node _currentPosition;
         private GridManager _gridManager;
         private CarManager _carManager;
+
+        private void Update()
+        {
+            _vector3Path.MoveAlongPath(gameObject, movementSpeed);
+        }
 
         public void Init(CarManager carManager, GridManager gridManager)
         {
@@ -37,7 +42,7 @@ namespace Needs
             
             foreach (var node in _vector3Path.Path)
             {
-                Gizmos.DrawSphere(node, 0.1f);
+                Gizmos.DrawSphere(new Vector3(node.x, 0.2f, node.z), 0.1f);
             }
 
             // for (var i = 0; i < _vector3Path.Path.Count - 1; i++)

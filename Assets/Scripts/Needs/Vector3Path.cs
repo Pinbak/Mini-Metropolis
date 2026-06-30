@@ -7,18 +7,55 @@ namespace Needs
     {
         // Converts a path of nodes into a viable path of vector3 points to follow
         public List<Vector3> Path { get; private set; } = new();
-
+        public bool PathGenerated { get; private set; }
+        
+        private Node _currentPosition;
+        private Vector3 _currentTargetPosition; // the position that we are currently driving towards
         private readonly GridManager _gridManager;
         private readonly float _offset;
-        private const float PathHeight = .2f;
         private const float PathInset = .2f;
         private const float PathWidth = .4f; // todo get from elsewhere
         private const float PathStraightLength = .5f; // todo get from elsewhere
         private const float PathDiagonalLength = .7071f; // todo get from elsewhere
+        private const float TargetTolerance = .01f;
 
         public Vector3Path(GridManager gridManager)
         {
             _gridManager = gridManager;
+        }
+
+        public void MoveAlongPath(GameObject objectToMove, float movementSpeed)
+        {
+            if (!PathGenerated) return;
+
+            var currentPosition = objectToMove.transform.position;
+            var currentRotation = objectToMove.transform.rotation;
+            var rotationSpeed = movementSpeed * 10f;
+
+            if (Vector3.Distance(currentPosition, _currentTargetPosition) > TargetTolerance)
+            {
+                // if the car are not yet at the target, move it and rotate it
+                objectToMove.transform.position =
+                    Vector3.MoveTowards(currentPosition, _currentTargetPosition, movementSpeed * Time.deltaTime);
+                var direction = _currentTargetPosition - currentPosition;
+                var targetAngle = Vector3.SignedAngle(Vector3.right, direction.normalized, Vector3.up);
+                var targetRotation = Quaternion.Euler(0, targetAngle, 0);
+                objectToMove.transform.rotation =
+                    Quaternion.Lerp(currentRotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
+            else
+            {
+                // if the car has reached the target, it needs to get the next target
+                Path.Remove(_currentTargetPosition);
+                if (Path.Count == 0)
+                {
+                    // if the car have reached the destination
+                    PathGenerated = false;
+                    return;
+                }
+                _currentTargetPosition = Path[0];
+                
+            }
         }
 
         public void GeneratePath(List<Node> nodePath)
@@ -49,12 +86,15 @@ namespace Needs
                 
                 nextPoint = directionToNextPosition * (nextRoadLength * .5f) + nextPoint;
                 previousPoint = directionToPreviousPosition * (previousRoadLength * .5f) + previousPoint;
-                
-                Path.Add(new Vector3(nextPoint.x, PathHeight, nextPoint.z));
-                Path.Add(new Vector3(previousPoint.x, PathHeight, previousPoint.z));
-                
+
+                Path.Add(previousPoint);
+                Path.Add(nextPoint);
+
             }
-            
+
+            PathGenerated = Path.Count != 0;
+            if (PathGenerated) _currentTargetPosition = Path[0];
+
         }
         
     }
