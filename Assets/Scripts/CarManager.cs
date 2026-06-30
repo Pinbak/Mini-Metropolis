@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Needs;
 using UnityEngine;
 
@@ -8,17 +8,25 @@ public class CarManager : MonoBehaviour
     [SerializeField] private GridManager gridManager;
     [field:SerializeField] public GameObject TestPosition { get; set; }
 
-    private Worker _testCar;
+    private readonly List<Worker> _testCars = new();
     
     private void Start()
     {
-        _testCar = Instantiate(workerPrefab, Vector3.zero, Quaternion.identity, transform);
-        _testCar.Init(this, gridManager);
+        const int numberOfCars = 2;
+        for (var i = 0; i < numberOfCars; i++)
+        {
+            var testCar = Instantiate(workerPrefab, Vector3.zero, Quaternion.identity, transform);
+            testCar.Init(this, gridManager);
+            _testCars.Add(testCar);
+        }
     }
 
     public void CreateTestPath()
     {
         Debug.Log("Attempting to find path");
-        _testCar.FindTestPath();
+        foreach (var testCar in _testCars)
+        {
+            testCar.FindTestPath();
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace Needs
 {
     public class Worker : MonoBehaviour
     {
-        [SerializeField] private float movementSpeed = 1f;
+        [SerializeField] private float movementSpeed = .5f;
         private Pathfinding _pathfinding;
         private Vector3Path _vector3Path;
         private GridManager _gridManager;
