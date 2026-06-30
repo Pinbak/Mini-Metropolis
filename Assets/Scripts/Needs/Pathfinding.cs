@@ -7,6 +7,9 @@ namespace Needs
 {
     public class Pathfinding
     {
+        public List<Node> Path { get; private set; } = new();
+        public bool ValidPathExists { get; private set; }
+        
         private Grid _grid;
         
         public Pathfinding(Grid graph)
@@ -33,7 +36,13 @@ namespace Needs
             return path;
         }
 
-        public List<Node> FindPath(Node start, Node goal)
+        public void GeneratePath(Node start, Node goal)
+        {
+            Path = FindPath(start, goal);
+            ValidPathExists = Path.Count > 0;
+        }
+
+        private List<Node> FindPath(Node start, Node goal)
         {
             // A* is defined as f(n) = g(n) + h(n)
             // g(n) is the total cost of transitions, which in our case is 1 per transition

@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Needs
 {
     public class Worker : MonoBehaviour
     {
         private Pathfinding _pathfinding;
-        private List<Node> _currentPath = new();
+        private Vector3Path _vector3Path;
+        private Node _currentPosition;
         private GridManager _gridManager;
         private CarManager _carManager;
 
@@ -15,6 +15,7 @@ namespace Needs
             _gridManager = gridManager;
             _carManager = carManager;
             _pathfinding = new Pathfinding(gridManager.Grid);
+            _vector3Path = new Vector3Path(gridManager);
         }
 
         public void FindTestPath()
@@ -23,26 +24,25 @@ namespace Needs
             var currentNode = _gridManager.Grid[positionOnGrid.x, positionOnGrid.y];
             var goalPositionOnGrid = _gridManager.WorldToGrid(_carManager.TestPosition.transform.position);
             var goalNode = _gridManager.Grid[goalPositionOnGrid.x, goalPositionOnGrid.y];
-            _currentPath = _pathfinding.FindPath(currentNode, goalNode);
+            _pathfinding.GeneratePath(currentNode, goalNode);
+            _vector3Path.GeneratePath(_pathfinding.Path);
         }
 
         private void OnDrawGizmos()
         {
-            if (_currentPath.Count == 0) return;
+            if (_vector3Path.Path.Count == 0) return;
+            if (!_pathfinding.ValidPathExists) return;
             
             Gizmos.color = Color.red;
             
-            foreach (var node in _currentPath)
+            foreach (var node in _vector3Path.Path)
             {
-                var position = _gridManager.GridToWorld(new Vector2Int(node.X, node.Y));
-                Gizmos.DrawSphere(position, 0.1f);
+                Gizmos.DrawSphere(node, 0.1f);
             }
 
-            for (var i = 0; i < _currentPath.Count - 1; i++)
+            for (var i = 0; i < _vector3Path.Path.Count - 1; i++)
             {
-                var start = _gridManager.GridToWorld(new Vector2Int(_currentPath[i].X, _currentPath[i].Y));
-                var end = _gridManager.GridToWorld(new Vector2Int(_currentPath[i + 1].X, _currentPath[i + 1].Y));
-                Gizmos.DrawLine(new Vector3(start.x, .1f, start.z), new Vector3(end.x, .1f, end.z));
+                Gizmos.DrawLine(_vector3Path.Path[i], _vector3Path.Path[i + 1]);
             }
             
         }
