@@ -18,6 +18,7 @@ namespace Needs
         private const float PathStraightLength = .5f; // todo get from elsewhere
         private const float PathDiagonalLength = .7071f; // todo get from elsewhere
         private const float TargetTolerance = .01f;
+        private const float TurnSmoothness = .1f; // lower number is smoother
 
         public Vector3Path(GridManager gridManager)
         {
@@ -84,11 +85,23 @@ namespace Needs
                 var previousIsDiagonal = directionToPreviousPosition.x != 0 && directionToPreviousPosition.z != 0;
                 var previousRoadLength = previousIsDiagonal ? PathDiagonalLength : PathStraightLength;
                 
-                nextPoint = directionToNextPosition * (nextRoadLength * .5f) + nextPoint;
-                previousPoint = directionToPreviousPosition * (previousRoadLength * .5f) + previousPoint;
+                nextPoint = directionToNextPosition * (nextRoadLength) + nextPoint;
+                previousPoint = directionToPreviousPosition * (previousRoadLength) + previousPoint;
+                var movedPosition = position + nextPerpendicular * ((PathWidth - PathInset)  * .5f); // the centre of the node that is shifted to the correct lane
+                
+                
+                // for straight roads, we don't need to Bezier
+                if (directionToNextPosition == directionToPreviousPosition * -1)
+                    Path.Add(movedPosition);
+                else
+                {
+                    for (var t = TurnSmoothness; t < 1f; t += TurnSmoothness)
+                    {
+                        var point = BezierCurve.EvaluateQuadratic(previousPoint, movedPosition, nextPoint, t);
+                        Path.Add(point);
+                    }
 
-                Path.Add(previousPoint);
-                Path.Add(nextPoint);
+                }
 
             }
 
