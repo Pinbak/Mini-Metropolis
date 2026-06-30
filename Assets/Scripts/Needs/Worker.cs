@@ -40,10 +40,10 @@ namespace Needs
                 Gizmos.DrawSphere(node, 0.1f);
             }
 
-            for (var i = 0; i < _vector3Path.Path.Count - 1; i++)
-            {
-                Gizmos.DrawLine(_vector3Path.Path[i], _vector3Path.Path[i + 1]);
-            }
+            // for (var i = 0; i < _vector3Path.Path.Count - 1; i++)
+            // {
+            //     Gizmos.DrawLine(_vector3Path.Path[i], _vector3Path.Path[i + 1]);
+            // }
             
         }
     }

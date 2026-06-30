@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ namespace Needs
         public List<Node> Path { get; private set; } = new();
         public bool ValidPathExists { get; private set; }
         
-        private Grid _grid;
+        private Grid _grid; // todo maybe able to delete
         
         public Pathfinding(Grid graph)
         {
@@ -32,6 +31,7 @@ namespace Needs
                 current = cameFrom[current];
             }
 
+            path.Add(start);
             path.Reverse();
             return path;
         }
