@@ -41,6 +41,12 @@ public class GridManager : MonoBehaviour
         }
         
     }
+
+    public Node WorldToNode(Vector3 worldPosition)
+    {
+        var gridPosition = WorldToGrid(worldPosition);
+        return Grid[gridPosition.x, gridPosition.y];
+    }
     
     public Vector2Int WorldToGrid(Vector3 worldPosition)
     {

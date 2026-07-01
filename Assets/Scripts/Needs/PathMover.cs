@@ -9,16 +9,19 @@ namespace Needs
         public IReadOnlyCollection<Vector3> Path => _pathGenerator.Path.AsReadOnly();
         public Node CurrentPosition => _pathGenerator.CurrentNode; // the node that the car is currently on
         public Node NextPosition => _pathGenerator.NextNode; // the node that the car is moving to
-        
+
         // Converts a path of nodes into a viable path of vector3 points to follow
         private readonly PathGenerator _pathGenerator; // the vector3 generator to create points along the path of nodes to be followed
         private Vector3 _currentTargetPosition; // the position that we are currently driving towards
         private const float TargetTolerance = .01f;
 
-        public PathMover(GridManager gridManager, Node startPosition)
+        public PathMover(GridManager gridManager, Vector3 startPosition)
         {
             _pathGenerator = new PathGenerator(gridManager, startPosition);
         }
+
+        public void UpdateCurrentNodeFromWorldPosition(Vector3 worldPosition) =>
+            _pathGenerator.UpdateCurrentNodeFromWorldPosition(worldPosition);
 
         public void GeneratePath(Node end)
         {

@@ -18,17 +18,14 @@ namespace Needs
         {
             _gridManager = gridManager;
             _carManager = carManager;
-            var positionOnGrid = _gridManager.WorldToGrid(transform.position);
-            var currentNode = _gridManager.Grid[positionOnGrid.x, positionOnGrid.y];
-            _pathMover = new PathMover(gridManager, currentNode);
+            _pathMover = new PathMover(gridManager, transform.position);
         }
 
         public void FindTestPath()
         {
+            var goalNode = _gridManager.WorldToNode(_carManager.TestPosition.transform.position);
             
-            var goalPositionOnGrid = _gridManager.WorldToGrid(_carManager.TestPosition.transform.position);
-            var goalNode = _gridManager.Grid[goalPositionOnGrid.x, goalPositionOnGrid.y];
-
+            _pathMover.UpdateCurrentNodeFromWorldPosition(transform.position); // just in case the car has been moved in the editor
             _pathMover.GeneratePath(goalNode);
         }
 

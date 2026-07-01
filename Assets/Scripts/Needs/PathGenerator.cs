@@ -25,11 +25,11 @@ namespace Needs
         private const float PathDiagonalLength = .7071f; // todo get from elsewhere
         private const float TurnSmoothness = .1f; // lower number is smoother
 
-        public PathGenerator(GridManager gridManager, Node startPosition)
+        public PathGenerator(GridManager gridManager, Vector3 startPosition)
         {
             _gridManager = gridManager;
             _pathfinding = new Pathfinding(gridManager.Grid);
-            CurrentNode = startPosition;
+            UpdateCurrentNodeFromWorldPosition(startPosition);
         }
 
         /// <summary>
@@ -55,21 +55,20 @@ namespace Needs
             }
             return Path[_currentPositionPointer];
         }
-        
+
         /// <summary>
-        ///     After visiting this position, call <see cref="VisitedPosition"/>
-        ///     Updates <see cref="PathGenerated"/> and <see cref="Path"/>
+        ///     If the car's position has been moved in the editor, the <see cref="CurrentNode"/> will be out of sync,
+        ///     this syncs it up
         /// </summary>
-        private void VisitedPosition()
+        public void UpdateCurrentNodeFromWorldPosition(Vector3 worldPosition)
         {
-            _currentPositionPointer++;
-            if (_currentPositionPointer != Path.Count - 1) return;
-            // if the car has reached the destination
-            PathGenerated = false;
+            CurrentNode = _gridManager.WorldToNode(worldPosition);
         }
 
         public void GeneratePath(Node start, Node goal) // todo remove start and use current node
         {
+            _currentNodePointer = 0;
+            _currentPositionPointer = 0;
             _pathfinding.GeneratePath(start, goal);
             if (_pathfinding.ValidPathExists)
                 GeneratePath();
@@ -134,6 +133,7 @@ namespace Needs
             PathGenerated = true;
         }
         
+        // todo these two
         private void GenerateStartPath(Node[] nodePath, int currentNode)
         {
             Path = new List<Vector3>();
