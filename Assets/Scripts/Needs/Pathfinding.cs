@@ -9,7 +9,7 @@ namespace Needs
     /// </summary>
     public class Pathfinding
     {
-        public List<Node> Path { get; private set; } = new();
+        public Node[] Path { get; private set; } = { };
         public bool ValidPathExists { get; private set; }
         
         private Grid _grid; // todo maybe able to delete
@@ -25,7 +25,7 @@ namespace Needs
             return Mathf.Abs(current.X - goal.X) + Mathf.Abs(current.Y - goal.Y);
         }
 
-        private List<Node> ReconstructPath(Node start, Node current, Dictionary<Node, Node> cameFrom)
+        private Node[] ReconstructPath(Node start, Node current, Dictionary<Node, Node> cameFrom)
         {
             var path = new List<Node> { current };
             while (current != start)
@@ -36,16 +36,16 @@ namespace Needs
 
             path.Add(start);
             path.Reverse();
-            return path;
+            return path.ToArray();
         }
 
         public void GeneratePath(Node start, Node goal)
         {
             Path = FindPath(start, goal);
-            ValidPathExists = Path.Count > 0;
+            ValidPathExists = Path.Length > 0;
         }
 
-        private List<Node> FindPath(Node start, Node goal)
+        private Node[] FindPath(Node start, Node goal)
         {
             // A* is defined as f(n) = g(n) + h(n)
             // g(n) is the total cost of transitions, which in our case is 1 per transition
@@ -85,12 +85,12 @@ namespace Needs
                 if (c > 500)
                 {
                     Debug.Log("Got stuck");
-                    return new List<Node>();
+                    return new Node[]{};
                 }
             }
 
             Debug.Log("Could not find a path!");
-            return new List<Node>();
+            return new Node[]{};
         }
     }
 }

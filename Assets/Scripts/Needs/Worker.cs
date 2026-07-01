@@ -18,17 +18,18 @@ namespace Needs
         {
             _gridManager = gridManager;
             _carManager = carManager;
-            _pathMover = new PathMover(gridManager);
+            var positionOnGrid = _gridManager.WorldToGrid(transform.position);
+            var currentNode = _gridManager.Grid[positionOnGrid.x, positionOnGrid.y];
+            _pathMover = new PathMover(gridManager, currentNode);
         }
 
         public void FindTestPath()
         {
-            var positionOnGrid = _gridManager.WorldToGrid(transform.position);
-            var currentNode = _gridManager.Grid[positionOnGrid.x, positionOnGrid.y];
+            
             var goalPositionOnGrid = _gridManager.WorldToGrid(_carManager.TestPosition.transform.position);
             var goalNode = _gridManager.Grid[goalPositionOnGrid.x, goalPositionOnGrid.y];
 
-            _pathMover.GeneratePath(currentNode, goalNode);
+            _pathMover.GeneratePath(goalNode);
         }
 
         private void OnDrawGizmos()
@@ -42,10 +43,14 @@ namespace Needs
                 Gizmos.DrawSphere(new Vector3(node.x, 0.2f, node.z), 0.1f);
             }
 
-            // for (var i = 0; i < _vector3Path.Path.Count - 1; i++)
-            // {
-            //     Gizmos.DrawLine(_vector3Path.Path[i], _vector3Path.Path[i + 1]);
-            // }
+            Gizmos.color = Color.blue;
+            var currentPosition =
+                _gridManager.GridToWorld(new Vector2Int(_pathMover.CurrentPosition.X, _pathMover.CurrentPosition.Y));
+            var nextPosition =
+                _gridManager.GridToWorld(new Vector2Int(_pathMover.NextPosition.X, _pathMover.NextPosition.Y));
+            Gizmos.DrawSphere(new Vector3(currentPosition.x, 0.2f, currentPosition.z), 0.1f);
+            Gizmos.color = Color.purple;
+            Gizmos.DrawSphere(new Vector3(nextPosition.x, 0.2f, nextPosition.z), 0.1f);
             
         }
     }

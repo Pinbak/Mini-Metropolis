@@ -7,26 +7,23 @@ namespace Needs
     {
         public bool PathExists => _pathGenerator.PathGenerated;
         public IReadOnlyCollection<Vector3> Path => _pathGenerator.Path.AsReadOnly();
+        public Node CurrentPosition => _pathGenerator.CurrentNode; // the node that the car is currently on
+        public Node NextPosition => _pathGenerator.NextNode; // the node that the car is moving to
         
         // Converts a path of nodes into a viable path of vector3 points to follow
-        private readonly Pathfinding _pathfinding; // the actual a* algorithm to find a path from A to B
         private readonly PathGenerator _pathGenerator; // the vector3 generator to create points along the path of nodes to be followed
-        private Node _currentPosition;
         private Vector3 _currentTargetPosition; // the position that we are currently driving towards
         private const float TargetTolerance = .01f;
 
-        public PathMover(GridManager gridManager)
+        public PathMover(GridManager gridManager, Node startPosition)
         {
-            _pathGenerator = new PathGenerator(gridManager);
-            _pathfinding = new Pathfinding(gridManager.Grid);
+            _pathGenerator = new PathGenerator(gridManager, startPosition);
         }
 
-        public void GeneratePath(Node start, Node end)
+        public void GeneratePath(Node end)
         {
-            _pathfinding.GeneratePath(start, end);
-            _pathGenerator.GeneratePath(_pathfinding.Path);
+            _pathGenerator.GeneratePath(CurrentPosition, end);
             if (_pathGenerator.PathGenerated) _currentTargetPosition = _pathGenerator.Path[0];
-            
         }
 
         public void MoveAlongPath(GameObject objectToMove, float movementSpeed)
@@ -51,7 +48,7 @@ namespace Needs
             else
             {
                 // if the car has reached the target, it needs to get the next target
-                _currentTargetPosition = _pathGenerator.GetNextPosition(_currentTargetPosition, out var foundPosition);
+                _currentTargetPosition = _pathGenerator.GetNextPosition();
             }
         }
         
