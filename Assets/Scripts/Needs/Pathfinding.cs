@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Needs
 {
+    /// <summary>
+    ///     Implementation of A*
+    /// </summary>
     public class Pathfinding
     {
         public List<Node> Path { get; private set; } = new();
