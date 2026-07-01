@@ -31,7 +31,7 @@ namespace Needs
 
         private void OnDrawGizmos()
         {
-            if (!_pathMover.PathExists) return;
+            if (!_pathMover.HasValidPath) return;
             
             Gizmos.color = Color.red;
             
