@@ -14,6 +14,7 @@ namespace Needs
         private void Update()
         {
             _pathMover.MoveAlongPath(movementSpeed);
+            return;
             if (!_pathMover.HasValidPath)
             {
                 var validGoalPositions = new List<Node>();
