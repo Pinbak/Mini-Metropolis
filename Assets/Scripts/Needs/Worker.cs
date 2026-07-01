@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Needs
 {
@@ -12,6 +14,21 @@ namespace Needs
         private void Update()
         {
             _pathMover.MoveAlongPath(movementSpeed);
+            if (!_pathMover.HasValidPath)
+            {
+                var validGoalPositions = new List<Node>();
+                for (var x = 0; x < _gridManager.Width; x++)
+                for (var y = 0; y < _gridManager.Height; y++)
+                {
+                    var node = _gridManager.Grid[x, y];
+                    if (node.Type is NodeType.Road)
+                        validGoalPositions.Add(node);
+                }
+
+                if (validGoalPositions.Count == 0) return;
+                var newGoalNode = validGoalPositions[Random.Range(0, validGoalPositions.Count)];
+                _pathMover.GeneratePath(newGoalNode);
+            }
         }
 
         public void Init(CarManager carManager, GridManager gridManager)
