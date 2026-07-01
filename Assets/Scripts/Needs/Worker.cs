@@ -11,21 +11,21 @@ namespace Needs
 
         private void Update()
         {
-            _pathMover.MoveAlongPath(gameObject, movementSpeed);
+            _pathMover.MoveAlongPath(movementSpeed);
         }
 
         public void Init(CarManager carManager, GridManager gridManager)
         {
             _gridManager = gridManager;
             _carManager = carManager;
-            _pathMover = new PathMover(gridManager, transform.position);
+            _pathMover = new PathMover(gridManager, gameObject);
         }
 
         public void FindTestPath()
         {
             var goalNode = _gridManager.WorldToNode(_carManager.TestPosition.transform.position);
             
-            _pathMover.UpdateCurrentNodeFromWorldPosition(transform.position); // just in case the car has been moved in the editor
+            // _pathMover.UpdateCurrentNodeFromWorldPosition(transform.position); // just in case the car has been moved in the editor
             _pathMover.GeneratePath(goalNode);
         }
 

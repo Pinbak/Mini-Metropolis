@@ -12,7 +12,7 @@ public class CarManager : MonoBehaviour
     
     private void Start()
     {
-        const int numberOfCars = 2;
+        const int numberOfCars = 1;
         for (var i = 0; i < numberOfCars; i++)
         {
             var testCar = Instantiate(workerPrefab, Vector3.zero, Quaternion.identity, transform);

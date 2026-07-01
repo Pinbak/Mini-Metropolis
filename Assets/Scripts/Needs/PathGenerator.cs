@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Needs
 {
     /// <summary>
-    ///     Converts an A* found path of <see cref="Node"/>s into a <see cref="Vector3"/> path to be followed by a car
+    ///     Converts an A* found path of <see cref="Node"/>s into a <see cref="Vector3"/> path to be followed by an agent
     /// </summary>
     public class PathGenerator
     {
@@ -16,6 +16,7 @@ namespace Needs
         private readonly Pathfinding _pathfinding; // the actual a* algorithm to find a path from A to B
         private int _currentNodePointer;
         private int _currentPositionPointer;
+        private readonly GameObject _agent; // the agent that has the position which is being used
         
         private readonly GridManager _gridManager;
         private readonly float _offset;
@@ -25,11 +26,12 @@ namespace Needs
         private const float PathDiagonalLength = .7071f; // todo get from elsewhere
         private const float TurnSmoothness = .1f; // lower number is smoother
 
-        public PathGenerator(GridManager gridManager, Vector3 startPosition)
+        public PathGenerator(GridManager gridManager, GameObject agent)
         {
             _gridManager = gridManager;
             _pathfinding = new Pathfinding(gridManager.Grid);
-            UpdateCurrentNodeFromWorldPosition(startPosition);
+            _agent = agent;
+            UpdateCurrentNodeFromWorldPosition(agent.transform.position);
         }
 
         /// <summary>
@@ -51,13 +53,20 @@ namespace Needs
                     return Vector3.zero;
                 }
                 NextNode = _pathfinding.Path[_currentNodePointer];
+                // the road has been removed since setting out
+                if (NextNode.Type is not NodeType.Road)
+                {
+                    _currentNodePointer = 0;
+                    PathGenerated = false;
+                    return Vector3.zero;
+                }
                 GeneratePath();
             }
             return Path[_currentPositionPointer];
         }
 
         /// <summary>
-        ///     If the car's position has been moved in the editor, the <see cref="CurrentNode"/> will be out of sync,
+        ///     If the agent's position has been moved in the editor, the <see cref="CurrentNode"/> will be out of sync,
         ///     this syncs it up
         /// </summary>
         public void UpdateCurrentNodeFromWorldPosition(Vector3 worldPosition)
@@ -136,11 +145,7 @@ namespace Needs
         // todo these two
         private void GenerateStartPath(Node[] nodePath, int currentNode)
         {
-            Path = new List<Vector3>();
-            var position =
-                _gridManager.GridToWorld(new Vector2Int(_pathfinding.Path[_currentNodePointer].X,
-                    _pathfinding.Path[_currentNodePointer].Y));
-            Path.Add(position);
+            Path = new List<Vector3> { _agent.transform.position };
             PathGenerated = true;
         }
 
