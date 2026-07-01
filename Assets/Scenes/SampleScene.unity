@@ -972,9 +972,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a00b413de1524c279d0b43b9f4bd5979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarManager
+  <AgentLayer>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 128
+  <TestPosition>k__BackingField: {fileID: 379856742}
   workerPrefab: {fileID: 1679263155091622085, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
   gridManager: {fileID: 1487683637}
-  <TestPosition>k__BackingField: {fileID: 379856742}
 --- !u!4 &2009150916
 Transform:
   m_ObjectHideFlags: 0

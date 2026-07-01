@@ -18,20 +18,22 @@ namespace Needs
         {
             _gridManager = gridManager;
             _carManager = carManager;
-            _pathMover = new PathMover(gridManager, gameObject);
+            _pathMover = new PathMover(gridManager, gameObject, carManager.AgentLayer);
         }
 
         public void FindTestPath()
         {
             var goalNode = _gridManager.WorldToNode(_carManager.TestPosition.transform.position);
             
-            // _pathMover.UpdateCurrentNodeFromWorldPosition(transform.position); // just in case the car has been moved in the editor
+            _pathMover.UpdateCurrentNodeFromWorldPosition(transform.position); // just in case the car has been moved in the editor
             _pathMover.GeneratePath(goalNode);
         }
 
         private void OnDrawGizmos()
         {
+            if (_pathMover is null) return;
             if (!_pathMover.HasValidPath) return;
+            return;
             
             Gizmos.color = Color.red;
             

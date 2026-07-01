@@ -12,6 +12,10 @@ namespace Needs
 
         private int _currentNodePointer;
         private int _currentPositionPointer;
+        private bool _attemptRecalculatePath; // if path breaks try once to recalculate
+        private Node _destination;
+        private readonly LayerMask _agentLayer;
+        private readonly float _detectionDistance = .8f; // the distance to check for other agents
 
         // Converts a path of nodes into a viable path of vector3 points to follow
         private readonly PathGenerator _pathGenerator; // the vector3 generator to create points along the path of nodes to be followed
@@ -19,11 +23,15 @@ namespace Needs
         private const float TargetTolerance = .01f;
         private readonly GameObject _agent; // a reference to the object this is affecting
         private readonly GridManager _gridManager;
+        private float _currentSpeed;
+        private const float Acceleration = 1f;
+        private const float DistanceToAgentInFront = 0.5f; // how close the agent gets to another agent before fully stopping
 
-        public PathMover(GridManager gridManager, GameObject agent)
+        public PathMover(GridManager gridManager, GameObject agent, LayerMask agentLayer)
         {
             _pathGenerator = new PathGenerator(gridManager, agent);
             _agent = agent;
+            _agentLayer = agentLayer;
             _gridManager = gridManager;
             UpdateCurrentNodeFromWorldPosition(agent.transform.position);
         }
@@ -42,6 +50,7 @@ namespace Needs
             _currentNodePointer = 0;
             _currentPositionPointer = 0;
             _pathGenerator.GeneratePath(CurrentPosition, end);
+            _destination = end;
             if (_pathGenerator.PathGenerated)
             {
                 _currentTargetPosition = _pathGenerator.Path[0];
@@ -54,16 +63,35 @@ namespace Needs
             if (!HasValidPath) return;
 
             var currentPosition = _agent.transform.position;
-            var currentRotation = _agent.transform.rotation;
-            var rotationSpeed = movementSpeed * 10f;
-
+            
             if (Vector3.Distance(currentPosition, _currentTargetPosition) > TargetTolerance)
             {
+                var currentRotation = _agent.transform.rotation;
+                var rotationSpeed = movementSpeed * 10f;
+                var adjustedSpeed = movementSpeed;
+                if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
+                        _agentLayer))
+                {
+                    Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
+                        hit.point, Color.blue);
+                    adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
+                }
+                else
+                {
+                    // todo remove
+                    var rayCastEndPosition = currentPosition + _agent.transform.forward * _detectionDistance;
+                    Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
+                        rayCastEndPosition, Color.red);
+                }
+                
+                // slowly change the speed to match the maximum target speed * the distance to the car in front
+                _currentSpeed = Mathf.MoveTowards(_currentSpeed, adjustedSpeed, Acceleration * Time.deltaTime);
+                
                 // if the agent is not yet at the target, move it and rotate it
                 _agent.transform.position =
-                    Vector3.MoveTowards(currentPosition, _currentTargetPosition, movementSpeed * Time.deltaTime);
+                    Vector3.MoveTowards(currentPosition, _currentTargetPosition, _currentSpeed * Time.deltaTime);
                 var direction = _currentTargetPosition - currentPosition;
-                var targetAngle = Vector3.SignedAngle(Vector3.right, direction.normalized, Vector3.up);
+                var targetAngle = Vector3.SignedAngle(Vector3.forward, direction.normalized, Vector3.up);
                 var targetRotation = Quaternion.Euler(0, targetAngle, 0);
                 _agent.transform.rotation =
                     Quaternion.Lerp(currentRotation, targetRotation, rotationSpeed * Time.deltaTime);
@@ -99,6 +127,12 @@ namespace Needs
                 {
                     _currentNodePointer = 0;
                     HasValidPath = false;
+                    // if (!_attemptRecalculatePath)
+                    // {
+                    //     _attemptRecalculatePath = true;
+                    //     UpdateCurrentNodeFromWorldPosition(_agent.transform.position);
+                    //     GeneratePath(_destination);
+                    // }
                     return Vector3.zero;
                 }
                 _pathGenerator.GenerateSteps(_currentNodePointer);
