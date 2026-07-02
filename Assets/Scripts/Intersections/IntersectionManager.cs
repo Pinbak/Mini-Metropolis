@@ -7,7 +7,6 @@ namespace Intersections
     public class IntersectionManager : MonoBehaviour
     {
         [SerializeField] private GridManager gridManager;
-        [SerializeField] private LayerMask agentLayer;
 
         private Intersection[,] _intersections;
         private readonly List<Intersection> _activeIntersections = new();
@@ -44,8 +43,7 @@ namespace Intersections
             var x = node.X;
             var y = node.Y;
             if (_intersections[x, y] is not null) return;
-            var worldPosition = gridManager.GridToWorld(x, y);
-            var newIntersection = new Intersection(node, worldPosition, agentLayer);
+            var newIntersection = new Intersection(node);
             _intersections[x, y] = newIntersection;
             _activeIntersections.Add(newIntersection);
         }

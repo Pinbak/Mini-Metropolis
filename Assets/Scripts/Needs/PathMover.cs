@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Numerics;
 using Intersections;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -33,7 +32,6 @@ namespace Needs
         private float _speedMultiplier = 1f; // used to stop the agent
         private const float Acceleration = 1f;
         private const float DistanceToAgentInFront = 0.5f; // how close the agent gets to another agent before fully stopping
-        private bool _atJunction;
 
         public PathMover(GridManager gridManager, IntersectionManager intersectionManager, GameObject agent,
             LayerMask agentLayer)
@@ -72,13 +70,11 @@ namespace Needs
         {
             MovingInJunction = true;
             _speedMultiplier = 1f;
-            _atJunction = false;
         }
 
         public void Stop()
         {
             _speedMultiplier = 0f;
-            _atJunction = true;
         }
 
         public void MoveAlongPath(float movementSpeed)
@@ -91,24 +87,21 @@ namespace Needs
             {
                 var currentRotation = _agent.transform.rotation;
                 var rotationSpeed = movementSpeed * 10f;
-                var adjustedSpeed = movementSpeed * _speedMultiplier;
+                var adjustedSpeed = movementSpeed;
                 var acceleration = Acceleration;
                 if (!MovingInJunction)
                 {
+                    adjustedSpeed = movementSpeed * _speedMultiplier;
                     if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
                             _agentLayer))
                     {
-                        if (Vector3.Dot(_agent.transform.position, hit.transform.position) > 0)
 
-                        {
-                            
-                        }
                         Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
                             hit.point, Color.blue);
                         adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
                         // make acceleration/deceleration inversely proportional to distance
                         acceleration = Mathf.Min(Acceleration,
-                            Acceleration + Mathf.Pow(Acceleration * 3f - hit.distance * 3f, 2));
+                            Acceleration + Mathf.Pow(Acceleration * 2f - hit.distance * 2f, 4));
                     }
                 }
                 
