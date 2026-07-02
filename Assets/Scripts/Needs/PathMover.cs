@@ -13,6 +13,7 @@ namespace Needs
         public IReadOnlyCollection<Vector3> Path => _pathGenerator.Path.AsReadOnly();
         public Node CurrentPosition { get; private set; } // the node that the agent is currently on
         public Node NextPosition { get; private set; } // the node that the agent is moving to
+        public bool MovingInJunction { get; set; }
 
         private int _currentNodePointer;
         private int _currentPositionPointer;
@@ -69,6 +70,7 @@ namespace Needs
 
         public void Go()
         {
+            MovingInJunction = true;
             _speedMultiplier = 1f;
             _atJunction = false;
         }
@@ -85,38 +87,33 @@ namespace Needs
 
             var currentPosition = _agent.transform.position;
             var distanceToNextNode = Vector3.Distance(currentPosition, _currentTargetPosition);
-            var minSpeed = _atJunction ? .1f : 0f;
             if (distanceToNextNode > TargetTolerance)
             {
                 var currentRotation = _agent.transform.rotation;
                 var rotationSpeed = movementSpeed * 10f;
                 var adjustedSpeed = movementSpeed * _speedMultiplier;
                 var acceleration = Acceleration;
-                if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
-                        _agentLayer))
+                if (!MovingInJunction)
                 {
-                    Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
-                        hit.point, Color.blue);
-                    adjustedSpeed = movementSpeed * Mathf.Max(minSpeed, hit.distance - DistanceToAgentInFront);
-                    // make acceleration/deceleration inversely proportional to distance
-                    acceleration = Mathf.Min(Acceleration,
-                        Acceleration + Mathf.Pow(Acceleration * 3f - hit.distance * 3f, 2));
-                }
-                else
-                {
-                    // todo remove
-                    var rayCastEndPosition = currentPosition + _agent.transform.forward * _detectionDistance;
-                    Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
-                        rayCastEndPosition, Color.red);
-                    if (_atJunction)
+                    if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
+                            _agentLayer))
                     {
+                        if (Vector3.Dot(_agent.transform.position, hit.transform.position) > 0)
+
+                        {
+                            
+                        }
+                        Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
+                            hit.point, Color.blue);
+                        adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
+                        // make acceleration/deceleration inversely proportional to distance
                         acceleration = Mathf.Min(Acceleration,
-                            Acceleration + Mathf.Pow(Acceleration * 3f - distanceToNextNode * 3f, 2));
+                            Acceleration + Mathf.Pow(Acceleration * 3f - hit.distance * 3f, 2));
                     }
                 }
                 
-                // slowly change the speed to match the maximum target speed * the distance to the car in front
                 
+                // slowly change the speed to match the maximum target speed * the distance to the car in front
                 _currentSpeed = Mathf.MoveTowards(_currentSpeed, adjustedSpeed, acceleration * Time.deltaTime);
                 
                 // if the agent is not yet at the target, move it and rotate it

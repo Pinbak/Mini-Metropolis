@@ -41,6 +41,7 @@ namespace Intersections
                 Debug.DrawLine(_rayCastPosition, _position, Color.blue);
                 if (_lastSent.NextPosition != _node && _lastSent.CurrentPosition != _node)
                 {
+                    _lastSent.MovingInJunction = false;
                     _lastSent = null;
                     
                 }
@@ -49,7 +50,7 @@ namespace Intersections
             if (_lastSent is not null) return;
             Debug.DrawLine(_rayCastPosition, _position, Color.red);
             if (_agents.Count == 0) return; // nobody waiting at intersection
-            // if nothing is currently in the junction, send the next car that is waiting through.
+            // if nothing is currently in the junction, send the next car that is waiting through
             _lastSent = _agents.Dequeue();
             _lastSent.Go();
 
