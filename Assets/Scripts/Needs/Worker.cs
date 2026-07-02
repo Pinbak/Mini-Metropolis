@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Intersections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -32,11 +33,11 @@ namespace Needs
             }
         }
 
-        public void Init(CarManager carManager, GridManager gridManager)
+        public void Init(CarManager carManager, GridManager gridManager, IntersectionManager intersectionManager)
         {
             _gridManager = gridManager;
             _carManager = carManager;
-            _pathMover = new PathMover(gridManager, gameObject, carManager.AgentLayer);
+            _pathMover = new PathMover(gridManager, intersectionManager, gameObject, carManager.AgentLayer);
         }
 
         public void FindTestPath()

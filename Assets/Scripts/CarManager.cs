@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Intersections;
 using Needs;
 using UnityEngine;
 
@@ -9,16 +10,17 @@ public class CarManager : MonoBehaviour
 
     [SerializeField] private Worker workerPrefab;
     [SerializeField] private GridManager gridManager;
+    [SerializeField] private IntersectionManager intersectionManager;
 
     private readonly List<Worker> _testCars = new();
     
     private void Start()
     {
-        const int numberOfCars = 1;
+        const int numberOfCars = 2;
         for (var i = 0; i < numberOfCars; i++)
         {
             var testCar = Instantiate(workerPrefab, Vector3.zero, Quaternion.identity, transform);
-            testCar.Init(this, gridManager);
+            testCar.Init(this, gridManager, intersectionManager);
             _testCars.Add(testCar);
         }
     }

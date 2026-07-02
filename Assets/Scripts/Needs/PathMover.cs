@@ -1,5 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
+using Intersections;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Needs
 {
@@ -23,16 +27,21 @@ namespace Needs
         private const float TargetTolerance = .01f;
         private readonly GameObject _agent; // a reference to the object this is affecting
         private readonly GridManager _gridManager;
+        private readonly IntersectionManager _intersectionManager;
         private float _currentSpeed;
+        private float _speedMultiplier = 1f; // used to stop the agent
         private const float Acceleration = 1f;
         private const float DistanceToAgentInFront = 0.5f; // how close the agent gets to another agent before fully stopping
+        private bool _atJunction;
 
-        public PathMover(GridManager gridManager, GameObject agent, LayerMask agentLayer)
+        public PathMover(GridManager gridManager, IntersectionManager intersectionManager, GameObject agent,
+            LayerMask agentLayer)
         {
             _pathGenerator = new PathGenerator(gridManager, agent);
             _agent = agent;
             _agentLayer = agentLayer;
             _gridManager = gridManager;
+            _intersectionManager = intersectionManager;
             UpdateCurrentNodeFromWorldPosition(agent.transform.position);
         }
         
@@ -58,23 +67,38 @@ namespace Needs
             }
         }
 
+        public void Go()
+        {
+            _speedMultiplier = 1f;
+            _atJunction = false;
+        }
+
+        public void Stop()
+        {
+            _speedMultiplier = 0f;
+            _atJunction = true;
+        }
+
         public void MoveAlongPath(float movementSpeed)
         {
             if (!HasValidPath) return;
 
             var currentPosition = _agent.transform.position;
-            
-            if (Vector3.Distance(currentPosition, _currentTargetPosition) > TargetTolerance)
+            var distanceToNextNode = Vector3.Distance(currentPosition, _currentTargetPosition);
+            if (distanceToNextNode > TargetTolerance)
             {
                 var currentRotation = _agent.transform.rotation;
                 var rotationSpeed = movementSpeed * 10f;
-                var adjustedSpeed = movementSpeed;
+                var adjustedSpeed = movementSpeed * _speedMultiplier;
+                var acceleration = Acceleration;
                 if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
                         _agentLayer))
                 {
                     Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
                         hit.point, Color.blue);
                     adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
+                    // make acceleration/deceleration inversely proportional to distance
+                    acceleration = Acceleration + Mathf.Pow(Acceleration * 2f - hit.distance * 2f, 2);
                 }
                 else
                 {
@@ -82,10 +106,15 @@ namespace Needs
                     var rayCastEndPosition = currentPosition + _agent.transform.forward * _detectionDistance;
                     Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
                         rayCastEndPosition, Color.red);
+                    if (_atJunction)
+                    {
+                        acceleration = Acceleration + Acceleration - distanceToNextNode;
+                    }
                 }
                 
                 // slowly change the speed to match the maximum target speed * the distance to the car in front
-                _currentSpeed = Mathf.MoveTowards(_currentSpeed, adjustedSpeed, Acceleration * Time.deltaTime);
+                
+                _currentSpeed = Mathf.MoveTowards(_currentSpeed, adjustedSpeed, acceleration * Time.deltaTime);
                 
                 // if the agent is not yet at the target, move it and rotate it
                 _agent.transform.position =
@@ -122,6 +151,8 @@ namespace Needs
                     return Vector3.zero;
                 }
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
+                if (_intersectionManager.IsIntersection(NextPosition))
+                    _intersectionManager.AddToIntersection(this, NextPosition);
                 // the road has been removed since setting out
                 if (NextPosition.Type is not NodeType.Road)
                 {

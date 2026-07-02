@@ -63,7 +63,6 @@ namespace Needs
                 var currentNode = current.Key;
                 if (currentNode == goal)
                 {
-                    Debug.Log("Found path!");
                     return ReconstructPath(start, currentNode, cameFrom);
                 }
 
@@ -84,12 +83,10 @@ namespace Needs
 
                 if (c > 500)
                 {
-                    Debug.Log("Got stuck");
                     return new Node[]{};
                 }
             }
 
-            Debug.Log("Could not find a path!");
             return new Node[]{};
         }
     }

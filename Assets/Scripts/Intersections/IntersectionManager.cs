@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Needs;
 using UnityEngine;
 
 namespace Intersections
@@ -7,6 +7,7 @@ namespace Intersections
     public class IntersectionManager : MonoBehaviour
     {
         [SerializeField] private GridManager gridManager;
+        [SerializeField] private LayerMask agentLayer;
 
         private Intersection[,] _intersections;
         private readonly List<Intersection> _activeIntersections = new();
@@ -24,12 +25,25 @@ namespace Intersections
             }
         }
 
-
+        public void AddToIntersection(PathMover agentToAdd, Node intersectionToAddTo)
+        {
+            var intersection = _intersections[intersectionToAddTo.X, intersectionToAddTo.Y];
+            intersection.AddToQueue(agentToAdd);
+        }
+        
+        /// <summary>
+        ///     Checks if the node is an intersection or not. Returns true if it is
+        /// </summary>
+        public bool IsIntersection(Node node)
+        {
+            return _intersections[node.X, node.Y] is not null;
+        }
+        
         public void CreateIntersection(int x, int y)
         {
             if (_intersections[x, y] is not null) return;
             var worldPosition = gridManager.GridToWorld(x, y);
-            var newIntersection = new Intersection(x, y, worldPosition);
+            var newIntersection = new Intersection(x, y, worldPosition, agentLayer);
             _intersections[x, y] = newIntersection;
             _activeIntersections.Add(newIntersection);
         }
