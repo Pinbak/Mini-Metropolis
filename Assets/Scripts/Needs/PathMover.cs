@@ -91,18 +91,26 @@ namespace Needs
                 var acceleration = _acceleration;
                 if (!MovingInJunction)
                 {
-                    adjustedSpeed = movementSpeed * _speedMultiplier;
-                    if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
-                            _agentLayer))
+                    if (_speedMultiplier == 0f)
                     {
-
-                        Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
-                            hit.point, Color.blue);
-                        adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
-                        // make acceleration/deceleration inversely proportional to distance
-                        acceleration = Mathf.Min(_acceleration,
-                            _acceleration + Mathf.Pow(_acceleration * 2f - hit.distance * 2f, 4));
+                        adjustedSpeed = movementSpeed * _speedMultiplier;
                     }
+                    else
+                    {
+                        if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
+                                _agentLayer))
+                        {
+                            if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
+                            {
+                                Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
+                                    hit.point, Color.blue);
+                                adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
+                                // make acceleration/deceleration inversely proportional to distance
+                                acceleration = _acceleration + _acceleration- hit.distance;
+                            }
+                        }
+                    }
+                    
                 }
                 
                 
@@ -145,14 +153,7 @@ namespace Needs
                 }
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
                 if (_intersectionManager.IsIntersection(NextPosition))
-                {
                     _intersectionManager.AddToIntersection(this, NextPosition);
-                    _acceleration = 2f;
-                }
-                else
-                {
-                    _acceleration = 1f;
-                }
                 // the road has been removed since setting out
                 if (NextPosition.Type is not NodeType.Road)
                 {
