@@ -11,11 +11,12 @@ namespace Needs
         private PathMover _pathMover; // the ability to move along a path
         private GridManager _gridManager; // the grid that this car sits on
         private CarManager _carManager; // parent
+        private IntersectionManager _intersectionManager;
 
         private void Update()
         {
             _pathMover.MoveAlongPath(movementSpeed);
-            return;
+            // return;
             if (!_pathMover.HasValidPath)
             {
                 var validGoalPositions = new List<Node>();
@@ -23,10 +24,10 @@ namespace Needs
                 for (var y = 0; y < _gridManager.Height; y++)
                 {
                     var node = _gridManager.Grid[x, y];
-                    if (node.Type is NodeType.Road)
+                    if (node.Type is NodeType.Road && !_intersectionManager.IsIntersection(node))
                         validGoalPositions.Add(node);
                 }
-
+            
                 if (validGoalPositions.Count == 0) return;
                 var newGoalNode = validGoalPositions[Random.Range(0, validGoalPositions.Count)];
                 _pathMover.GeneratePath(newGoalNode);
@@ -37,6 +38,7 @@ namespace Needs
         {
             _gridManager = gridManager;
             _carManager = carManager;
+            _intersectionManager = intersectionManager;
             _pathMover = new PathMover(gridManager, intersectionManager, gameObject, carManager.AgentLayer);
         }
 

@@ -124,9 +124,9 @@ public class PlacementManager : MonoBehaviour
         gridManager.BuildRoadMesh(endGridPosition.x, endGridPosition.y);
 
         if (startNode.Neighbours.Count > 2)
-            intersectionManager.CreateIntersection(startNode.X, startNode.Y);
+            intersectionManager.CreateIntersection(startNode);
         if (endNode.Neighbours.Count > 2)
-            intersectionManager.CreateIntersection(endNode.X, endNode.Y);
+            intersectionManager.CreateIntersection(endNode);
         
         // Instantiate(roadStructure, _startingPosition, Quaternion.identity);
         // Instantiate(roadStructure, _lastSuccessfulPosition, Quaternion.identity);

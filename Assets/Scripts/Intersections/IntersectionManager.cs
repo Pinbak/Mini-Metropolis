@@ -39,11 +39,13 @@ namespace Intersections
             return _intersections[node.X, node.Y] is not null;
         }
         
-        public void CreateIntersection(int x, int y)
+        public void CreateIntersection(Node node)
         {
+            var x = node.X;
+            var y = node.Y;
             if (_intersections[x, y] is not null) return;
             var worldPosition = gridManager.GridToWorld(x, y);
-            var newIntersection = new Intersection(x, y, worldPosition, agentLayer);
+            var newIntersection = new Intersection(node, worldPosition, agentLayer);
             _intersections[x, y] = newIntersection;
             _activeIntersections.Add(newIntersection);
         }

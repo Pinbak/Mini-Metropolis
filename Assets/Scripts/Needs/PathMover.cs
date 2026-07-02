@@ -25,7 +25,7 @@ namespace Needs
         private readonly PathGenerator _pathGenerator; // the vector3 generator to create points along the path of nodes to be followed
         private Vector3 _currentTargetPosition; // the position that we are currently driving towards
         private const float TargetTolerance = .01f;
-        private readonly GameObject _agent; // a reference to the object this is affecting
+        public readonly GameObject _agent; // a reference to the object this is affecting
         private readonly GridManager _gridManager;
         private readonly IntersectionManager _intersectionManager;
         private float _currentSpeed;
@@ -85,6 +85,7 @@ namespace Needs
 
             var currentPosition = _agent.transform.position;
             var distanceToNextNode = Vector3.Distance(currentPosition, _currentTargetPosition);
+            var minSpeed = _atJunction ? .1f : 0f;
             if (distanceToNextNode > TargetTolerance)
             {
                 var currentRotation = _agent.transform.rotation;
@@ -96,9 +97,10 @@ namespace Needs
                 {
                     Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
                         hit.point, Color.blue);
-                    adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
+                    adjustedSpeed = movementSpeed * Mathf.Max(minSpeed, hit.distance - DistanceToAgentInFront);
                     // make acceleration/deceleration inversely proportional to distance
-                    acceleration = Acceleration + Mathf.Pow(Acceleration * 2f - hit.distance * 2f, 2);
+                    acceleration = Mathf.Min(Acceleration,
+                        Acceleration + Mathf.Pow(Acceleration * 3f - hit.distance * 3f, 2));
                 }
                 else
                 {
@@ -108,7 +110,8 @@ namespace Needs
                         rayCastEndPosition, Color.red);
                     if (_atJunction)
                     {
-                        acceleration = Acceleration + Acceleration - distanceToNextNode;
+                        acceleration = Mathf.Min(Acceleration,
+                            Acceleration + Mathf.Pow(Acceleration * 3f - distanceToNextNode * 3f, 2));
                     }
                 }
                 
