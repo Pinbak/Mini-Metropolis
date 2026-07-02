@@ -25,7 +25,7 @@ namespace Needs
         private readonly PathGenerator _pathGenerator; // the vector3 generator to create points along the path of nodes to be followed
         private Vector3 _currentTargetPosition; // the position that we are currently driving towards
         private const float TargetTolerance = .01f;
-        public readonly GameObject _agent; // a reference to the object this is affecting
+        private readonly GameObject _agent; // a reference to the object this is affecting
         private readonly GridManager _gridManager;
         private readonly IntersectionManager _intersectionManager;
         private float _currentSpeed;
