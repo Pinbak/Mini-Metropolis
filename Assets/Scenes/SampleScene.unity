@@ -879,9 +879,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Intersections.IntersectionManager
   gridManager: {fileID: 1487683637}
-  agentLayer:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!1 &1562068234
 GameObject:
   m_ObjectHideFlags: 0

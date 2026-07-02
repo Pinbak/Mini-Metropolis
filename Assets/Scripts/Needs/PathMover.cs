@@ -13,6 +13,7 @@ namespace Needs
         public Node CurrentPosition { get; private set; } // the node that the agent is currently on
         public Node NextPosition { get; private set; } // the node that the agent is moving to
         public bool MovingInJunction { get; set; }
+        public Vector3 WorldPosition => _agent.transform.position;
 
         private int _currentNodePointer;
         private int _currentPositionPointer;

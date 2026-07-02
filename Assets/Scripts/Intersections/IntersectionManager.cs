@@ -43,7 +43,7 @@ namespace Intersections
             var x = node.X;
             var y = node.Y;
             if (_intersections[x, y] is not null) return;
-            var newIntersection = new Intersection(node);
+            var newIntersection = new Intersection(gridManager.GridToWorld(node.X, node.Y), node);
             _intersections[x, y] = newIntersection;
             _activeIntersections.Add(newIntersection);
         }
