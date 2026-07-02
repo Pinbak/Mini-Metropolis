@@ -30,7 +30,7 @@ namespace Needs
         private readonly IntersectionManager _intersectionManager;
         private float _currentSpeed;
         private float _speedMultiplier = 1f; // used to stop the agent
-        private const float Acceleration = 1f;
+        private float _acceleration = 1f;
         private const float DistanceToAgentInFront = 0.5f; // how close the agent gets to another agent before fully stopping
 
         public PathMover(GridManager gridManager, IntersectionManager intersectionManager, GameObject agent,
@@ -88,7 +88,7 @@ namespace Needs
                 var currentRotation = _agent.transform.rotation;
                 var rotationSpeed = movementSpeed * 10f;
                 var adjustedSpeed = movementSpeed;
-                var acceleration = Acceleration;
+                var acceleration = _acceleration;
                 if (!MovingInJunction)
                 {
                     adjustedSpeed = movementSpeed * _speedMultiplier;
@@ -100,8 +100,8 @@ namespace Needs
                             hit.point, Color.blue);
                         adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
                         // make acceleration/deceleration inversely proportional to distance
-                        acceleration = Mathf.Min(Acceleration,
-                            Acceleration + Mathf.Pow(Acceleration * 2f - hit.distance * 2f, 4));
+                        acceleration = Mathf.Min(_acceleration,
+                            _acceleration + Mathf.Pow(_acceleration * 2f - hit.distance * 2f, 4));
                     }
                 }
                 
@@ -145,7 +145,14 @@ namespace Needs
                 }
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
                 if (_intersectionManager.IsIntersection(NextPosition))
+                {
                     _intersectionManager.AddToIntersection(this, NextPosition);
+                    _acceleration = 2f;
+                }
+                else
+                {
+                    _acceleration = 1f;
+                }
                 // the road has been removed since setting out
                 if (NextPosition.Type is not NodeType.Road)
                 {
