@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Intersections;
 using Roads;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public class PlacementManager : MonoBehaviour
     
     [SerializeField] private GameObject roadStructure;
     [SerializeField] private GridManager gridManager;
+    [SerializeField] private IntersectionManager intersectionManager;
     
     private GameObject _startingNode;
     private Vector3Int _startingPosition;
@@ -62,10 +64,14 @@ public class PlacementManager : MonoBehaviour
             {
                 neighbour.Neighbours.Remove(node);
                 toUpdate.Add((neighbour.X, neighbour.Y));
+                
+                if (neighbour.Neighbours.Count < 3)
+                    intersectionManager.RemoveIntersection(neighbour.X, neighbour.Y);
             }
 
             node.Neighbours = new List<Node>();
             node.Type = NodeType.Empty;
+            intersectionManager.RemoveIntersection(node.X, node.Y);
         }
 
         var chunksToRefresh = gridManager.GetUniqueChunksFromPositions(toUpdate);
@@ -116,6 +122,11 @@ public class PlacementManager : MonoBehaviour
         
         gridManager.BuildRoadMesh(startGridPosition.x, startGridPosition.y);
         gridManager.BuildRoadMesh(endGridPosition.x, endGridPosition.y);
+
+        if (startNode.Neighbours.Count > 2)
+            intersectionManager.CreateIntersection(startNode.X, startNode.Y);
+        if (endNode.Neighbours.Count > 2)
+            intersectionManager.CreateIntersection(endNode.X, endNode.Y);
         
         // Instantiate(roadStructure, _startingPosition, Quaternion.identity);
         // Instantiate(roadStructure, _lastSuccessfulPosition, Quaternion.identity);

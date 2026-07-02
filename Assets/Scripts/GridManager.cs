@@ -63,8 +63,16 @@ public class GridManager : MonoBehaviour
             worldPosition.z + _offsetY
         );
     }
+
+    public Vector3Int GridToWorld(int x, int y)
+    {
+        return new Vector3Int(
+            x - _offsetX,
+            0,
+            y - _offsetY);
+    }
     
-    public Vector3Int GridToWorld(Vector2Int gridPosition)
+    public Vector3Int GridToWorld(Vector2Int gridPosition) // todo check if can use above
     {
         return new Vector3Int(
             gridPosition.x - _offsetX,
