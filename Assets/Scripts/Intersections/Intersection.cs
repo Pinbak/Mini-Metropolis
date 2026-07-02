@@ -20,7 +20,7 @@ namespace Intersections
         {
             if (_lastSent is not null)
             {
-                if (_lastSent.NextPosition != _position)
+                if (_lastSent.NextPosition != _position) // if the next position is no longer the junction
                 {
                     _lastSent.MovingInJunction = false;
                     _lastSent = null;
