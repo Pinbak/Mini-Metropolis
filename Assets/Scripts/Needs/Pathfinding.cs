@@ -27,7 +27,7 @@ namespace Needs
 
         private Node[] ReconstructPath(Node start, Node current, Dictionary<Node, Node> cameFrom)
         {
-            var path = new List<Node> { current };
+            var path = new List<Node>();
             while (current != start)
             {
                 path.Add(current);
