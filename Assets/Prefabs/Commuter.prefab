@@ -46,7 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 156af4a319484d249fbc34de5c442ba3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Need
+  <Currently>k__BackingField: 1
   movementSpeed: 1
+  spendAtWork: 10
 --- !u!65 &5619498843596990357
 BoxCollider:
   m_ObjectHideFlags: 0

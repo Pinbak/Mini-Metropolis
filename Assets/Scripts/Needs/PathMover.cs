@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Intersections;
 using Needs.Buildings;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace Needs
         public Vector3 WorldPosition => _agent.transform.position;
         public ParkingSpace ParkedAt { get; private set; }// the space this agent is currently in
         public ParkingSpace Destination { get; private set; }
+        public Action<Node> Arrived { get; set; } // invoked when the agent has arrived at its intended destination
         
         private Vector3 _targetNodePosition;
         private int _currentNodePointer;
@@ -191,6 +193,7 @@ namespace Needs
                     ParkedAt = Destination;
                     ParkedAt.IsFree = false;
                     _agent.transform.rotation = Destination.transform.rotation;
+                    Arrived?.Invoke(CurrentPosition);
                     return Vector3.zero;
 
                 }

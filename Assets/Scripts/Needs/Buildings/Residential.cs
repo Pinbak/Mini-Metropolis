@@ -12,6 +12,7 @@ namespace Needs.Buildings
         [SerializeField] private Commuter commuterPrefab;
         [SerializeField] private BuildingType type;
         [SerializeField] private ParkingSpace[] validParkingSpaces;
+        [SerializeField] private float workNeed = 100f;
         private const int Width = 2;
         private const int Height = 1;
 
@@ -20,7 +21,17 @@ namespace Needs.Buildings
 
         private void Update()
         {
-            
+            workNeed -= Time.deltaTime;
+            if (workNeed < 50f)
+            {
+                if (_commuter.Currently is State.AtHome)
+                    _commuter.GoToWork();
+            }
+        }
+
+        private void ArrivedAtWork()
+        {
+            workNeed += 50f;
         }
 
         public void Init(BuildingManager buildingManager)
@@ -36,21 +47,18 @@ namespace Needs.Buildings
             BuildingInformation =
                 new BuildingInformation(buildingManager.GridManager, Width, Height, bottomLeft, layout,
                     validParkingSpaces);
-            foreach (var parkingSpace in validParkingSpaces)
-            {
-                _commuter = Instantiate(commuterPrefab, parkingSpace.transform.position, Quaternion.identity,
-                    transform);
-                _commuter.Init(this, buildingManager, buildingManager.GridManager, buildingManager.IntersectionManager,
-                    buildingManager.CarAcceleration, parkingSpace);
-            }
-            
+
+            var commuterParkingSpace = validParkingSpaces[0];
+            _commuter = Instantiate(commuterPrefab, commuterParkingSpace.transform.position, Quaternion.identity,
+                transform);
+            _commuter.Init(this, buildingManager, buildingManager.GridManager, buildingManager.IntersectionManager,
+                buildingManager.CarAcceleration, commuterParkingSpace);
+            _commuter.ArrivedAtWork += ArrivedAtWork;
+
         }
 
-        public void FindTestPath()
-        {
-            _commuter.FindTestPath();
-        }
-
+        #region Draw Gizmos
+        
         private void OnDrawGizmos()
         {
             if (BuildingInformation is null) return;
@@ -69,5 +77,7 @@ namespace Needs.Buildings
             }
             
         }
+        
+        #endregion
     }
 }

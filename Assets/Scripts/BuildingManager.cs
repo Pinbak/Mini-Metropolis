@@ -37,10 +37,5 @@ public class BuildingManager : MonoBehaviour
         TestIndustrial.Init(this);
         placementManager.PlaceBuilding(TestIndustrial.BuildingInformation);
     }
-
-    public void StartTestMovement()
-    {
-        TestHouse.FindTestPath();
-        TestHouse2.FindTestPath();
-    }
+    
 }

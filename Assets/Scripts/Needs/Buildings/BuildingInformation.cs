@@ -9,8 +9,7 @@ namespace Needs.Buildings
         public int Width { get; set; }
         public int Height { get; set; }
         public Node BottomLeft { get; set; }
-        
-        private Vector3 _position;
+        public Vector3 WorldPosition { get; set; }
         
         public NodeType[,] Layout { get; set; }
         public ParkingSpace[] ParkingSpaces { get; set; }
@@ -24,7 +23,7 @@ namespace Needs.Buildings
             Width = width;
             Height = height;
             BottomLeft = bottomLeft;
-            _position = gridManager.NodeToWorld(bottomLeft);
+            WorldPosition = gridManager.NodeToWorld(bottomLeft);
             Layout = layout;
             ParkingSpaces = parkingSpaces;
         }
@@ -34,15 +33,17 @@ namespace Needs.Buildings
             return ParkingSpaces.Any(parkingSpace => parkingSpace.IsBeingTaken);
         }
 
-        public ParkingSpace GetFreeParkingSpace()
+        public bool GetFreeParkingSpace(out ParkingSpace freeParkingSpace)
         {
+            freeParkingSpace = null;
             foreach (var parkingSpace in ParkingSpaces)
             {
                 if (parkingSpace.IsBeingTaken) continue;
-                return parkingSpace;
+                freeParkingSpace = parkingSpace;
+                return true;
             }
-
-            return null;
+            
+            return false;
         }
     }
 }
