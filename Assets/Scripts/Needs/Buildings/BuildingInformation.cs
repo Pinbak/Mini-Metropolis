@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Needs.Buildings
 {
@@ -10,7 +11,7 @@ namespace Needs.Buildings
         private Vector3 _position;
         
         public NodeType[,] Layout { get; set; }
-
+        
         public BuildingInformation(int width, int height, Node bottomLeft, Vector3 position, NodeType[,] layout)
         {
             Width = width;

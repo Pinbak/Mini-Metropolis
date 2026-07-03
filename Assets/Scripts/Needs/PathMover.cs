@@ -37,21 +37,21 @@ namespace Needs
         private const float DistanceToAgentInFront = .3f; // how close the agent gets to another agent before fully stopping
 
         public PathMover(GridManager gridManager, IntersectionManager intersectionManager, GameObject agent,
-            LayerMask agentLayer)
+            LayerMask agentLayer, Node startingPosition)
         {
             _pathGenerator = new PathGenerator(gridManager, agent);
             _agent = agent;
             _agentLayer = agentLayer;
             _gridManager = gridManager;
             _intersectionManager = intersectionManager;
-            UpdateCurrentNodeFromWorldPosition(agent.transform.position);
+            CurrentPosition = startingPosition;
         }
         
         /// <summary>
         ///     If the agent's position has been moved in the editor, the <see cref="CurrentPosition"/> will be out of sync,
         ///     this syncs it up
         /// </summary>
-        public void UpdateCurrentNodeFromWorldPosition(Vector3 worldPosition)
+        public void UpdateCurrentNodeFromPosition(Vector3 worldPosition)
         {
             CurrentPosition = _gridManager.WorldToNode(worldPosition);
         }

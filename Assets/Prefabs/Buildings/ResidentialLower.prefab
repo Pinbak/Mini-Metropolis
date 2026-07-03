@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1491314675336399974}
-  - {fileID: 544909847610541230}
+  - {fileID: 2973114250770914060}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2206404345454251422
@@ -49,7 +49,80 @@ MonoBehaviour:
   commuterPrefab: {fileID: 1679263155091622085, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
   type: 0
   validParkingSpaces:
-  - {fileID: 2295976216090828547}
+  - {fileID: 7377723312171224275}
+--- !u!1001 &1275299001288953468
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3329852073043283842}
+    m_Modifications:
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7862199614194920756, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_Name
+      value: ParkingSpace
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+--- !u!4 &2973114250770914060 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+  m_PrefabInstance: {fileID: 1275299001288953468}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7377723312171224275 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8633459774121869999, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+  m_PrefabInstance: {fileID: 1275299001288953468}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dee673153584abf94b7163e574c3866, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.ParkingSpace
 --- !u!1001 &1385014900509485965
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -115,71 +188,4 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9bef4ea3fd6b3fd44b51814a0f5e21e4, type: 3}
   m_PrefabInstance: {fileID: 1385014900509485965}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &1771365393107187936
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 3329852073043283842}
-    m_Modifications:
-    - target: {fileID: 525185322473236451, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_Name
-      value: ParkingSpace
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
---- !u!4 &544909847610541230 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2241332385996258382, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-  m_PrefabInstance: {fileID: 1771365393107187936}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2295976216090828547 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 525185322473236451, guid: 0bbe6113cce88d1438aba0a0cc2cd64d, type: 3}
-  m_PrefabInstance: {fileID: 1771365393107187936}
   m_PrefabAsset: {fileID: 0}

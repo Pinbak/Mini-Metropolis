@@ -11,7 +11,7 @@ namespace Needs.Buildings
         // the people that live here
         [SerializeField] private Commuter commuterPrefab;
         [SerializeField] private BuildingType type;
-        [SerializeField] private GameObject[] validParkingSpaces;
+        [SerializeField] private ParkingSpace[] validParkingSpaces;
         private const int Width = 2;
         private const int Height = 1;
 
@@ -32,16 +32,17 @@ namespace Needs.Buildings
                 { NodeType.Parking },
                 { NodeType.Building }
             };
-            BuildingInformation =
-                new BuildingInformation(Width, Height, buildingManager.GridManager.WorldToNode(position), position,
-                    layout);
+            var bottomLeft = buildingManager.GridManager.WorldToNode(position);
+            BuildingInformation = new BuildingInformation(Width, Height, bottomLeft, position, layout);
             foreach (var parkingSpace in validParkingSpaces)
             {
                 _commuter = Instantiate(commuterPrefab, parkingSpace.transform.position, Quaternion.identity,
                     transform);
                 _commuter.Init(buildingManager, buildingManager.GridManager, buildingManager.IntersectionManager,
-                    buildingManager.CarAcceleration);
+                    buildingManager.CarAcceleration,
+                    buildingManager.GridManager.WorldToNode(parkingSpace.ParentPosition));
             }
+            
         }
 
         private void OnDrawGizmos()

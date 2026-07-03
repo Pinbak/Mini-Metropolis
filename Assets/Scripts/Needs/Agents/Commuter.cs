@@ -35,20 +35,22 @@ namespace Needs.Agents
             }
         }
 
-        public void Init(BuildingManager buildingManager, GridManager gridManager, IntersectionManager intersectionManager, AnimationCurve carAcceleration)
+        public void Init(BuildingManager buildingManager, GridManager gridManager,
+            IntersectionManager intersectionManager, AnimationCurve carAcceleration, Node startingPosition)
         {
             _gridManager = gridManager;
             _buildingManager = buildingManager;
             _intersectionManager = intersectionManager;
             _carAcceleration = carAcceleration;
-            _pathMover = new PathMover(gridManager, intersectionManager, gameObject, buildingManager.AgentLayer);
+            _pathMover = new PathMover(gridManager, intersectionManager, gameObject, buildingManager.AgentLayer,
+                startingPosition);
         }
 
         public void FindTestPath()
         {
             var goalNode = _gridManager.WorldToNode(_buildingManager.TestPosition.transform.position);
             
-            _pathMover.UpdateCurrentNodeFromWorldPosition(transform.position); // just in case the car has been moved in the editor
+            _pathMover.UpdateCurrentNodeFromPosition(transform.position); // just in case the car has been moved in the editor
             _pathMover.GeneratePath(goalNode);
         }
 
