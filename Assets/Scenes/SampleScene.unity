@@ -956,7 +956,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   inputManager: {fileID: 777633688}
   placementManager: {fileID: 267754611}
-  carManager: {fileID: 2009150915}
+  buildingManager: {fileID: 0}
 --- !u!1 &1976711958
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,7 +1000,7 @@ GameObject:
   - component: {fileID: 2009150916}
   - component: {fileID: 2009150915}
   m_Layer: 0
-  m_Name: Car Manager
+  m_Name: BuildingManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

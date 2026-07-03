@@ -3,7 +3,7 @@ using Intersections;
 using Needs;
 using UnityEngine;
 
-public class CarManager : MonoBehaviour
+public class BuildingManager : MonoBehaviour
 {
     [field:SerializeField] public LayerMask AgentLayer { get; set; } // the layer the agents are on
     [field:SerializeField] public GameObject TestPosition { get; set; }

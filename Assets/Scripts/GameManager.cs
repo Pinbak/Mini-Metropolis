@@ -4,7 +4,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private InputManager inputManager;
     [SerializeField] private PlacementManager placementManager;
-    [SerializeField] private CarManager carManager;
+    [SerializeField] private BuildingManager buildingManager;
 
     private void Start()
     {
@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     private void HandleKeyboardPress(KeyboardKeys key)
     {
         placementManager.ChangeMode();
-        carManager.CreateTestPath();
+        buildingManager.CreateTestPath();
     }
 
     private void HandleMouseHeldDown(Vector3 position)

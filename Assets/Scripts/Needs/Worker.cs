@@ -11,7 +11,7 @@ namespace Needs
         private AnimationCurve _carAcceleration;
         private PathMover _pathMover; // the ability to move along a path
         private GridManager _gridManager; // the grid that this car sits on
-        private CarManager _carManager; // parent
+        private BuildingManager _buildingManager; // parent
         private IntersectionManager _intersectionManager;
 
         private void Update()
@@ -35,18 +35,18 @@ namespace Needs
             }
         }
 
-        public void Init(CarManager carManager, GridManager gridManager, IntersectionManager intersectionManager, AnimationCurve carAcceleration)
+        public void Init(BuildingManager buildingManager, GridManager gridManager, IntersectionManager intersectionManager, AnimationCurve carAcceleration)
         {
             _gridManager = gridManager;
-            _carManager = carManager;
+            _buildingManager = buildingManager;
             _intersectionManager = intersectionManager;
             _carAcceleration = carAcceleration;
-            _pathMover = new PathMover(gridManager, intersectionManager, gameObject, carManager.AgentLayer);
+            _pathMover = new PathMover(gridManager, intersectionManager, gameObject, buildingManager.AgentLayer);
         }
 
         public void FindTestPath()
         {
-            var goalNode = _gridManager.WorldToNode(_carManager.TestPosition.transform.position);
+            var goalNode = _gridManager.WorldToNode(_buildingManager.TestPosition.transform.position);
             
             _pathMover.UpdateCurrentNodeFromWorldPosition(transform.position); // just in case the car has been moved in the editor
             _pathMover.GeneratePath(goalNode);
