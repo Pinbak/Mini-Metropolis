@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Intersections;
+using Needs.Buildings;
 using Roads;
 using UnityEngine;
 
@@ -17,6 +18,18 @@ public class PlacementManager : MonoBehaviour
     private Vector3Int _lastSuccessfulPosition;
     private List<(int x, int y)> _validNeighbourNodes = new();
     private BuildingMode _mode;
+
+    public void PlaceBuilding(BuildingInformation information)
+    {
+        for (var x = 0; x < information.Width; x++)
+        for (var y = 0; y < information.Height; y++)
+        {
+            var gridPosition = new Vector2Int(information.BottomLeft.X + x, information.BottomLeft.Y + y);
+            var node = gridManager.Grid[gridPosition.x, gridPosition.y];
+            if (node.Type is not NodeType.Empty) return;
+            node.Type = information.Layout[x, y];
+        }
+    }
 
     public void StartRoadPlacement(Vector3Int position)
     {

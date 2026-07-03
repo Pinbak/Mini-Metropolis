@@ -2,5 +2,6 @@
 {
     Empty,
     Road,
-    Building
+    Building,
+    Parking
 }
