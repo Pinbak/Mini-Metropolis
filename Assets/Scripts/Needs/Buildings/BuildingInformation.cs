@@ -31,14 +31,14 @@ namespace Needs.Buildings
 
         public bool CheckParkingIsFree()
         {
-            return ParkingSpaces.Any(parkingSpace => parkingSpace.IsFree);
+            return ParkingSpaces.Any(parkingSpace => parkingSpace.IsBeingTaken);
         }
 
         public ParkingSpace GetFreeParkingSpace()
         {
             foreach (var parkingSpace in ParkingSpaces)
             {
-                if (!parkingSpace.IsFree) continue;
+                if (parkingSpace.IsBeingTaken) continue;
                 return parkingSpace;
             }
 

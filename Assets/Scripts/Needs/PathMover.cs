@@ -64,6 +64,7 @@ namespace Needs
 
         public void GeneratePath(ParkingSpace parkingSpace)
         {
+            if (ParkedAt is null) return;
             _destination = parkingSpace;
             var startingPosition = _gridManager.WorldToNode(ParkedAt.RoadConnection);
             var parkingSpaceNode = _gridManager.WorldToNode(parkingSpace.RoadConnection);
@@ -80,6 +81,8 @@ namespace Needs
             if (_pathGenerator.PathGenerated)
             {
                 ParkedAt.IsFree = true;
+                ParkedAt.IsBeingTaken = false;
+                _destination.IsBeingTaken = true; // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
                 ParkedAt = null;
                 _currentTargetPosition = _pathGenerator.Path[0];
                 HasValidPath = true;

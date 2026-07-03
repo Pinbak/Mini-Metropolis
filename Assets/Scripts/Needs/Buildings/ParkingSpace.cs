@@ -15,6 +15,7 @@ namespace Needs.Buildings
         
         [Tooltip("Whether there is anyone parked here.")]
         [field:SerializeField] public bool IsFree { get; set; }
+        [field:SerializeField] public bool IsBeingTaken { get; set; }
         [field:SerializeField] public PathMover ParkedAgent { get; set; }
         
     }
