@@ -15,6 +15,7 @@ namespace Needs.Agents
         private BuildingManager _buildingManager; // parent
         private IntersectionManager _intersectionManager;
         private Industrial _workplace;
+        private Residential _home;
 
         private void Update()
         {
@@ -37,24 +38,36 @@ namespace Needs.Agents
             // }
         }
 
-        public void Init(BuildingInformation buildingInformation, BuildingManager buildingManager, GridManager gridManager,
+        public void Init(Residential home, BuildingManager buildingManager, GridManager gridManager,
             IntersectionManager intersectionManager, AnimationCurve carAcceleration, ParkingSpace initialParkingSpace)
         {
             _gridManager = gridManager;
             _buildingManager = buildingManager;
             _intersectionManager = intersectionManager;
             _carAcceleration = carAcceleration;
-            _pathMover = new PathMover(buildingInformation, gridManager, intersectionManager, gameObject,
+            _home = home;
+            _pathMover = new PathMover(home.BuildingInformation, gridManager, intersectionManager, gameObject,
                 buildingManager.AgentLayer, initialParkingSpace);
+            
         }
 
         public void FindTestPath()
         {
-            // if (!_workplace.BuildingInformation.CheckParkingIsFree()) return;
-            _workplace = _buildingManager.TestIndustrial;
-            var parkingSpace = _workplace.BuildingInformation.Park(_pathMover);
-            if (parkingSpace is null) return;
-            _pathMover.GeneratePath(parkingSpace);
+            if (Vector3.Distance(transform.position, _home.transform.position) < 1f)
+            {
+                _workplace = _buildingManager.TestIndustrial;
+                var parkingSpace = _workplace.BuildingInformation.GetFreeParkingSpace();
+                if (parkingSpace is null) return;
+                _pathMover.GeneratePath(parkingSpace);
+            }
+            else
+            {
+                var parkingSpace = _home.BuildingInformation.GetFreeParkingSpace();
+                if (parkingSpace is null) return;
+                _pathMover.GeneratePath(parkingSpace);
+            }
+            
+            
         }
 
         private void OnDrawGizmos()

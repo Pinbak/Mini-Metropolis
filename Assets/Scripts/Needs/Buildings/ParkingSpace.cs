@@ -11,7 +11,7 @@ namespace Needs.Buildings
         
         [field:SerializeField] public GameObject RoadConnectionGameObject { get; set; }
 
-        [field: SerializeField] public Vector3 RoadConnection => RoadConnectionGameObject.transform.position;
+        public Vector3 RoadConnection => RoadConnectionGameObject.transform.position;
         
         [Tooltip("Whether there is anyone parked here.")]
         [field:SerializeField] public bool IsFree { get; set; }

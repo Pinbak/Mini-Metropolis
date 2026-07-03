@@ -28,14 +28,13 @@ namespace Needs.Buildings
             Layout = layout;
             ParkingSpaces = parkingSpaces;
         }
-        
 
         public bool CheckParkingIsFree()
         {
             return ParkingSpaces.Any(parkingSpace => parkingSpace.IsFree);
         }
 
-        public ParkingSpace Park(PathMover agentToPark)
+        public ParkingSpace GetFreeParkingSpace()
         {
             foreach (var parkingSpace in ParkingSpaces)
             {

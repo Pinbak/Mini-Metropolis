@@ -67,8 +67,8 @@ namespace Needs
             _destination = parkingSpace;
             var startingPosition = _gridManager.WorldToNode(ParkedAt.RoadConnection);
             var parkingSpaceNode = _gridManager.WorldToNode(parkingSpace.RoadConnection);
-            var actualPosition = _gridManager.WorldToNode(ParkedAt.transform.position);
-            var actualGoal = _gridManager.WorldToNode(parkingSpace.transform.position);
+            var actualPosition = _gridManager.WorldToNode(ParkedAt.ParentPosition);
+            var actualGoal = _gridManager.WorldToNode(parkingSpace.ParentPosition);
             GeneratePath(actualPosition, actualGoal, startingPosition, parkingSpaceNode);
         }
 
@@ -79,6 +79,7 @@ namespace Needs
             _pathGenerator.GeneratePath(modifiedStart, modifiedEnd, start, end);
             if (_pathGenerator.PathGenerated)
             {
+                ParkedAt.IsFree = true;
                 ParkedAt = null;
                 _currentTargetPosition = _pathGenerator.Path[0];
                 HasValidPath = true;
@@ -185,6 +186,7 @@ namespace Needs
                     HasValidPath = false;
                     // we have reached the adjacent road
                     ParkedAt = _destination;
+                    ParkedAt.IsFree = false;
                     return Vector3.zero;
 
                 }

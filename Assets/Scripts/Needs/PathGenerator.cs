@@ -31,7 +31,7 @@ namespace Needs
             _agent = agent;
         }
         
-        public void GeneratePath(Node modifiedStart, Node modifiedEnd, Node start, Node goal) // todo remove start and use current node
+        public void GeneratePath(Node modifiedStart, Node modifiedEnd, Node start, Node goal) // todo remove start and use current node also clear up meaning behind modified start/end
         {
             PathGenerated = false;
             _pathfinding.GeneratePath(start, goal);

@@ -40,7 +40,7 @@ namespace Needs.Buildings
             {
                 _commuter = Instantiate(commuterPrefab, parkingSpace.transform.position, Quaternion.identity,
                     transform);
-                _commuter.Init(BuildingInformation, buildingManager, buildingManager.GridManager, buildingManager.IntersectionManager,
+                _commuter.Init(this, buildingManager, buildingManager.GridManager, buildingManager.IntersectionManager,
                     buildingManager.CarAcceleration, parkingSpace);
             }
             
