@@ -64,6 +64,11 @@ public class GridManager : MonoBehaviour
         );
     }
 
+    public Vector3 NodeToWorld(Node node)
+    {
+        return GridToWorld(node.X, node.Y);
+    }
+
     public Vector3Int GridToWorld(int x, int y)
     {
         return new Vector3Int(

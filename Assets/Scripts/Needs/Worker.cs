@@ -8,6 +8,7 @@ namespace Needs
     public class Worker : MonoBehaviour
     {
         [SerializeField] private float movementSpeed = .5f;
+        private AnimationCurve _carAcceleration;
         private PathMover _pathMover; // the ability to move along a path
         private GridManager _gridManager; // the grid that this car sits on
         private CarManager _carManager; // parent
@@ -15,7 +16,7 @@ namespace Needs
 
         private void Update()
         {
-            _pathMover.MoveAlongPath(movementSpeed);
+            _pathMover.MoveAlongPath(movementSpeed, _carAcceleration);
             // return;
             if (!_pathMover.HasValidPath)
             {
@@ -34,11 +35,12 @@ namespace Needs
             }
         }
 
-        public void Init(CarManager carManager, GridManager gridManager, IntersectionManager intersectionManager)
+        public void Init(CarManager carManager, GridManager gridManager, IntersectionManager intersectionManager, AnimationCurve carAcceleration)
         {
             _gridManager = gridManager;
             _carManager = carManager;
             _intersectionManager = intersectionManager;
+            _carAcceleration = carAcceleration;
             _pathMover = new PathMover(gridManager, intersectionManager, gameObject, carManager.AgentLayer);
         }
 

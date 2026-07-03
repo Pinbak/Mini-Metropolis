@@ -15,12 +15,14 @@ namespace Needs
         public bool MovingInJunction { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
 
+        private Vector3 _targetNodePosition;
         private int _currentNodePointer;
         private int _currentPositionPointer;
         private bool _attemptRecalculatePath; // if path breaks try once to recalculate
         private Node _destination;
         private readonly LayerMask _agentLayer;
         private readonly float _detectionDistance = .8f; // the distance to check for other agents
+        private bool _approachingJunction;
 
         // Converts a path of nodes into a viable path of vector3 points to follow
         private readonly PathGenerator _pathGenerator; // the vector3 generator to create points along the path of nodes to be followed
@@ -32,7 +34,7 @@ namespace Needs
         private float _currentSpeed;
         private float _speedMultiplier = 1f; // used to stop the agent
         private float _acceleration = 1f;
-        private const float DistanceToAgentInFront = 0.5f; // how close the agent gets to another agent before fully stopping
+        private const float DistanceToAgentInFront = .3f; // how close the agent gets to another agent before fully stopping
 
         public PathMover(GridManager gridManager, IntersectionManager intersectionManager, GameObject agent,
             LayerMask agentLayer)
@@ -71,20 +73,22 @@ namespace Needs
         {
             MovingInJunction = true;
             _speedMultiplier = 1f;
+            _approachingJunction = false;
         }
 
         public void Stop()
         {
             _speedMultiplier = 0f;
+            _approachingJunction = true;
         }
 
-        public void MoveAlongPath(float movementSpeed)
+        public void MoveAlongPath(float movementSpeed, AnimationCurve accelerationProfile)
         {
             if (!HasValidPath) return;
 
-            var currentPosition = _agent.transform.position;
-            var distanceToNextNode = Vector3.Distance(currentPosition, _currentTargetPosition);
-            if (distanceToNextNode > TargetTolerance)
+            var currentPosition = WorldPosition;
+            var distanceToNextStep = Vector3.Distance(currentPosition, _currentTargetPosition);
+            if (distanceToNextStep > TargetTolerance)
             {
                 var currentRotation = _agent.transform.rotation;
                 var rotationSpeed = movementSpeed * 10f;
@@ -107,11 +111,17 @@ namespace Needs
                                     hit.point, Color.blue);
                                 adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
                                 // make acceleration/deceleration inversely proportional to distance
-                                acceleration = _acceleration + _acceleration- hit.distance;
+                                acceleration = accelerationProfile.Evaluate(hit.distance);
                             }
                         }
                     }
                     
+                }
+
+                if (_approachingJunction)
+                {
+                    var distanceToJunction = Vector3.Distance(currentPosition, _targetNodePosition);
+                    acceleration = accelerationProfile.Evaluate(Mathf.Min(1f, distanceToJunction));
                 }
                 
                 
@@ -153,6 +163,7 @@ namespace Needs
                     return Vector3.zero;
                 }
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
+                _targetNodePosition = _gridManager.NodeToWorld(NextPosition);
                 if (_intersectionManager.IsIntersection(NextPosition))
                     _intersectionManager.AddToIntersection(this, NextPosition);
                 // the road has been removed since setting out

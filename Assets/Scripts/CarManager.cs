@@ -7,11 +7,12 @@ public class CarManager : MonoBehaviour
 {
     [field:SerializeField] public LayerMask AgentLayer { get; set; } // the layer the agents are on
     [field:SerializeField] public GameObject TestPosition { get; set; }
-
+    
     [SerializeField] private Worker workerPrefab;
     [SerializeField] private GridManager gridManager;
     [SerializeField] private IntersectionManager intersectionManager;
-
+    [SerializeField] private AnimationCurve carAcceleration;
+    
     private readonly List<Worker> _testCars = new();
     
     private void Start()
@@ -20,7 +21,7 @@ public class CarManager : MonoBehaviour
         for (var i = 0; i < numberOfCars; i++)
         {
             var testCar = Instantiate(workerPrefab, Vector3.zero, Quaternion.identity, transform);
-            testCar.Init(this, gridManager, intersectionManager);
+            testCar.Init(this, gridManager, intersectionManager, carAcceleration);
             _testCars.Add(testCar);
         }
     }
