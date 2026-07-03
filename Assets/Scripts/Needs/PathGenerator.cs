@@ -108,17 +108,18 @@ namespace Needs
         // todo these two
         private void GenerateStartPath(Node[] nodePath, int currentNode)
         {
-            Path = new List<Vector3>();
-            var position =
-                _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
-                    NodePath[currentNode].Y));
-            var nextPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode + 1].X,
-                NodePath[currentNode + 1].Y));
-            Vector3 directionToNextPosition = nextPosition - position;
-            directionToNextPosition.Normalize();
-            var nextPerpendicular = Vector3.Cross(Vector3.up, directionToNextPosition);
-            var movedPosition = position + nextPerpendicular * ((PathWidth - PathInset)  * .5f); // the centre of the node that is shifted to the correct lane
-            Path.Add(movedPosition);
+            Path = new List<Vector3> { _agent.transform.position };
+            // Path = new List<Vector3>();
+            // var position =
+            //     _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
+            //         NodePath[currentNode].Y));
+            // var nextPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode + 1].X,
+            //     NodePath[currentNode + 1].Y));
+            // Vector3 directionToNextPosition = nextPosition - position;
+            // directionToNextPosition.Normalize();
+            // var nextPerpendicular = Vector3.Cross(Vector3.up, directionToNextPosition);
+            // var movedPosition = position + nextPerpendicular * ((PathWidth - PathInset)  * .5f); // the centre of the node that is shifted to the correct lane
+            // Path.Add(movedPosition);
         }
 
         private void GenerateEndPath(Node[] nodePath, int currentNode)
