@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour
     private void HandleKeyboardPress(KeyboardKeys key)
     {
         placementManager.ChangeMode();
-        buildingManager.CreateTestPath();
     }
 
     private void HandleMouseHeldDown(Vector3 position)

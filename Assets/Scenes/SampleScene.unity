@@ -1022,39 +1022,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   <TestPosition>k__BackingField: {fileID: 379856742}
-  workerPrefab: {fileID: 1679263155091622085, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
-  gridManager: {fileID: 1487683637}
-  intersectionManager: {fileID: 1529207314}
-  carAcceleration:
+  residentialLowWealthPrefab: {fileID: 2206404345454251422, guid: e52968b8fd081584185356fa1e0d61ba, type: 3}
+  residentialHighWealthPrefab: {fileID: 0}
+  <GridManager>k__BackingField: {fileID: 1487683637}
+  <IntersectionManager>k__BackingField: {fileID: 1529207314}
+  <CarAcceleration>k__BackingField:
     serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 4
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.24989624
-      value: 3.4540038
-      inSlope: -8.708515
-      outSlope: -8.708515
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.12420386
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: -0.034953605
-      outSlope: -0.034953605
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.15923572
-      outWeight: 0
+    m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4

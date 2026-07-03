@@ -3,9 +3,9 @@ using Intersections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Needs
+namespace Needs.Agents
 {
-    public class Worker : MonoBehaviour
+    public class Commuter : MonoBehaviour
     {
         [SerializeField] private float movementSpeed = .5f;
         private AnimationCurve _carAcceleration;
