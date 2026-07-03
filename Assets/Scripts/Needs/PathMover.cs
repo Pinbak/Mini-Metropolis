@@ -15,9 +15,9 @@ namespace Needs
         public Node NextPosition { get; private set; } // the node that the agent is moving to
         public bool MovingInJunction { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
-        public ParkingSpace ParkedAt { get; set; }// the space this agent is currently in
-
-        private ParkingSpace _destination;
+        public ParkingSpace ParkedAt { get; private set; }// the space this agent is currently in
+        public ParkingSpace Destination { get; private set; }
+        
         private Vector3 _targetNodePosition;
         private int _currentNodePointer;
         private int _currentPositionPointer;
@@ -43,7 +43,7 @@ namespace Needs
             IntersectionManager intersectionManager, GameObject agent,
             LayerMask agentLayer, ParkingSpace initialParking)
         {
-            _pathGenerator = new PathGenerator(gridManager, agent);
+            _pathGenerator = new PathGenerator(gridManager, this);
             _agent = agent;
             _agentLayer = agentLayer;
             _gridManager = gridManager;
@@ -65,7 +65,7 @@ namespace Needs
         public void GeneratePath(ParkingSpace parkingSpace)
         {
             if (ParkedAt is null) return;
-            _destination = parkingSpace;
+            Destination = parkingSpace;
             var startingPosition = _gridManager.WorldToNode(ParkedAt.RoadConnection);
             var parkingSpaceNode = _gridManager.WorldToNode(parkingSpace.RoadConnection);
             var actualPosition = _gridManager.WorldToNode(ParkedAt.ParentPosition);
@@ -82,7 +82,7 @@ namespace Needs
             {
                 ParkedAt.IsFree = true;
                 ParkedAt.IsBeingTaken = false;
-                _destination.IsBeingTaken = true; // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
+                Destination.IsBeingTaken = true; // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
                 ParkedAt = null;
                 _currentTargetPosition = _pathGenerator.Path[0];
                 HasValidPath = true;
@@ -188,8 +188,9 @@ namespace Needs
                     _currentNodePointer = 0;
                     HasValidPath = false;
                     // we have reached the adjacent road
-                    ParkedAt = _destination;
+                    ParkedAt = Destination;
                     ParkedAt.IsFree = false;
+                    _agent.transform.rotation = Destination.transform.rotation;
                     return Vector3.zero;
 
                 }

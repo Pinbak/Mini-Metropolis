@@ -15,7 +15,7 @@ namespace Needs
         public bool PathGenerated { get; private set; }
         
         private readonly Pathfinding _pathfinding; // the actual a* algorithm to find a path from A to B
-        private readonly GameObject _agent; // the agent that has the position which is being used
+        private readonly PathMover _agent; // the agent that has the position which is being used
         private readonly GridManager _gridManager;
         private readonly float _offset;
         private const float PathInset = .2f;
@@ -24,7 +24,7 @@ namespace Needs
         private const float PathDiagonalLength = .7071f; // todo get from elsewhere
         private const float TurnSmoothness = .1f; // lower number is smoother
 
-        public PathGenerator(GridManager gridManager, GameObject agent)
+        public PathGenerator(GridManager gridManager, PathMover agent)
         {
             _gridManager = gridManager;
             _pathfinding = new Pathfinding(gridManager.Grid);
@@ -108,7 +108,7 @@ namespace Needs
         // todo these two
         private void GenerateStartPath(Node[] nodePath, int currentNode)
         {
-            Path = new List<Vector3> { _agent.transform.position };
+            Path = new List<Vector3> { _agent.WorldPosition };
             // Path = new List<Vector3>();
             // var position =
             //     _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
@@ -124,11 +124,11 @@ namespace Needs
 
         private void GenerateEndPath(Node[] nodePath, int currentNode)
         {
-            Path = new List<Vector3>();
-            var position =
-                _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
-                    NodePath[currentNode].Y));
-            Path.Add(position);
+            Path = new List<Vector3> { _agent.Destination.transform.position};
+            // var position =
+            //     _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
+            //         NodePath[currentNode].Y));
+            // Path.Add(position);
         }
     }
 }
