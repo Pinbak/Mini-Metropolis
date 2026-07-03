@@ -98,9 +98,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6517171863933481060, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7862199614194920756, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
       propertyPath: m_Name
       value: ParkingSpace
+      objectReference: {fileID: 0}
+    - target: {fileID: 8597325768766682977, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8633459774121869999, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
+      propertyPath: <RoadConnection>k__BackingField.z
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

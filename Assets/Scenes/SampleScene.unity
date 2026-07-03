@@ -844,7 +844,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   inputManager: {fileID: 777633688}
   placementManager: {fileID: 267754611}
-  buildingManager: {fileID: 0}
+  buildingManager: {fileID: 2009150915}
 --- !u!1 &1976711958
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,6 +912,7 @@ MonoBehaviour:
   <TestPosition>k__BackingField: {fileID: 0}
   residentialLowWealthPrefab: {fileID: 2206404345454251422, guid: e52968b8fd081584185356fa1e0d61ba, type: 3}
   residentialHighWealthPrefab: {fileID: -4079102970333303133, guid: 18f2d688aa540ef46b14a725c83958bc, type: 3}
+  industrialLowWealthPrefab: {fileID: 3875937316071277200, guid: 33f3d0854f0b75b42a55122c8dbc5f18, type: 3}
   <GridManager>k__BackingField: {fileID: 1487683637}
   <IntersectionManager>k__BackingField: {fileID: 1529207314}
   <CarAcceleration>k__BackingField:

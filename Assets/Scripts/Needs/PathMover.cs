@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Intersections;
+using Needs.Buildings;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -14,12 +15,13 @@ namespace Needs
         public Node NextPosition { get; private set; } // the node that the agent is moving to
         public bool MovingInJunction { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
+        public ParkingSpace ParkedAt { get; set; }// the space this agent is currently in
 
+        private ParkingSpace _destination;
         private Vector3 _targetNodePosition;
         private int _currentNodePointer;
         private int _currentPositionPointer;
         private bool _attemptRecalculatePath; // if path breaks try once to recalculate
-        private Node _destination;
         private readonly LayerMask _agentLayer;
         private readonly float _detectionDistance = .8f; // the distance to check for other agents
         private bool _approachingJunction;
@@ -35,16 +37,20 @@ namespace Needs
         private float _speedMultiplier = 1f; // used to stop the agent
         private float _acceleration = 1f;
         private const float DistanceToAgentInFront = .3f; // how close the agent gets to another agent before fully stopping
+        private BuildingInformation _buildingInformation; // the building that this car belongs to
 
-        public PathMover(GridManager gridManager, IntersectionManager intersectionManager, GameObject agent,
-            LayerMask agentLayer, Node startingPosition)
+        public PathMover(BuildingInformation buildingInformation, GridManager gridManager,
+            IntersectionManager intersectionManager, GameObject agent,
+            LayerMask agentLayer, ParkingSpace initialParking)
         {
             _pathGenerator = new PathGenerator(gridManager, agent);
             _agent = agent;
             _agentLayer = agentLayer;
             _gridManager = gridManager;
             _intersectionManager = intersectionManager;
-            CurrentPosition = startingPosition;
+            _buildingInformation = buildingInformation;
+            ParkedAt = initialParking;
+            CurrentPosition = gridManager.WorldToNode(initialParking.ParentPosition);
         }
         
         /// <summary>
@@ -56,14 +62,24 @@ namespace Needs
             CurrentPosition = _gridManager.WorldToNode(worldPosition);
         }
 
-        public void GeneratePath(Node end)
+        public void GeneratePath(ParkingSpace parkingSpace)
+        {
+            _destination = parkingSpace;
+            var startingPosition = _gridManager.WorldToNode(ParkedAt.RoadConnection);
+            var parkingSpaceNode = _gridManager.WorldToNode(parkingSpace.RoadConnection);
+            var actualPosition = _gridManager.WorldToNode(ParkedAt.transform.position);
+            var actualGoal = _gridManager.WorldToNode(parkingSpace.transform.position);
+            GeneratePath(actualPosition, actualGoal, startingPosition, parkingSpaceNode);
+        }
+
+        private void GeneratePath(Node modifiedStart, Node modifiedEnd, Node start, Node end)
         {
             _currentNodePointer = 0;
             _currentPositionPointer = 0;
-            _pathGenerator.GeneratePath(CurrentPosition, end);
-            _destination = end;
+            _pathGenerator.GeneratePath(modifiedStart, modifiedEnd, start, end);
             if (_pathGenerator.PathGenerated)
             {
+                ParkedAt = null;
                 _currentTargetPosition = _pathGenerator.Path[0];
                 HasValidPath = true;
             }
@@ -85,6 +101,7 @@ namespace Needs
         public void MoveAlongPath(float movementSpeed, AnimationCurve accelerationProfile)
         {
             if (!HasValidPath) return;
+            if (ParkedAt is not null) return; // we're currently parked
 
             var currentPosition = WorldPosition;
             var distanceToNextStep = Vector3.Distance(currentPosition, _currentTargetPosition);
@@ -143,6 +160,11 @@ namespace Needs
                 _currentTargetPosition = GetNextPosition();
             }
         }
+
+        private Vector3 ParkUp()
+        {
+            return ParkedAt.transform.position;
+        }
         
         /// <summary>
         ///     Gets the next position in the path to visit
@@ -157,17 +179,21 @@ namespace Needs
                 _currentNodePointer++;
                 if (_currentNodePointer == _pathGenerator.NodePath.Length)
                 {
+                    // if (Vector3.Distance(WorldPosition, ParkedAt.transform.position) > TargetTolerance)
+                    //     return ParkUp();
                     _currentNodePointer = 0;
                     HasValidPath = false;
-                    // we have reached our destination
+                    // we have reached the adjacent road
+                    ParkedAt = _destination;
                     return Vector3.zero;
+
                 }
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
                 _targetNodePosition = _gridManager.NodeToWorld(NextPosition);
                 if (_intersectionManager.IsIntersection(NextPosition))
                     _intersectionManager.AddToIntersection(this, NextPosition);
                 // the road has been removed since setting out
-                if (NextPosition.Type is not NodeType.Road)
+                if (NextPosition.Type is not NodeType.Road && NextPosition.Type is not NodeType.Parking)
                 {
                     _currentNodePointer = 0;
                     HasValidPath = false;

@@ -1,56 +1,36 @@
-﻿using System;
-using Needs.Agents;
+﻿using Needs.Agents;
 using UnityEngine;
 
 namespace Needs.Buildings
 {
-    public class Residential : MonoBehaviour
+    public class Industrial : MonoBehaviour
     {
         public BuildingInformation BuildingInformation { get; private set; }
 
         // the people that live here
-        [SerializeField] private Commuter commuterPrefab;
         [SerializeField] private BuildingType type;
         [SerializeField] private ParkingSpace[] validParkingSpaces;
         private const int Width = 2;
-        private const int Height = 1;
-
+        private const int Height = 2;
         private BuildingManager _buildingManager;
-        private Commuter _commuter;
-
-        private void Update()
-        {
-            
-        }
-
+        // private Commuter _commuter;
+        
         public void Init(BuildingManager buildingManager)
         {
             var position = transform.position;
             _buildingManager = buildingManager;
             var layout = new[,]
             {
-                { NodeType.Parking },
-                { NodeType.Building }
+                { NodeType.Parking, NodeType.Building },
+                { NodeType.Building, NodeType.Building }
             };
             var bottomLeft = buildingManager.GridManager.WorldToNode(position);
             BuildingInformation =
                 new BuildingInformation(buildingManager.GridManager, Width, Height, bottomLeft, layout,
                     validParkingSpaces);
-            foreach (var parkingSpace in validParkingSpaces)
-            {
-                _commuter = Instantiate(commuterPrefab, parkingSpace.transform.position, Quaternion.identity,
-                    transform);
-                _commuter.Init(BuildingInformation, buildingManager, buildingManager.GridManager, buildingManager.IntersectionManager,
-                    buildingManager.CarAcceleration, parkingSpace);
-            }
-            
-        }
 
-        public void FindTestPath()
-        {
-            _commuter.FindTestPath();
         }
-
+        
         private void OnDrawGizmos()
         {
             if (BuildingInformation is null) return;

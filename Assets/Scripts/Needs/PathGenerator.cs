@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Needs
@@ -8,7 +9,7 @@ namespace Needs
     /// </summary>
     public class PathGenerator
     {
-        public Node[] NodePath => _pathfinding.Path;
+        public Node[] NodePath { get; private set; }
         
         public List<Vector3> Path { get; private set; } = new();
         public bool PathGenerated { get; private set; }
@@ -30,10 +31,15 @@ namespace Needs
             _agent = agent;
         }
         
-        public void GeneratePath(Node start, Node goal) // todo remove start and use current node
+        public void GeneratePath(Node modifiedStart, Node modifiedEnd, Node start, Node goal) // todo remove start and use current node
         {
             PathGenerated = false;
             _pathfinding.GeneratePath(start, goal);
+            var nodePath = _pathfinding.Path.ToList();
+            nodePath.Insert(0, modifiedStart);
+            nodePath.Add(modifiedEnd);
+            NodePath = nodePath.ToArray();
+            
             if (_pathfinding.ValidPathExists)
             {
                 GenerateSteps(0);
@@ -45,24 +51,24 @@ namespace Needs
         {
             if (currentNode == 0)
             {
-                GenerateStartPath(_pathfinding.Path, currentNode);
+                GenerateStartPath(NodePath, currentNode);
                 return;
             }
-            if (currentNode == _pathfinding.Path.Length - 1)
+            if (currentNode == NodePath.Length - 1)
             {
-                GenerateEndPath(_pathfinding.Path, currentNode);
+                GenerateEndPath(NodePath, currentNode);
                 return;
             }
             
             Path = new List<Vector3>();
 
             var position =
-                _gridManager.GridToWorld(new Vector2Int(_pathfinding.Path[currentNode].X,
-                    _pathfinding.Path[currentNode].Y));
-            var nextPosition = _gridManager.GridToWorld(new Vector2Int(_pathfinding.Path[currentNode + 1].X,
-                _pathfinding.Path[currentNode + 1].Y));
-            var previousPosition = _gridManager.GridToWorld(new Vector2Int(_pathfinding.Path[currentNode - 1].X,
-                _pathfinding.Path[currentNode - 1].Y));
+                _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
+                    NodePath[currentNode].Y));
+            var nextPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode + 1].X,
+                NodePath[currentNode + 1].Y));
+            var previousPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode - 1].X,
+                NodePath[currentNode - 1].Y));
                 
             // todo add the ability to swap road sides
             Vector3 directionToNextPosition = nextPosition - position;
@@ -104,10 +110,10 @@ namespace Needs
         {
             Path = new List<Vector3>();
             var position =
-                _gridManager.GridToWorld(new Vector2Int(_pathfinding.Path[currentNode].X,
-                    _pathfinding.Path[currentNode].Y));
-            var nextPosition = _gridManager.GridToWorld(new Vector2Int(_pathfinding.Path[currentNode + 1].X,
-                _pathfinding.Path[currentNode + 1].Y));
+                _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
+                    NodePath[currentNode].Y));
+            var nextPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode + 1].X,
+                NodePath[currentNode + 1].Y));
             Vector3 directionToNextPosition = nextPosition - position;
             directionToNextPosition.Normalize();
             var nextPerpendicular = Vector3.Cross(Vector3.up, directionToNextPosition);
@@ -119,8 +125,8 @@ namespace Needs
         {
             Path = new List<Vector3>();
             var position =
-                _gridManager.GridToWorld(new Vector2Int(_pathfinding.Path[currentNode].X,
-                    _pathfinding.Path[currentNode].Y));
+                _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
+                    NodePath[currentNode].Y));
             Path.Add(position);
         }
     }
