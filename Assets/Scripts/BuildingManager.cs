@@ -25,12 +25,27 @@ public class BuildingManager : MonoBehaviour
     
     private void Start()
     {
+        var layout = new[,]
+        {
+            { NodeType.Parking, NodeType.Building },
+            { NodeType.Building, NodeType.Building }
+        }; // todo remove
+        TestIndustrial = Instantiate(industrialLowWealthPrefab, new Vector3(2f, 0f, 2f), Quaternion.identity,
+            transform);
+        TestIndustrial.Init(this, layout);
+        placementManager.PlaceBuilding(TestIndustrial);
+        
+        layout = new[,]
+        {
+            { NodeType.Parking },
+            { NodeType.Building }
+        };
         TestHouse = Instantiate(residentialLowWealthPrefab, new Vector3(0f, 0f, 2f), Quaternion.identity, transform);
-        TestHouse.Init(this);
+        TestHouse.Init(this, layout);
         placementManager.PlaceBuilding(TestHouse);
         
         TestHouse2 = Instantiate(residentialLowWealthPrefab, new Vector3(0f, 0f, -2f), Quaternion.identity, transform);
-        TestHouse2.Init(this);
+        TestHouse2.Init(this, layout);
         placementManager.PlaceBuilding(TestHouse2);
 
         // var vectors = new List<Vector3>()
@@ -47,10 +62,7 @@ public class BuildingManager : MonoBehaviour
         //     placementManager.PlaceBuilding(house.BuildingInformation);
         // }
 
-        TestIndustrial = Instantiate(industrialLowWealthPrefab, new Vector3(2f, 0f, 2f), Quaternion.identity,
-            transform);
-        TestIndustrial.Init(this);
-        placementManager.PlaceBuilding(TestIndustrial);
+        
     }
     
 }

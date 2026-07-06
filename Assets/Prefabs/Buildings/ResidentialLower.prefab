@@ -50,8 +50,9 @@ MonoBehaviour:
   <Height>k__BackingField: 1
   <ParkingSpaces>k__BackingField:
   - {fileID: 7377723312171224275}
-  commuterPrefab: {fileID: 1679263155091622085, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
-  workNeed: 100
+  supplies:
+  - {fileID: 1679263155091622085, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
+  demands: []
 --- !u!1001 &1275299001288953468
 PrefabInstance:
   m_ObjectHideFlags: 0
