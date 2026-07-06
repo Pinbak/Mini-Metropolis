@@ -44,7 +44,7 @@ namespace Needs.Agents
             _intersectionManager = intersectionManager;
             _carAcceleration = carAcceleration;
             _home = home;
-            _pathMover = new PathMover(home.BuildingInformation, gridManager, intersectionManager, gameObject,
+            _pathMover = new PathMover(home, gridManager, intersectionManager, gameObject,
                 buildingManager.AgentLayer, initialParkingSpace);
             _pathMover.Arrived += Arrived;
         }
@@ -52,7 +52,7 @@ namespace Needs.Agents
         private void GoHome()
         {
             if (_pathMover.HasValidPath) Debug.Log("Attempting to travel home while travelling");
-            if (!_home.BuildingInformation.GetFreeParkingSpace(out var parkingSpace)) return;
+            if (!_home.GetFreeParkingSpace(out var parkingSpace)) return;
             _pathMover.GeneratePath(parkingSpace);
             if (_pathMover.HasValidPath)
                 Currently = State.Travelling;
@@ -63,7 +63,7 @@ namespace Needs.Agents
             if (_pathMover.HasValidPath) Debug.Log("Attempting to travel to work while travelling");
             _workplace = _buildingManager.TestIndustrial; // todo temporary
             if (_workplace is null) return;
-            if (!_workplace.BuildingInformation.GetFreeParkingSpace(out var parkingSpace)) return;
+            if (!_workplace.GetFreeParkingSpace(out var parkingSpace)) return;
             _pathMover.GeneratePath(parkingSpace);
             if (_pathMover.HasValidPath)
                 Currently = State.Travelling;
@@ -71,7 +71,7 @@ namespace Needs.Agents
 
         private void Arrived(Node node)
         {
-            if (_pathMover.CurrentPosition == _workplace.BuildingInformation.BottomLeft) // todo technically true, although not if car park was over to the right
+            if (_pathMover.CurrentPosition == _workplace.BottomLeft) // todo technically true, although not if car park was over to the right
             {
                 _spentAtWork = 0;
                 Currently = State.AtWork;

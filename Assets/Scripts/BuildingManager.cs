@@ -27,30 +27,30 @@ public class BuildingManager : MonoBehaviour
     {
         TestHouse = Instantiate(residentialLowWealthPrefab, new Vector3(0f, 0f, 2f), Quaternion.identity, transform);
         TestHouse.Init(this);
-        placementManager.PlaceBuilding(TestHouse.BuildingInformation);
+        placementManager.PlaceBuilding(TestHouse);
         
         TestHouse2 = Instantiate(residentialLowWealthPrefab, new Vector3(0f, 0f, -2f), Quaternion.identity, transform);
         TestHouse2.Init(this);
-        placementManager.PlaceBuilding(TestHouse2.BuildingInformation);
+        placementManager.PlaceBuilding(TestHouse2);
 
-        var vectors = new List<Vector3>()
-        {
-            new Vector3(-2f, 0f, 2f), new Vector3(-4f, 0f, 2f), new Vector3(-6f, 0f, 2f),
-            new Vector3(-2f, 0f, 0f), new Vector3(-4f, 0f, 0f), new Vector3(-6f, 0f, 0f), 
-            new Vector3(-2f, 0f, -2f), new Vector3(-4f, 0f, -2f), new Vector3(-6f, 0f, -2f), 
-        };
+        // var vectors = new List<Vector3>()
+        // {
+        //     new Vector3(-2f, 0f, 2f), new Vector3(-4f, 0f, 2f), new Vector3(-6f, 0f, 2f),
+        //     new Vector3(-2f, 0f, 0f), new Vector3(-4f, 0f, 0f), new Vector3(-6f, 0f, 0f), 
+        //     new Vector3(-2f, 0f, -2f), new Vector3(-4f, 0f, -2f), new Vector3(-6f, 0f, -2f), 
+        // };
 
-        foreach (var vector3 in vectors)
-        {
-            var house = Instantiate(residentialLowWealthPrefab, vector3, Quaternion.identity, transform);
-            house.Init(this);
-            placementManager.PlaceBuilding(house.BuildingInformation);
-        }
+        // foreach (var vector3 in vectors)
+        // {
+        //     var house = Instantiate(residentialLowWealthPrefab, vector3, Quaternion.identity, transform);
+        //     house.Init(this);
+        //     placementManager.PlaceBuilding(house.BuildingInformation);
+        // }
 
         TestIndustrial = Instantiate(industrialLowWealthPrefab, new Vector3(2f, 0f, 2f), Quaternion.identity,
             transform);
         TestIndustrial.Init(this);
-        placementManager.PlaceBuilding(TestIndustrial.BuildingInformation);
+        placementManager.PlaceBuilding(TestIndustrial);
     }
     
 }

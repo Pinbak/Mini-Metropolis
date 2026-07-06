@@ -39,9 +39,9 @@ namespace Needs
         private float _speedMultiplier = 1f; // used to stop the agent
         private float _acceleration = 1f;
         private const float DistanceToAgentInFront = .3f; // how close the agent gets to another agent before fully stopping
-        private BuildingInformation _buildingInformation; // the building that this car belongs to
+        private Building _buildingInformation; // the building that this car belongs to
 
-        public PathMover(BuildingInformation buildingInformation, GridManager gridManager,
+        public PathMover(Building buildingInformation, GridManager gridManager,
             IntersectionManager intersectionManager, GameObject agent,
             LayerMask agentLayer, ParkingSpace initialParking)
         {

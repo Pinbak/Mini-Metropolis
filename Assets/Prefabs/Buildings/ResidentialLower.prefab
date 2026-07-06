@@ -46,10 +46,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cd95813c3b14ee99c2c08943085d1d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Residential
-  commuterPrefab: {fileID: 1679263155091622085, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
-  type: 0
-  validParkingSpaces:
+  <Width>k__BackingField: 2
+  <Height>k__BackingField: 1
+  <ParkingSpaces>k__BackingField:
   - {fileID: 7377723312171224275}
+  commuterPrefab: {fileID: 1679263155091622085, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
+  workNeed: 100
 --- !u!1001 &1275299001288953468
 PrefabInstance:
   m_ObjectHideFlags: 0

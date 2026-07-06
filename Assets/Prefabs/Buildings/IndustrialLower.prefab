@@ -48,8 +48,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51f00e2dd498404da109e0566496cc75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Industrial
-  type: 0
-  validParkingSpaces:
+  <Width>k__BackingField: 2
+  <Height>k__BackingField: 2
+  <ParkingSpaces>k__BackingField:
   - {fileID: 462544197649846239}
   - {fileID: 5827054332861495701}
   - {fileID: 7438238872540830180}
