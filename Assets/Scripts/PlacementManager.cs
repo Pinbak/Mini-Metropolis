@@ -19,7 +19,7 @@ public class PlacementManager : MonoBehaviour
     private List<(int x, int y)> _validNeighbourNodes = new();
     private BuildingMode _mode;
 
-    public void PlaceBuilding(BuildingInformation information)
+    public void PlaceBuilding(Building information)
     {
         for (var x = 0; x < information.Width; x++)
         for (var y = 0; y < information.Height; y++)

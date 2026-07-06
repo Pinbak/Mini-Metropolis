@@ -4,19 +4,12 @@ using UnityEngine;
 
 namespace Needs.Buildings
 {
-    public class Residential : MonoBehaviour
+    public class Residential : Building
     {
-        public BuildingInformation BuildingInformation { get; private set; }
-
         // the people that live here
         [SerializeField] private Commuter commuterPrefab;
-        [SerializeField] private BuildingType type;
-        [SerializeField] private ParkingSpace[] validParkingSpaces;
         [SerializeField] private float workNeed = 100f;
-        private const int Width = 2;
-        private const int Height = 1;
 
-        private BuildingManager _buildingManager;
         private Commuter _commuter;
 
         private void Update()
@@ -34,21 +27,11 @@ namespace Needs.Buildings
             workNeed += 50f;
         }
 
-        public void Init(BuildingManager buildingManager)
+        public new void Init(BuildingManager buildingManager)
         {
-            var position = transform.position;
-            _buildingManager = buildingManager;
-            var layout = new[,]
-            {
-                { NodeType.Parking },
-                { NodeType.Building }
-            };
-            var bottomLeft = buildingManager.GridManager.WorldToNode(position);
-            BuildingInformation =
-                new BuildingInformation(buildingManager.GridManager, Width, Height, bottomLeft, layout,
-                    validParkingSpaces);
-
-            var commuterParkingSpace = validParkingSpaces[0];
+            base.Init(buildingManager);
+            
+            var commuterParkingSpace = ParkingSpaces[0];
             _commuter = Instantiate(commuterPrefab, commuterParkingSpace.transform.position, Quaternion.identity,
                 transform);
             _commuter.Init(this, buildingManager, buildingManager.GridManager, buildingManager.IntersectionManager,
@@ -61,13 +44,12 @@ namespace Needs.Buildings
         
         private void OnDrawGizmos()
         {
-            if (BuildingInformation is null) return;
-            for (var x = 0; x < BuildingInformation.Width; x++)
-            for (var y = 0; y < BuildingInformation.Height; y++)
+            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
             {
-                var gridPosition = new Vector2Int(BuildingInformation.BottomLeft.X + x, BuildingInformation.BottomLeft.Y + y);
-                var node = _buildingManager.GridManager.Grid[gridPosition.x, gridPosition.y];
-                var worldPosition = _buildingManager.GridManager.NodeToWorld(node);
+                var gridPosition = new Vector2Int(BottomLeft.X + x, BottomLeft.Y + y);
+                var node = BuildingManager.GridManager.Grid[gridPosition.x, gridPosition.y];
+                var worldPosition = BuildingManager.GridManager.NodeToWorld(node);
                 Gizmos.color = Color.red;
 
                 if (node.Type is NodeType.Parking)

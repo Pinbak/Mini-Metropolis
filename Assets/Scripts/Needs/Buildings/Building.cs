@@ -1,33 +1,36 @@
-﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Needs.Buildings
 {
-    public class BuildingInformation
+    public class Building : MonoBehaviour
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
+        [field:SerializeField] public int Width { get; set; }
+        [field:SerializeField] public int Height { get; set; }
+        [field:SerializeField] public ParkingSpace[] ParkingSpaces { get; set; }
         public Node BottomLeft { get; set; }
         public Vector3 WorldPosition { get; set; }
-        
         public NodeType[,] Layout { get; set; }
-        public ParkingSpace[] ParkingSpaces { get; set; }
 
-        private GridManager _gridManager;
+        protected BuildingManager BuildingManager { get; private set; }
 
-        public BuildingInformation(GridManager gridManager, int width, int height, Node bottomLeft, NodeType[,] layout,
-            ParkingSpace[] parkingSpaces)
+        public void Init(BuildingManager buildingManager)
         {
-            _gridManager = gridManager;
-            Width = width;
-            Height = height;
+            var position = transform.position;
+            BuildingManager = buildingManager;
+            var layout = new[,]
+            {
+                { NodeType.Parking, NodeType.Building },
+                { NodeType.Building, NodeType.Building }
+            };
+            var bottomLeft = buildingManager.GridManager.WorldToNode(position);
+            
+            var gridManager = buildingManager.GridManager;
             BottomLeft = bottomLeft;
             WorldPosition = gridManager.NodeToWorld(bottomLeft);
             Layout = layout;
-            ParkingSpaces = parkingSpaces;
         }
-
+        
         public bool CheckParkingIsFree()
         {
             return ParkingSpaces.Any(parkingSpace => parkingSpace.IsBeingTaken);
