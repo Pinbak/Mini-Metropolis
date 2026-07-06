@@ -1,4 +1,7 @@
-﻿public enum NodeType
+﻿using System;
+
+[Serializable]
+public enum NodeType
 {
     Empty,
     Road,
