@@ -48,6 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46698c5c67d7436f8ed2008b7f0bc4bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Building
+  <BuildingType>k__BackingField: 2
+  <UpgradesTo>k__BackingField: {fileID: 0}
   <Width>k__BackingField: 2
   <Height>k__BackingField: 2
   <ParkingSpaces>k__BackingField:
@@ -55,7 +57,9 @@ MonoBehaviour:
   - {fileID: 5827054332861495701}
   - {fileID: 7438238872540830180}
   supplies: []
-  <BuildingType>k__BackingField: 2
+  demands:
+  - {fileID: -2346467231963870893, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
+  startingNeed: 50
 --- !u!1001 &1218746192501201739
 PrefabInstance:
   m_ObjectHideFlags: 0

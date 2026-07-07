@@ -6,13 +6,19 @@ namespace Needs.Agents
 {
     public class Agent : MonoBehaviour
     {
-        public IAgentState AgentState { get; private set; }
         [field:SerializeField] public AgentType AgentType { get; set; }
+        [field:SerializeField] public float UpgradeThreshold { get; set; }
+        [field:SerializeField] public float DowngradeThreshold { get; set; }
+        [field:SerializeField] public string PrimaryNeedName { get; set; }
+        [field:SerializeField] public string SecondaryNeedName { get; set; }
         [field:SerializeField] public float MovementSpeed { get; set; }= 1f;
         [field:SerializeField] public float TimeToSpendAtPrimary { get; set; }
         [field:SerializeField] public float TimeToSpendAtSecondary { get; set; }
-        
+        [field: SerializeField] public float TimeToWaitUntilRetryingRoute { get; set; } = 5f;
+        [field:SerializeField] public float NeedIncrease { get; set; }
+
         // States
+        public IAgentState AgentState { get; private set; }
         public AtPrimary AtPrimary { get; private set; } = new();
         public AtSecondary AtSecondary { get; private set; } = new();
         public TravellingToPrimary TravellingToPrimary { get; private set; } = new();
