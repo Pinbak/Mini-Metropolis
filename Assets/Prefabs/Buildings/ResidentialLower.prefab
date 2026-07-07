@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3329852073043283842}
-  - component: {fileID: 2206404345454251422}
+  - component: {fileID: 7138364579099239615}
   m_Layer: 0
   m_Name: ResidentialLower
   m_TagString: Untagged
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 2973114250770914060}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2206404345454251422
+--- !u!114 &7138364579099239615
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,16 +43,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2511214019681921889}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3cd95813c3b14ee99c2c08943085d1d4, type: 3}
+  m_Script: {fileID: 11500000, guid: 46698c5c67d7436f8ed2008b7f0bc4bf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Residential
+  m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Building
+  <BuildingType>k__BackingField: 0
+  <UpgradesTo>k__BackingField: {fileID: 0}
   <Width>k__BackingField: 2
   <Height>k__BackingField: 1
   <ParkingSpaces>k__BackingField:
   - {fileID: 7377723312171224275}
   supplies:
-  - {fileID: 1679263155091622085, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
-  demands: []
+  - {fileID: 1635139131920816101, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
 --- !u!1001 &1275299001288953468
 PrefabInstance:
   m_ObjectHideFlags: 0

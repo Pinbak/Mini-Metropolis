@@ -7,6 +7,7 @@ namespace Needs.Agents
     public class Agent : MonoBehaviour
     {
         public IAgentState AgentState { get; private set; }
+        [field:SerializeField] public AgentType AgentType { get; set; }
         [field:SerializeField] public float MovementSpeed { get; set; }= 1f;
         [field:SerializeField] public float TimeToSpendAtPrimary { get; set; }
         [field:SerializeField] public float TimeToSpendAtSecondary { get; set; }

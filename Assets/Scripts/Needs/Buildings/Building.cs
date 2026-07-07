@@ -7,15 +7,13 @@ namespace Needs.Buildings
 {
     public class Building : MonoBehaviour
     {
+        [field:SerializeField] public BuildingType BuildingType { get; set; }
+        [field:SerializeField] public Building UpgradesTo { get; set; }
         [field:SerializeField] public int Width { get; set; }
         [field:SerializeField] public int Height { get; set; }
         [field:SerializeField] public ParkingSpace[] ParkingSpaces { get; set; }
-        public NodeType[,] Layout { get; private set; }
         [SerializeField] private Agent[] supplies;
-        [SerializeField] private Agent[] demands;
-
-        public List<Agent> Supplies { get; set; } = new();
-        
+        public NodeType[,] Layout { get; private set; }
         public Node BottomLeft { get; private set; }
         public Vector3 WorldPosition { get; set; }
         

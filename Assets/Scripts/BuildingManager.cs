@@ -1,25 +1,23 @@
-﻿using System.Collections.Generic;
-using Intersections;
+﻿using Intersections;
 using Needs.Buildings;
 using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
 {
     [field:SerializeField] public LayerMask AgentLayer { get; set; } // the layer the agents are on
-    [field:SerializeField] public GameObject TestPosition { get; set; }
     
-    [SerializeField] private Residential residentialLowWealthPrefab;
-    [SerializeField] private Residential residentialHighWealthPrefab;
-    [SerializeField] private Industrial industrialLowWealthPrefab;
+    [SerializeField] private Building residentialLowWealthPrefab;
+    [SerializeField] private Building residentialHighWealthPrefab;
+    [SerializeField] private Building industrialLowWealthPrefab;
     
     [field:SerializeField] public GridManager GridManager { get; set; }
     [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
     [field:SerializeField] public AnimationCurve CarAcceleration { get; set; }
     [SerializeField] private PlacementManager placementManager;
     
-    public Industrial TestIndustrial { get; set; } // todo should be a list of available workplaces for example
-    public Residential TestHouse { get; set; }
-    public Residential TestHouse2 { get; set; }
+    public Building TestIndustrial { get; set; } // todo should be a list of available workplaces for example
+    public Building TestHouse { get; set; }
+    public Building TestHouse2 { get; set; }
     
     // private readonly List<Commuter> _testCars = new();
     

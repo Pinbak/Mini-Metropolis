@@ -2,7 +2,8 @@
 {
     public enum BuildingType
     {
-        ResidentialLow,
-        ResidentialHigh,
+        Residential,
+        Commercial,
+        Industrial,
     }
 }
