@@ -48,7 +48,7 @@ namespace Needs.Agents
 
         private void Update()
         {
-            AgentState.Update(this); // todo might be null as update runs before init once??
+            AgentState.Update(this);
         }
         
         private void OnDrawGizmos()

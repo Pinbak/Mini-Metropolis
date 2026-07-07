@@ -54,6 +54,9 @@ MonoBehaviour:
   - {fileID: 462544197649846239}
   - {fileID: 5827054332861495701}
   - {fileID: 7438238872540830180}
+  <Layout>k__BackingField: 
+  supplies: []
+  demands: []
 --- !u!1001 &1218746192501201739
 PrefabInstance:
   m_ObjectHideFlags: 0
