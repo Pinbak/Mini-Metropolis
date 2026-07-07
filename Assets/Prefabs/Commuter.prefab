@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3863246948348114360}
-  - component: {fileID: 1635139131920816101}
+  - component: {fileID: -2346467231963870893}
   - component: {fileID: 5619498843596990357}
   m_Layer: 7
   m_Name: Commuter
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 327135518479331197}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1635139131920816101
+--- !u!114 &-2346467231963870893
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,12 +43,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 5199846455253727309}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abd967ff6cfb46999cb35e224af96652, type: 3}
+  m_Script: {fileID: 11500000, guid: a837af02ae2248bf857a9e247710a7c4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Needs.Agents.Agent
+  m_EditorClassIdentifier: Assembly-CSharp::Needs.Agents.Commuter
+  <AgentType>k__BackingField: 0
+  <UpgradeThreshold>k__BackingField: 70
+  <DowngradeThreshold>k__BackingField: 30
+  <PrimaryNeedName>k__BackingField: Work
+  <SecondaryNeedName>k__BackingField: Staff
   <MovementSpeed>k__BackingField: 1
   <TimeToSpendAtPrimary>k__BackingField: 10
   <TimeToSpendAtSecondary>k__BackingField: 10
+  <TimeToWaitUntilRetryingRoute>k__BackingField: 5
+  <NeedIncrease>k__BackingField: 10
 --- !u!65 &5619498843596990357
 BoxCollider:
   m_ObjectHideFlags: 0

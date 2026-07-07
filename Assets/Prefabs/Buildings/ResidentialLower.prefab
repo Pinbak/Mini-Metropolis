@@ -53,7 +53,9 @@ MonoBehaviour:
   <ParkingSpaces>k__BackingField:
   - {fileID: 7377723312171224275}
   supplies:
-  - {fileID: 1635139131920816101, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
+  - {fileID: -2346467231963870893, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
+  demands: []
+  startingNeed: 50
 --- !u!1001 &1275299001288953468
 PrefabInstance:
   m_ObjectHideFlags: 0
