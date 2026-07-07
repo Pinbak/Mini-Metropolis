@@ -10,7 +10,7 @@ namespace Needs.Buildings
         [field:SerializeField] public int Width { get; set; }
         [field:SerializeField] public int Height { get; set; }
         [field:SerializeField] public ParkingSpace[] ParkingSpaces { get; set; }
-        [field:SerializeField] public NodeType[,] Layout { get; set; }
+        public NodeType[,] Layout { get; private set; }
         [SerializeField] private Agent[] supplies;
         [SerializeField] private Agent[] demands;
 
@@ -21,7 +21,7 @@ namespace Needs.Buildings
         
         protected BuildingManager BuildingManager { get; private set; }
 
-        public void Init(BuildingManager buildingManager, NodeType[,] layout)
+        public void Init(BuildingManager buildingManager)
         {
             var position = transform.position;
             BuildingManager = buildingManager;
@@ -30,13 +30,33 @@ namespace Needs.Buildings
             var gridManager = buildingManager.GridManager;
             BottomLeft = bottomLeft;
             WorldPosition = gridManager.NodeToWorld(bottomLeft);
-            Layout = layout;
+            
+            GenerateLayout();
 
             for (var i = 0; i < supplies.Length; i++)
             {
                 var agentPrefab = supplies[i];
                 var agent = Instantiate(agentPrefab, ParkingSpaces[i].transform.position, Quaternion.identity, transform);
                 agent.Init(this, buildingManager.TestIndustrial, buildingManager, ParkingSpaces[i]);
+            }
+        }
+
+        private void GenerateLayout()
+        {
+            Layout = new NodeType[Width, Height];
+            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
+            {
+                Layout[x, y] = NodeType.Building;
+            }
+
+            foreach (var parkingSpace in ParkingSpaces)
+            {
+                var parkingPosition = BuildingManager.GridManager.WorldToNode(parkingSpace.ParentPosition);
+                // have to shift real world position by buildings position for relative local position
+                var localGridPosition =
+                    new Vector2Int(parkingPosition.X - BottomLeft.X, parkingPosition.Y - BottomLeft.Y);
+                Layout[localGridPosition.x, localGridPosition.y] = NodeType.Parking;
             }
         }
         

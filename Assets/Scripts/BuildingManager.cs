@@ -25,27 +25,17 @@ public class BuildingManager : MonoBehaviour
     
     private void Start()
     {
-        var layout = new[,]
-        {
-            { NodeType.Parking, NodeType.Building },
-            { NodeType.Building, NodeType.Building }
-        }; // todo remove
         TestIndustrial = Instantiate(industrialLowWealthPrefab, new Vector3(2f, 0f, 2f), Quaternion.identity,
             transform);
-        TestIndustrial.Init(this, layout);
+        TestIndustrial.Init(this);
         placementManager.PlaceBuilding(TestIndustrial);
         
-        layout = new[,]
-        {
-            { NodeType.Parking },
-            { NodeType.Building }
-        };
         TestHouse = Instantiate(residentialLowWealthPrefab, new Vector3(0f, 0f, 2f), Quaternion.identity, transform);
-        TestHouse.Init(this, layout);
+        TestHouse.Init(this);
         placementManager.PlaceBuilding(TestHouse);
         
         TestHouse2 = Instantiate(residentialLowWealthPrefab, new Vector3(0f, 0f, -2f), Quaternion.identity, transform);
-        TestHouse2.Init(this, layout);
+        TestHouse2.Init(this);
         placementManager.PlaceBuilding(TestHouse2);
 
         // var vectors = new List<Vector3>()

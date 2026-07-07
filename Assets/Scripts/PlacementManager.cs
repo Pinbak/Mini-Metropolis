@@ -19,15 +19,15 @@ public class PlacementManager : MonoBehaviour
     private List<(int x, int y)> _validNeighbourNodes = new();
     private BuildingMode _mode;
 
-    public void PlaceBuilding(Building information)
+    public void PlaceBuilding(Building building)
     {
-        for (var x = 0; x < information.Width; x++)
-        for (var y = 0; y < information.Height; y++)
+        for (var x = 0; x < building.Width; x++)
+        for (var y = 0; y < building.Height; y++)
         {
-            var gridPosition = new Vector2Int(information.BottomLeft.X + x, information.BottomLeft.Y + y);
+            var gridPosition = new Vector2Int(building.BottomLeft.X + x, building.BottomLeft.Y + y);
             var node = gridManager.Grid[gridPosition.x, gridPosition.y];
             if (node.Type is not NodeType.Empty) return;
-            node.Type = information.Layout[x, y];
+            node.Type = building.Layout[x, y];
         }
     }
 
