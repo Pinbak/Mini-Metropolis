@@ -21,21 +21,17 @@ public class GameManager : MonoBehaviour
 
     private void HandleMouseHeldDown(Vector3 position)
     {
-        placementManager.MouseDown(position);
+        placementManager.HandleMouseHeldDown(position);
     }
 
     private void HandleMouseClick(Vector3 position)
     {
-        placementManager.StartRoadPlacement(Vector3Int.RoundToInt(position));
+        placementManager.HandleMouseClick(position);
     }
 
     private void HandleMouseRelease()
     {
-        placementManager.RemoveStartingNode();
+        placementManager.HandleMouseRelease();
     }
 
-    private void Update()
-    {
-        
-    }
 }
