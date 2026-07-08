@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Intersections;
 using Needs.Buildings;
 using UnityEngine;
@@ -12,9 +11,9 @@ public class BuildingManager : MonoBehaviour
     [field:SerializeField] public LayerMask AgentLayer { get; set; } // the layer the agents are on
 
     [SerializeField] private Zone zonePrefab;
-    [SerializeField] private Building residentialLowWealthPrefab;
-    [SerializeField] private Building residentialHighWealthPrefab;
-    [SerializeField] private Building industrialLowWealthPrefab;
+    [SerializeField] private ResidentialBuilding residentialLowWealthPrefab;
+    [SerializeField] private ResidentialBuilding residentialHighWealthPrefab;
+    [SerializeField] private IndustrialBuilding industrialLowWealthPrefab;
 
     [field:SerializeField] public GridManager GridManager { get; set; }
     [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
@@ -50,17 +49,17 @@ public class BuildingManager : MonoBehaviour
         var newZone = Instantiate(zonePrefab, GridManager.NodeToWorld(position), Quaternion.identity, transform);
         newZone.Init(this, type);
         placementManager.PlaceZone(newZone);
-        
-        // keep track of zones
-        switch (type.BuildingType)
+
+        switch (type)
         {
-            case BuildingType.Residential:
+            // keep track of zones
+            case ResidentialBuilding:
                 _residentialZones.Add(newZone);
                 break;
-            case BuildingType.Commercial:
+            case CommercialBuilding:
                 _commercialZones.Add(newZone);
                 break;
-            case BuildingType.Industrial:
+            case IndustrialBuilding:
                 _industrialZones.Add(newZone);
                 break;
         }
@@ -82,6 +81,8 @@ public class BuildingManager : MonoBehaviour
         _allBuildings = new Building[GridManager.Width, GridManager.Height];
         CreateResidentialZone(GridManager.WorldToNode(new Vector3(2f, 0f, 2f)));
         BuildFromZone(_residentialZones[0]);
+        CreateIndustrialZone(GridManager.WorldToNode(new Vector3(0f, 0f, 2f)));
+        BuildFromZone(_industrialZones[0]);
     }
     
 }

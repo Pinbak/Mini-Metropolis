@@ -30,12 +30,12 @@ namespace Needs.Agents
         public AnimationCurve CarAcceleration { get; private set; }
         
         private GridManager _gridManager;
-        private BuildingManager _buildingManager; // parent
+        protected BuildingManager BuildingManager { get; set; } // parent
 
         public void Init(Building primaryLocation, BuildingManager buildingManager, ParkingSpace initialParkingSpace)
         {
             _gridManager = buildingManager.GridManager;
-            _buildingManager = buildingManager;
+            BuildingManager = buildingManager;
             AgentState = AtPrimary;
             AgentState.EnterState(this);
             CarAcceleration = buildingManager.CarAcceleration;

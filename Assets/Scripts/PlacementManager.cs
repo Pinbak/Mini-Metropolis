@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Intersections;
+﻿using Intersections;
 using Needs.Buildings;
 using Placement;
-using Roads;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
@@ -92,7 +89,7 @@ public class PlacementManager : MonoBehaviour
         }
     }
 
-    public bool IsPositionFree(Vector3Int position)
+    public bool IsPositionFreeOrRoad(Vector3Int position)
     {
         var gridPosition = GridManager.WorldToGrid(position);
         return GridManager.Grid[gridPosition.x, gridPosition.y].Type == NodeType.Empty ||

@@ -6,9 +6,8 @@ using UnityEngine;
 
 namespace Needs.Buildings
 {
-    public class Building : MonoBehaviour
+    public abstract class Building : MonoBehaviour
     {
-        [field:SerializeField] public BuildingType BuildingType { get; set; }
         [field:SerializeField] public Building UpgradesTo { get; set; }
         [field:SerializeField] public int Width { get; set; }
         [field:SerializeField] public int Height { get; set; }
