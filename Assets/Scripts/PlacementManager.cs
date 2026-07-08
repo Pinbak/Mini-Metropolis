@@ -19,6 +19,22 @@ public class PlacementManager : MonoBehaviour
     private List<(int x, int y)> _validNeighbourNodes = new();
     private BuildingMode _mode;
 
+    public bool IsSpaceAvailable(int width, int height, Node bottomLeft)
+    {
+        for (var x = 0; x < width; x++)
+        for (var y = 0; y < height; y++)
+        {
+            var gridPosition = new Vector2Int(bottomLeft.X + x, bottomLeft.Y + y);
+            var node = gridManager.Grid[gridPosition.x, gridPosition.y];
+            if (node.Type is not NodeType.Empty) return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Warning is destructive!
+    /// </summary>
     public void PlaceBuilding(Building building)
     {
         for (var x = 0; x < building.Width; x++)
@@ -26,8 +42,19 @@ public class PlacementManager : MonoBehaviour
         {
             var gridPosition = new Vector2Int(building.BottomLeft.X + x, building.BottomLeft.Y + y);
             var node = gridManager.Grid[gridPosition.x, gridPosition.y];
-            if (node.Type is not NodeType.Empty) return;
             node.Type = building.Layout[x, y];
+        }
+    }
+    
+    public void PlaceZone(Zone zone)
+    {
+        for (var x = 0; x < zone.Width; x++)
+        for (var y = 0; y < zone.Height; y++)
+        {
+            var gridPosition = new Vector2Int(zone.BottomLeft.X + x, zone.BottomLeft.Y + y);
+            var node = gridManager.Grid[gridPosition.x, gridPosition.y];
+            if (node.Type is not NodeType.Empty) return;
+            node.Type = zone.Layout[x, y];
         }
     }
 

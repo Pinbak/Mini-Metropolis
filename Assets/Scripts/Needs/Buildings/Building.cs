@@ -45,7 +45,7 @@ namespace Needs.Buildings
                 Needs[agent.AgentType] = startingNeed;
                 NeedUpgradeThresholds[agent.AgentType] = agent.UpgradeThreshold;
                 NeedDowngradeThresholds[agent.AgentType] = agent.DowngradeThreshold;
-                agent.Init(this, buildingManager.TestIndustrial, buildingManager, ParkingSpaces[i]);
+                agent.Init(this, buildingManager, ParkingSpaces[i]);
             }
 
             foreach (var demand in demands)

@@ -10,7 +10,13 @@ namespace Needs.Agents
         {
             _timeSpent += Time.deltaTime;
             if (_timeSpent > context.TimeToSpendAtPrimary)
-                context.ChangeState(context.TravellingToSecondary);
+            {
+                _timeSpent = 0f;
+                if (context.SecondaryLocation is not null)
+                    context.ChangeState(context.TravellingToSecondary);
+                else
+                    context.FindSecondaryLocation();
+            }
         }
 
         public void EnterState(Agent context)
