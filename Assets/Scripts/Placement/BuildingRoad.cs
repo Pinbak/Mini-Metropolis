@@ -61,7 +61,7 @@ namespace Placement
         public void StartRoadPlacement(Vector3Int position)
         {
             if (!_context.IsPositionInBound(position)) return;
-            if (!_context.IsPositionFree(position)) return;
+            if (!_context.IsPositionFreeOrRoad(position)) return;
         
             RemoveStartingNode();
 

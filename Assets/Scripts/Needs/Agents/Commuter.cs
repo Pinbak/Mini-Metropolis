@@ -6,7 +6,6 @@ namespace Needs.Agents
     {
         public override void FindSecondaryLocation()
         {
-            Debug.Log("Here");
         }
     }
 }

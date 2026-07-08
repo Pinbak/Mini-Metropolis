@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8344905535501330450}
-  - component: {fileID: 6874568733226888587}
+  - component: {fileID: 4249458409379074798}
   m_Layer: 0
   m_Name: IndustrialLower
   m_TagString: Untagged
@@ -36,7 +36,7 @@ Transform:
   - {fileID: 2889482694268538427}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6874568733226888587
+--- !u!114 &4249458409379074798
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,10 +45,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5548089700260671266}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46698c5c67d7436f8ed2008b7f0bc4bf, type: 3}
+  m_Script: {fileID: 11500000, guid: 17e413925c014fc4858140488722e386, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Building
-  <BuildingType>k__BackingField: 2
+  m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.IndustrialBuilding
   <UpgradesTo>k__BackingField: {fileID: 0}
   <Width>k__BackingField: 2
   <Height>k__BackingField: 2
@@ -59,7 +58,7 @@ MonoBehaviour:
   supplies: []
   demands:
   - {fileID: -2346467231963870893, guid: 5254dc7e9e51ba446a459e43286bf135, type: 3}
-  startingNeed: 50
+  startingNeed: 0
 --- !u!1001 &1218746192501201739
 PrefabInstance:
   m_ObjectHideFlags: 0
