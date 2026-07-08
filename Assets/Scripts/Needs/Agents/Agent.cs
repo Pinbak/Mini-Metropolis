@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Needs.Agents
 {
-    public class Agent : MonoBehaviour
+    public abstract class Agent : MonoBehaviour
     {
         [field:SerializeField] public AgentType AgentType { get; set; }
         [field:SerializeField] public float UpgradeThreshold { get; set; }
@@ -25,15 +25,14 @@ namespace Needs.Agents
         public TravellingToSecondary TravellingToSecondary { get; private set; } = new();
         
         public Building PrimaryLocation { get; private set; }
-        public Building SecondaryLocation { get; private set; }
+        public Building SecondaryLocation { get; protected set; }
         public PathMover PathMover { get; private set; } // the ability to move along a path
         public AnimationCurve CarAcceleration { get; private set; }
         
         private GridManager _gridManager;
         private BuildingManager _buildingManager; // parent
 
-        public void Init(Building primaryLocation, Building secondaryLocation,
-            BuildingManager buildingManager, ParkingSpace initialParkingSpace)
+        public void Init(Building primaryLocation, BuildingManager buildingManager, ParkingSpace initialParkingSpace)
         {
             _gridManager = buildingManager.GridManager;
             _buildingManager = buildingManager;
@@ -41,10 +40,11 @@ namespace Needs.Agents
             AgentState.EnterState(this);
             CarAcceleration = buildingManager.CarAcceleration;
             PrimaryLocation = primaryLocation;
-            SecondaryLocation = secondaryLocation;
             PathMover = new PathMover(primaryLocation, _gridManager, buildingManager.IntersectionManager, gameObject,
                 buildingManager.AgentLayer, initialParkingSpace);
         }
+
+        public abstract void FindSecondaryLocation();
 
         public void ChangeState(IAgentState newState)
         {
