@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Intersections;
 using Needs.Agents;
 using Needs.Buildings;
@@ -88,14 +89,31 @@ public class BuildingManager : MonoBehaviour
         BuildFromZone(_industrialZones[0]);
     }
 
+    private void Update()
+    {
+        foreach (var (type, buildings) in _supplies)
+        {
+            if (buildings.Count == 0) continue;
+            if (!_demands.TryGetValue(type, out var demand)) continue;
+            if (demand.Count == 0) continue;
+            var supplyBuilding = _supplies[type].Dequeue();
+            var demandBuilding = _demands[type].Dequeue();
+            supplyBuilding.GoTo(demandBuilding, type);
+        }
+    }
+
     public void AddToSupplyQueue(Building building, Need need)
     {
-        
+        if (!_supplies.ContainsKey(need.Type))
+            _supplies[need.Type] = new Queue<Building>();
+        _supplies[need.Type].Enqueue(building);
     }
     
     public void AddToDemandQueue(Building building, Need need)
     {
-        
+        if (!_demands.ContainsKey(need.Type))
+            _demands[need.Type] = new Queue<Building>();
+        _demands[need.Type].Enqueue(building);
     }
     
 }

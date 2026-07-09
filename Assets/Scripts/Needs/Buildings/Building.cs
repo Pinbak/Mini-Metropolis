@@ -14,6 +14,7 @@ namespace Needs.Buildings
         [field:SerializeField] public ParkingSpace[] ParkingSpaces { get; set; }
         [SerializeField] private Agent[] supplies;
         [SerializeField] private Agent[] demands;
+        private Agent[] _agents;
         [SerializeField] private float startingNeed;
         
         public NodeType[,] Layout { get; private set; }
@@ -34,6 +35,7 @@ namespace Needs.Buildings
             var gridManager = buildingManager.GridManager;
             BottomLeft = bottomLeft;
             WorldPosition = gridManager.NodeToWorld(bottomLeft);
+            _agents = new Agent[supplies.Length];
             
             GenerateLayout();
             SetupNeeds();
@@ -43,6 +45,7 @@ namespace Needs.Buildings
                 var agentPrefab = supplies[i];
                 var agent = Instantiate(agentPrefab, ParkingSpaces[i].transform.position, Quaternion.identity, transform);
                 agent.Init(this, buildingManager, ParkingSpaces[i]);
+                _agents[i] = agent;
             }
             
         }
@@ -70,38 +73,49 @@ namespace Needs.Buildings
             
         }
 
-        public void IncrementNeed(Agent need, float amount)
+        public void GoTo(Building building, AgentType need)
         {
-            if (supplies.Contains(need))
+            foreach (var agent in _agents)
             {
-                foreach (var supply in Supplies)
+                
+                if (agent.AgentType == need)
                 {
-                    if (supply.Type == need.AgentType)
-                    {
-                        supply.Increase(amount);
-                    }
-                }
-            }
-            else if (demands.Contains(need))
-            {
-                foreach (var demand in Demands)
-                {
-                    if (demand.Type == need.AgentType)
-                    {
-                        demand.Increase(amount);
-                    }
+                    if (agent.AgentState is AtPrimary)
+                        agent.GoTo(building);
                 }
             }
         }
 
+        public void IncrementNeed(Agent need, float amount)
+        {
+            
+            foreach (var supply in Supplies)
+            {
+                if (supply.Type == need.AgentType)
+                {
+                    supply.Increase(amount);
+                }
+            }
+            
+            foreach (var demand in Demands)
+            {
+                if (demand.Type == need.AgentType)
+                {
+                    demand.Increase(amount);
+                }
+            }
+            
+        }
+
         private void NeedGettingLow(Need need)
         {
-            // todo need to check if building has available agent to prevent constantly adding to queue
-            foreach (var agent in supplies)
+            foreach (var agent in _agents)
             {
+                
                 if (agent.AgentType == need.Type)
                 {
-                    BuildingManager.AddToSupplyQueue(this, need);
+                    if (agent.AgentState is AtPrimary)
+                        BuildingManager.AddToSupplyQueue(this, need);
                 }
             }
 
@@ -109,7 +123,11 @@ namespace Needs.Buildings
             {
                 if (agent.AgentType == need.Type)
                 {
-                    BuildingManager.AddToDemandQueue(this, need);
+                    if (GetFreeParkingSpace(out var space))
+                    {
+                        space.IsReserved = true;
+                        BuildingManager.AddToDemandQueue(this, need);
+                    }
                 }
             }
         }
@@ -132,23 +150,26 @@ namespace Needs.Buildings
                 Layout[localGridPosition.x, localGridPosition.y] = NodeType.Parking;
             }
         }
-        
-        public bool CheckParkingIsFree()
-        {
-            return ParkingSpaces.Any(parkingSpace => parkingSpace.IsBeingTaken);
-        }
 
         public bool GetFreeParkingSpace(out ParkingSpace freeParkingSpace)
         {
             freeParkingSpace = null;
             foreach (var parkingSpace in ParkingSpaces)
             {
-                if (parkingSpace.IsBeingTaken) continue;
+                if (parkingSpace.IsBeingTaken || parkingSpace.IsReserved) continue;
                 freeParkingSpace = parkingSpace;
                 return true;
             }
             
             return false;
+        }
+
+        public void GetReservedParkingSpace(out ParkingSpace reservedSpace)
+        {
+            reservedSpace = null;
+            foreach (var parkingSpace in ParkingSpaces)
+                if (parkingSpace.IsReserved)
+                    reservedSpace = parkingSpace;
         }
         
         private void OnDrawGizmos()

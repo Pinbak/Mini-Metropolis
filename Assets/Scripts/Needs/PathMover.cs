@@ -84,6 +84,7 @@ namespace Needs
             {
                 ParkedAt.IsFree = true;
                 ParkedAt.IsBeingTaken = false;
+                ParkedAt.IsReserved = false;
                 Destination.IsBeingTaken = true; // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
                 ParkedAt = null;
                 _currentTargetPosition = _pathGenerator.Path[0];

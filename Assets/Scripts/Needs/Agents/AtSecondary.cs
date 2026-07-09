@@ -20,6 +20,8 @@ namespace Needs.Agents
 
         public void ExitState(Agent context)
         {
+            context.PrimaryLocation.IncrementNeed(context, context.NeedIncrease); // just finished work ect.
+            context.SecondaryLocation.IncrementNeed(context, context.NeedIncrease); // just finished work ect.
         }
     }
 }

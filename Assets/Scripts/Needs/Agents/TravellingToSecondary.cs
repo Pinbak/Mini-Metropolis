@@ -12,6 +12,7 @@ namespace Needs.Agents
         {
             if (!_foundPath)
             {
+                // todo not used but could be??
                 _timeSpentRetrying += Time.deltaTime;
                 if (_timeSpentRetrying > context.TimeToWaitUntilRetryingRoute)
                 {
@@ -28,13 +29,22 @@ namespace Needs.Agents
         {
             _foundPath = false;
             if (context.PathMover.HasValidPath) Debug.Log("Attempting to travel to work while travelling");
-            if (!context.SecondaryLocation.GetFreeParkingSpace(out var parkingSpace)) return;
+            context.SecondaryLocation.GetReservedParkingSpace(out var parkingSpace);
             context.PathMover.GeneratePath(parkingSpace);
             
             if (context.PathMover.HasValidPath)
             {
                 context.PathMover.Arrived += Arrived;
                 _foundPath = true;
+            }
+            else
+            {
+                // failed to find a path
+                parkingSpace.IsReserved = false;
+                parkingSpace.IsBeingTaken = false;
+                context.Returning();
+                _context.ChangeState(_context.AtPrimary);
+                
             }
         }
 

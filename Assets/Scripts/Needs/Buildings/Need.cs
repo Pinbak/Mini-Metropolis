@@ -6,8 +6,8 @@ namespace Needs.Buildings
 {
     public class Need : MonoBehaviour
     {
-        public AgentType Type { get; set; }
-        public float Amount { get; set; } = 100f;
+        [field:SerializeField] public AgentType Type { get; set; }
+        [field:SerializeField] public float Amount { get; set; } = 100f;
         public Action<Need> BelowThreshold { get; set; }
         public Action<Need> GettingLow { get; set; }
         public Action<Need> AboveThreshold { get; set; }
@@ -16,8 +16,8 @@ namespace Needs.Buildings
         private float _downgradeThreshold = 10f;
         private float _gettingLowThreshold = 50f;
 
-        private float _retryPollTimer = 0f;
-        private float _retryTime = 10f;
+        [SerializeField] private float _retryPollTimer = 0f;
+        [SerializeField] private float _retryTime = 10f;
 
         public void Init(AgentType type)
         {
@@ -37,12 +37,11 @@ namespace Needs.Buildings
             if (!(_retryPollTimer > _retryTime)) return;
             
             _retryPollTimer = 0f;
+            GettingLow?.Invoke(this);
+            
             if (Amount < _downgradeThreshold)
             {
                 BelowThreshold?.Invoke(this);
-            }else if (Amount < _gettingLowThreshold)
-            {
-                GettingLow?.Invoke(this);
             }
 
             if (Amount > _upgradeThreshold)
