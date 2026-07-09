@@ -40,9 +40,10 @@ namespace Needs.Agents
 
         public void EnterState(Agent context)
         {
-            context.PrimaryLocation.Needs[context.AgentType] += context.NeedIncrease; // just finished work ect.
-            context.SecondaryLocation.Needs[context.AgentType] += context.NeedIncrease; // just finished work ect.
+            context.PrimaryLocation.IncrementNeed(context, context.NeedIncrease); // just finished work ect.
+            context.SecondaryLocation.IncrementNeed(context, context.NeedIncrease); // just finished work ect.
             _context = context;
+            context.Returning();
             AttemptMoveToPrimaryLocation(context);
 
         }

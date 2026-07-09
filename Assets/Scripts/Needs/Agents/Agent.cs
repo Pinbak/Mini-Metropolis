@@ -12,10 +12,9 @@ namespace Needs.Agents
         [field:SerializeField] public string PrimaryNeedName { get; set; }
         [field:SerializeField] public string SecondaryNeedName { get; set; }
         [field:SerializeField] public float MovementSpeed { get; set; }= 1f;
-        [field:SerializeField] public float TimeToSpendAtPrimary { get; set; }
         [field:SerializeField] public float TimeToSpendAtSecondary { get; set; }
         [field: SerializeField] public float TimeToWaitUntilRetryingRoute { get; set; } = 5f;
-        [field:SerializeField] public float NeedIncrease { get; set; }
+        [field: SerializeField] public float NeedIncrease { get; set; } = 10f;
 
         // States
         public IAgentState AgentState { get; private set; }
@@ -42,6 +41,16 @@ namespace Needs.Agents
             PrimaryLocation = primaryLocation;
             PathMover = new PathMover(primaryLocation, _gridManager, buildingManager.IntersectionManager, gameObject,
                 buildingManager.AgentLayer, initialParkingSpace);
+        }
+
+        public void GoTo(Building location)
+        {
+            SecondaryLocation = location;
+        }
+
+        public void Returning()
+        {
+            SecondaryLocation = null;
         }
 
         public abstract void FindSecondaryLocation();
