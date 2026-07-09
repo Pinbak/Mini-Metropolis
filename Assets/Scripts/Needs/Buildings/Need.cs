@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Needs.Buildings
 {
-    public class Need : MonoBehaviour
+    public class Need
     {
         [field:SerializeField] public AgentType Type { get; set; }
         [field:SerializeField] public float Amount { get; set; } = 100f;
@@ -29,7 +29,7 @@ namespace Needs.Buildings
             Amount += amount;
         }
 
-        private void Update()
+        public void Update()
         {
             Amount -= Time.deltaTime;
             _retryPollTimer += Time.deltaTime;

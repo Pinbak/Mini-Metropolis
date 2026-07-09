@@ -8,6 +8,7 @@ namespace Needs.Buildings
 {
     public abstract class Building : MonoBehaviour
     {
+        [field:SerializeField] public BuildingType Type { get; set; }
         [field:SerializeField] public Building UpgradesTo { get; set; }
         [field:SerializeField] public int Width { get; set; }
         [field:SerializeField] public int Height { get; set; }
@@ -50,6 +51,19 @@ namespace Needs.Buildings
             
         }
 
+        private void Update()
+        {
+            foreach (var supply in Supplies)
+            {
+                supply.Update();
+            }
+            
+            foreach (var demand in Demands)
+            {
+                demand.Update();
+            }
+        }
+
         private void SetupNeeds()
         {
             var uniqueDemands = demands.ToHashSet();
@@ -57,7 +71,7 @@ namespace Needs.Buildings
 
             foreach (var uniqueSupply in uniqueSupplies)
             {
-                var need = gameObject.AddComponent<Need>();
+                var need = new Need();
                 need.Init(uniqueSupply.AgentType);
                 need.GettingLow += NeedGettingLow;
                 Supplies.Add(need);
@@ -65,7 +79,7 @@ namespace Needs.Buildings
             
             foreach (var uniqueDemand in uniqueDemands)
             {
-                var need = gameObject.AddComponent<Need>();
+                var need = new Need();
                 need.Init(uniqueDemand.AgentType);
                 need.GettingLow += NeedGettingLow;
                 Demands.Add(need);
