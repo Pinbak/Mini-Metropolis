@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Intersections;
 using Needs.Agents;
 using Needs.Buildings;
+using Placement;
 using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
@@ -12,81 +13,22 @@ public class BuildingManager : MonoBehaviour
     [field:SerializeField] public float IndustrialDemand { get; set; }
     [field:SerializeField] public LayerMask AgentLayer { get; set; } // the layer the agents are on
 
-    [SerializeField] private Zone zonePrefab;
-    [SerializeField] private ResidentialBuilding residentialLowWealthPrefab;
-    [SerializeField] private ResidentialBuilding residentialHighWealthPrefab;
-    [SerializeField] private IndustrialBuilding industrialLowWealthPrefab;
-
     [field:SerializeField] public GridManager GridManager { get; set; }
     [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
     [field:SerializeField] public AnimationCurve CarAcceleration { get; set; }
     [SerializeField] private PlacementManager placementManager;
 
-    private readonly List<Zone> _residentialZones = new();
-    private readonly List<Zone> _commercialZones = new();
-    private readonly List<Zone> _industrialZones = new();
+    public List<Zone> ResidentialZones { get; } = new();
+    public List<Zone> CommercialZones { get; } = new();
+    public List<Zone> IndustrialZones { get; }= new();
     private readonly List<Building> _buildingsWithAvailableParking = new();
-    private Building[,] _allBuildings;
+    public Building[,] AllBuildings { get; set; }
     private Dictionary<AgentType, Queue<Building>> _demands = new();
     private Dictionary<AgentType, Queue<Building>> _supplies = new();
-
-    public void CreateResidentialZone(Node position)
-    {
-        CreateZone(position, residentialLowWealthPrefab);
-    }
-    
-    public void CreateCommercialZone(Node position)
-    {
-        // CreateZone(position, );
-    }
-
-    public void CreateIndustrialZone(Node position)
-    {
-        CreateZone(position, industrialLowWealthPrefab);
-    }
-
-    private void CreateZone(Node position, Building type)
-    {
-        var width = type.Width;
-        var height = type.Height;
-        if (!placementManager.IsSpaceAvailable(width, height, position)) return;
-        var newZone = Instantiate(zonePrefab, GridManager.NodeToWorld(position), Quaternion.identity, transform);
-        newZone.Init(this, type);
-        placementManager.PlaceZone(newZone);
-
-        switch (type)
-        {
-            // keep track of zones
-            case ResidentialBuilding:
-                _residentialZones.Add(newZone);
-                break;
-            case CommercialBuilding:
-                _commercialZones.Add(newZone);
-                break;
-            case IndustrialBuilding:
-                _industrialZones.Add(newZone);
-                break;
-        }
-        
-    }
-
-    private void BuildFromZone(Zone zone)
-    {
-        var buildingPrefab = zone.Builds;
-        var building = Instantiate(buildingPrefab, zone.transform.position, Quaternion.identity, transform);
-        building.Init(this);
-        placementManager.PlaceBuilding(building);
-        _allBuildings[zone.BottomLeft.X, zone.BottomLeft.Y] = building;
-        Destroy(zone.gameObject);
-    }
     
     private void Start()
     {
-        _allBuildings = new Building[GridManager.Width, GridManager.Height];
-        CreateResidentialZone(GridManager.WorldToNode(new Vector3(2f, 0f, 2f)));
-        BuildFromZone(_residentialZones[0]);
-        CreateIndustrialZone(GridManager.WorldToNode(new Vector3(0f, 0f, 2f)));
-        BuildFromZone(_industrialZones[0]);
+        AllBuildings = new Building[GridManager.Width, GridManager.Height];
     }
 
     private void Update()
@@ -100,6 +42,9 @@ public class BuildingManager : MonoBehaviour
             var demandBuilding = _demands[type].Dequeue();
             supplyBuilding.GoTo(demandBuilding, type);
         }
+
+        foreach (var residentialZone in ResidentialZones.ToList()) BuildFromZone(residentialZone);
+        foreach (var industrialZone in IndustrialZones.ToList()) BuildFromZone(industrialZone);
     }
 
     public void AddToSupplyQueue(Building building, Need need)
@@ -114,6 +59,22 @@ public class BuildingManager : MonoBehaviour
         if (!_demands.ContainsKey(need.Type))
             _demands[need.Type] = new Queue<Building>();
         _demands[need.Type].Enqueue(building);
+    }
+    
+    private void BuildFromZone(Zone zone)
+    {
+        var buildingPrefab = zone.Builds;
+        var building = Instantiate(buildingPrefab, zone.transform.position, Quaternion.identity, transform);
+        building.Init(this);
+        BuildingZone.PlaceBuilding(building, placementManager);
+        AllBuildings[zone.BottomLeft.X, zone.BottomLeft.Y] = building;
+        Destroy(zone.gameObject);
+        if (zone.Builds.Type is BuildingType.Residential)
+            ResidentialZones.Remove(zone);
+        else if (zone.Builds.Type is BuildingType.Commercial)
+            CommercialZones.Remove(zone);
+        else if (zone.Builds.Type is BuildingType.Industrial)
+            IndustrialZones.Remove(zone);
     }
     
 }

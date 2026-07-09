@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17e413925c014fc4858140488722e386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.IndustrialBuilding
+  <Type>k__BackingField: 2
   <UpgradesTo>k__BackingField: {fileID: 0}
   <Width>k__BackingField: 2
   <Height>k__BackingField: 2

@@ -151,6 +151,11 @@ MonoBehaviour:
   <GridManager>k__BackingField: {fileID: 1487683637}
   <IntersectionManager>k__BackingField: {fileID: 1529207314}
   <PlacementIndicator>k__BackingField: {fileID: 1208998783}
+  <BuildingManager>k__BackingField: {fileID: 2009150915}
+  <ZonePrefab>k__BackingField: {fileID: 5880385975944513002, guid: 00fc84f64b810424d903d0980b721dd1, type: 3}
+  <ResidentialLowWealthPrefab>k__BackingField: {fileID: 3066291411998591043, guid: e52968b8fd081584185356fa1e0d61ba, type: 3}
+  <ResidentialHighWealthPrefab>k__BackingField: {fileID: 0}
+  <IndustrialLowWealthPrefab>k__BackingField: {fileID: 4249458409379074798, guid: 33f3d0854f0b75b42a55122c8dbc5f18, type: 3}
 --- !u!4 &267754612
 Transform:
   m_ObjectHideFlags: 0
@@ -1057,10 +1062,6 @@ MonoBehaviour:
   <AgentLayer>k__BackingField:
     serializedVersion: 2
     m_Bits: 128
-  zonePrefab: {fileID: 5880385975944513002, guid: 00fc84f64b810424d903d0980b721dd1, type: 3}
-  residentialLowWealthPrefab: {fileID: 3066291411998591043, guid: e52968b8fd081584185356fa1e0d61ba, type: 3}
-  residentialHighWealthPrefab: {fileID: -4079102970333303133, guid: 18f2d688aa540ef46b14a725c83958bc, type: 3}
-  industrialLowWealthPrefab: {fileID: 4249458409379074798, guid: 33f3d0854f0b75b42a55122c8dbc5f18, type: 3}
   <GridManager>k__BackingField: {fileID: 1487683637}
   <IntersectionManager>k__BackingField: {fileID: 1529207314}
   <CarAcceleration>k__BackingField:
