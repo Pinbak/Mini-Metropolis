@@ -13,8 +13,9 @@ namespace Needs.Agents
         [field:SerializeField] public string SecondaryNeedName { get; set; }
         [field:SerializeField] public float MovementSpeed { get; set; }= 1f;
         [field:SerializeField] public float TimeToSpendAtSecondary { get; set; }
-        [field: SerializeField] public float TimeToWaitUntilRetryingRoute { get; set; } = 5f;
-        [field: SerializeField] public float NeedIncrease { get; set; } = 10f;
+        [field:SerializeField] public float TimeToWaitUntilRetryingRoute { get; set; } = 5f;
+        [field:SerializeField] public float NeedIncrease { get; set; } = 10f;
+        [field:SerializeField] public bool InQueue { get; set; } // queueing for need
 
         // States
         public IAgentState AgentState { get; private set; }
@@ -45,6 +46,7 @@ namespace Needs.Agents
 
         public void GoTo(Building location)
         {
+            InQueue = false;
             SecondaryLocation = location;
         }
 

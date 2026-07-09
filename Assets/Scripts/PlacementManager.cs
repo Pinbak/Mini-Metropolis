@@ -59,10 +59,14 @@ public class PlacementManager : MonoBehaviour
             _buildingZoneState.Places = BuildingType.Residential;
             _mode = _buildingZoneState;
         }
-        else if (_mode is BuildingZone)
+        else if (_mode is BuildingZone && _buildingZoneState.Places is BuildingType.Residential)
         {
             _buildingZoneState.Places = BuildingType.Industrial;
             _mode = _buildingZoneState;
+        }
+        else if (_mode is BuildingZone && _buildingZoneState.Places is BuildingType.Industrial)
+        {
+            _mode = _buildingRoadState;
         }
         Debug.Log($"Changed mode to {_mode.GetType()}");
     }

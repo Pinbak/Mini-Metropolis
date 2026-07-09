@@ -10,18 +10,19 @@ namespace Needs.Agents
         
         public void Update(Agent context)
         {
-            if (!_foundPath)
-            {
-                // todo not used but could be??
-                _timeSpentRetrying += Time.deltaTime;
-                if (_timeSpentRetrying > context.TimeToWaitUntilRetryingRoute)
-                {
-                    _timeSpentRetrying = 0f;
-                    AttemptMoveToSecondaryLocation(context);
-                }
-
-                return;
-            }
+            // if (!_foundPath)
+            // {
+            //     // todo not used but could be??
+            //     _timeSpentRetrying += Time.deltaTime;
+            //     if (_timeSpentRetrying > context.TimeToWaitUntilRetryingRoute)
+            //     {
+            //         _timeSpentRetrying = 0f;
+            //         AttemptMoveToSecondaryLocation(context);
+            //     }
+            //
+            //     return;
+            // }
+            if (!_foundPath) return;
             context.PathMover.MoveAlongPath(context.MovementSpeed, context.CarAcceleration);
         }
 
@@ -31,6 +32,7 @@ namespace Needs.Agents
             if (context.PathMover.HasValidPath) Debug.Log("Attempting to travel to work while travelling");
             context.SecondaryLocation.GetReservedParkingSpace(out var parkingSpace);
             context.PathMover.GeneratePath(parkingSpace);
+            parkingSpace.IsReserved = false;
             
             if (context.PathMover.HasValidPath)
             {
@@ -40,8 +42,6 @@ namespace Needs.Agents
             else
             {
                 // failed to find a path
-                parkingSpace.IsReserved = false;
-                parkingSpace.IsBeingTaken = false;
                 context.Returning();
                 _context.ChangeState(_context.AtPrimary);
                 

@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Needs.Buildings
 {
+    [Serializable]
     public class Need
     {
         [field:SerializeField] public AgentType Type { get; set; }
