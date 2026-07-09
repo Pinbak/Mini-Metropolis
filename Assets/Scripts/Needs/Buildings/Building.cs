@@ -22,8 +22,8 @@ namespace Needs.Buildings
         public Node BottomLeft { get; private set; }
         public Vector3 WorldPosition { get; set; }
 
-        public List<Need> Supplies { get; private set; } = new();
-        public List<Need> Demands { get; private set; } = new();
+        [field:SerializeField] public List<Need> Supplies { get; private set; } = new();
+        [field:SerializeField] public List<Need> Demands { get; private set; } = new();
         
         protected BuildingManager BuildingManager { get; private set; }
 
@@ -91,7 +91,6 @@ namespace Needs.Buildings
         {
             foreach (var agent in _agents)
             {
-                
                 if (agent.AgentType == need)
                 {
                     if (agent.AgentState is AtPrimary)
@@ -128,8 +127,11 @@ namespace Needs.Buildings
                 
                 if (agent.AgentType == need.Type)
                 {
-                    if (agent.AgentState is AtPrimary)
+                    if (agent.AgentState is AtPrimary && !agent.InQueue)
+                    {
+                        agent.InQueue = true;
                         BuildingManager.AddToSupplyQueue(this, need);
+                    }
                 }
             }
 
