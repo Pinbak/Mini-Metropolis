@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Intersections;
+using Needs.Agents;
 using Needs.Buildings;
 using UnityEngine;
 
@@ -25,6 +26,8 @@ public class BuildingManager : MonoBehaviour
     private readonly List<Zone> _industrialZones = new();
     private readonly List<Building> _buildingsWithAvailableParking = new();
     private Building[,] _allBuildings;
+    private Dictionary<AgentType, Queue<Building>> _demands = new();
+    private Dictionary<AgentType, Queue<Building>> _supplies = new();
 
     public void CreateResidentialZone(Node position)
     {
@@ -83,6 +86,16 @@ public class BuildingManager : MonoBehaviour
         BuildFromZone(_residentialZones[0]);
         CreateIndustrialZone(GridManager.WorldToNode(new Vector3(0f, 0f, 2f)));
         BuildFromZone(_industrialZones[0]);
+    }
+
+    public void AddToSupplyQueue(Building building, Need need)
+    {
+        
+    }
+    
+    public void AddToDemandQueue(Building building, Need need)
+    {
+        
     }
     
 }

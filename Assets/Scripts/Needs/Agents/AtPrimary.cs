@@ -4,24 +4,15 @@ namespace Needs.Agents
 {
     public class AtPrimary : IAgentState
     {
-        private float _timeSpent;
         
         public void Update(Agent context)
         {
-            _timeSpent += Time.deltaTime;
-            if (_timeSpent > context.TimeToSpendAtPrimary)
-            {
-                _timeSpent = 0f;
-                if (context.SecondaryLocation is not null)
-                    context.ChangeState(context.TravellingToSecondary);
-                else
-                    context.FindSecondaryLocation();
-            }
+            if (context.SecondaryLocation is not null)
+                context.ChangeState(context.TravellingToSecondary);
         }
 
         public void EnterState(Agent context)
         {
-            _timeSpent = 0f;
         }
 
         public void ExitState(Agent context)

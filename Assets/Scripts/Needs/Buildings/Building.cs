@@ -19,9 +19,9 @@ namespace Needs.Buildings
         public NodeType[,] Layout { get; private set; }
         public Node BottomLeft { get; private set; }
         public Vector3 WorldPosition { get; set; }
-        public Dictionary<AgentType, float> Needs { get; set; } = new();
-        public Dictionary<AgentType, float> NeedUpgradeThresholds { get; set; } = new();
-        public Dictionary<AgentType, float> NeedDowngradeThresholds { get; set; } = new();
+
+        public List<Need> Supplies { get; private set; } = new();
+        public List<Need> Demands { get; private set; } = new();
         
         protected BuildingManager BuildingManager { get; private set; }
 
@@ -36,40 +36,82 @@ namespace Needs.Buildings
             WorldPosition = gridManager.NodeToWorld(bottomLeft);
             
             GenerateLayout();
+            SetupNeeds();
 
             for (var i = 0; i < supplies.Length; i++)
             {
                 var agentPrefab = supplies[i];
                 var agent = Instantiate(agentPrefab, ParkingSpaces[i].transform.position, Quaternion.identity, transform);
-                Needs[agent.AgentType] = startingNeed;
-                NeedUpgradeThresholds[agent.AgentType] = agent.UpgradeThreshold;
-                NeedDowngradeThresholds[agent.AgentType] = agent.DowngradeThreshold;
                 agent.Init(this, buildingManager, ParkingSpaces[i]);
             }
+            
+        }
 
-            foreach (var demand in demands)
+        private void SetupNeeds()
+        {
+            var uniqueDemands = demands.ToHashSet();
+            var uniqueSupplies = supplies.ToHashSet();
+
+            foreach (var uniqueSupply in uniqueSupplies)
             {
-               Needs[demand.AgentType] = startingNeed;
-               NeedUpgradeThresholds[demand.AgentType] = demand.UpgradeThreshold;
-               NeedDowngradeThresholds[demand.AgentType] = demand.DowngradeThreshold;
+                var need = gameObject.AddComponent<Need>();
+                need.Init(uniqueSupply.AgentType);
+                need.GettingLow += NeedGettingLow;
+                Supplies.Add(need);
+            }
+            
+            foreach (var uniqueDemand in uniqueDemands)
+            {
+                var need = gameObject.AddComponent<Need>();
+                need.Init(uniqueDemand.AgentType);
+                need.GettingLow += NeedGettingLow;
+                Demands.Add(need);
+            }
+            
+        }
+
+        public void IncrementNeed(Agent need, float amount)
+        {
+            if (supplies.Contains(need))
+            {
+                foreach (var supply in Supplies)
+                {
+                    if (supply.Type == need.AgentType)
+                    {
+                        supply.Increase(amount);
+                    }
+                }
+            }
+            else if (demands.Contains(need))
+            {
+                foreach (var demand in Demands)
+                {
+                    if (demand.Type == need.AgentType)
+                    {
+                        demand.Increase(amount);
+                    }
+                }
             }
         }
 
-        private void Update()
+        private void NeedGettingLow(Need need)
         {
-            foreach (var need in Needs.Keys.ToList())
+            // todo need to check if building has available agent to prevent constantly adding to queue
+            foreach (var agent in supplies)
             {
-                Needs[need] -= Time.deltaTime;
-                if (Needs[need] > NeedUpgradeThresholds[need])
+                if (agent.AgentType == need.Type)
                 {
-                    // upgrade building
-                }
-                else if (Needs[need] < NeedDowngradeThresholds[need])
-                {
-                    // downgrade or destroy building
+                    BuildingManager.AddToSupplyQueue(this, need);
                 }
             }
-            
+
+            foreach (var agent in demands)
+            {
+                if (agent.AgentType == need.Type)
+                {
+                    BuildingManager.AddToDemandQueue(this, need);
+                }
+            }
         }
 
         private void GenerateLayout()
