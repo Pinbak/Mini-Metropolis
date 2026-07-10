@@ -9,8 +9,11 @@ using UnityEngine;
 public class BuildingManager : MonoBehaviour
 {
     [field:SerializeField] public float ResidentialDemand { get; set; }
+    [field:SerializeField] public float BaseResidentialDemand { get; set; }
     [field:SerializeField] public float CommercialDemand { get; set; }
+    [field:SerializeField] public float BaseCommercialDemand { get; set; }
     [field:SerializeField] public float IndustrialDemand { get; set; }
+    [field:SerializeField] public float BaseIndustrialDemand { get; set; }
     [field:SerializeField] public LayerMask AgentLayer { get; set; } // the layer the agents are on
 
     [field:SerializeField] public GridManager GridManager { get; set; }
@@ -33,6 +36,7 @@ public class BuildingManager : MonoBehaviour
     {
         {AgentType.Commuter, BuildingType.Industrial}
     };
+
     
     private void Start()
     {
@@ -50,17 +54,40 @@ public class BuildingManager : MonoBehaviour
             var demandBuilding = _demands[type].Dequeue();
             supplyBuilding.GoTo(demandBuilding, type);
         }
-        if (ResidentialDemand >= 0)
-            foreach (var residentialZone in ResidentialZones.ToList()) BuildFromZone(residentialZone);
-        if (IndustrialDemand >= 0)
-            foreach (var industrialZone in IndustrialZones.ToList()) BuildFromZone(industrialZone);
+        
+        if (ResidentialZones.Count > 0 && BaseResidentialDemand < 2f)
+            BaseResidentialDemand += Time.deltaTime;
+        if (CommercialZones.Count > 0 && BaseCommercialDemand < 2f)
+            BaseCommercialDemand += Time.deltaTime;
+        if (IndustrialZones.Count > 0 && BaseIndustrialDemand < 2f)
+            BaseIndustrialDemand += Time.deltaTime;
+        
+        
+        foreach (var residentialZone in ResidentialZones.ToList())
+        {
+            if (ResidentialDemand >= 0f && BaseResidentialDemand > 2f)
+            {
+                BaseResidentialDemand -= 2f;
+                BuildFromZone(residentialZone);
+            }
+        }
+        
+        foreach (var industrialZone in IndustrialZones.ToList())
+        {
+            if (IndustrialDemand >= 0f && BaseIndustrialDemand > 2f)
+            {
+                BaseIndustrialDemand -= 2f;
+                BuildFromZone(industrialZone);
+            }
+        }
+        
     }
 
     private void UpdateRci()
     {
-        ResidentialDemand = 0;
-        CommercialDemand = 0;
-        IndustrialDemand = 0;
+        ResidentialDemand = 0f;
+        CommercialDemand = 0f;
+        IndustrialDemand = 0f;
         foreach (var (type, buildings) in _demands)
         {
             if (buildings.Count == 0) continue;
