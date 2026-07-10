@@ -7,6 +7,8 @@ namespace Needs.Agents
     public abstract class Agent : MonoBehaviour
     {
         [field:SerializeField] public AgentType AgentType { get; set; }
+        [field:SerializeField] public BuildingType DemandedBy { get; set; }
+        [field:SerializeField] public BuildingType SuppliedBy { get; set; }
         [field:SerializeField] public float UpgradeThreshold { get; set; }
         [field:SerializeField] public float DowngradeThreshold { get; set; }
         [field:SerializeField] public string PrimaryNeedName { get; set; }

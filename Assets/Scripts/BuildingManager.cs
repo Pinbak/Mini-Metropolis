@@ -25,6 +25,14 @@ public class BuildingManager : MonoBehaviour
     public Building[,] AllBuildings { get; set; }
     private Dictionary<AgentType, Queue<Building>> _demands = new();
     private Dictionary<AgentType, Queue<Building>> _supplies = new();
+    private Dictionary<AgentType, BuildingType> _rciSupplies = new()
+    {
+        {AgentType.Commuter, BuildingType.Residential}
+    };
+    private Dictionary<AgentType, BuildingType> _rciSDemands = new()
+    {
+        {AgentType.Commuter, BuildingType.Industrial}
+    };
     
     private void Start()
     {
@@ -42,9 +50,79 @@ public class BuildingManager : MonoBehaviour
             var demandBuilding = _demands[type].Dequeue();
             supplyBuilding.GoTo(demandBuilding, type);
         }
+        if (ResidentialDemand >= 0)
+            foreach (var residentialZone in ResidentialZones.ToList()) BuildFromZone(residentialZone);
+        if (IndustrialDemand >= 0)
+            foreach (var industrialZone in IndustrialZones.ToList()) BuildFromZone(industrialZone);
+    }
 
-        foreach (var residentialZone in ResidentialZones.ToList()) BuildFromZone(residentialZone);
-        foreach (var industrialZone in IndustrialZones.ToList()) BuildFromZone(industrialZone);
+    private void UpdateRci()
+    {
+        ResidentialDemand = 0;
+        CommercialDemand = 0;
+        IndustrialDemand = 0;
+        foreach (var (type, buildings) in _demands)
+        {
+            if (buildings.Count == 0) continue;
+            if (!_rciSupplies.TryGetValue(type, out var supplyZone)) continue;
+            switch (supplyZone)
+            {
+                case BuildingType.Residential:
+                    ResidentialDemand += buildings.Count;
+                    break;
+                case BuildingType.Commercial:
+                    CommercialDemand += buildings.Count;
+                    break;
+                case BuildingType.Industrial:
+                    IndustrialDemand += buildings.Count;
+                    break;
+            }
+            if (!_rciSDemands.TryGetValue(type, out var demandZone)) continue;
+            switch (demandZone)
+            {
+                case BuildingType.Residential:
+                    ResidentialDemand -= buildings.Count;
+                    break;
+                case BuildingType.Commercial:
+                    CommercialDemand -= buildings.Count;
+                    break;
+                case BuildingType.Industrial:
+                    IndustrialDemand -= buildings.Count;
+                    break;
+            }
+
+
+        }
+        foreach (var (type, buildings) in _supplies)
+        {
+            if (buildings.Count == 0) continue;
+            if (!_rciSDemands.TryGetValue(type, out var demandZone)) continue;
+            switch (demandZone)
+            {
+                case BuildingType.Residential:
+                    ResidentialDemand += buildings.Count;
+                    break;
+                case BuildingType.Commercial:
+                    CommercialDemand += buildings.Count;
+                    break;
+                case BuildingType.Industrial:
+                    IndustrialDemand += buildings.Count;
+                    break;
+            }
+            if (!_rciSupplies.TryGetValue(type, out var supplyZone)) continue;
+            switch (supplyZone)
+            {
+                case BuildingType.Residential:
+                    ResidentialDemand -= buildings.Count;
+                    break;
+                case BuildingType.Commercial:
+                    CommercialDemand -= buildings.Count;
+                    break;
+                case BuildingType.Industrial:
+                    IndustrialDemand -= buildings.Count;
+                    break;
+            }
+        }
     }
 
     public void AddToSupplyQueue(Building building, Need need)
@@ -52,6 +130,7 @@ public class BuildingManager : MonoBehaviour
         if (!_supplies.ContainsKey(need.Type))
             _supplies[need.Type] = new Queue<Building>();
         _supplies[need.Type].Enqueue(building);
+        UpdateRci();
     }
     
     public void AddToDemandQueue(Building building, Need need)
@@ -59,6 +138,7 @@ public class BuildingManager : MonoBehaviour
         if (!_demands.ContainsKey(need.Type))
             _demands[need.Type] = new Queue<Building>();
         _demands[need.Type].Enqueue(building);
+        UpdateRci();
     }
     
     private void BuildFromZone(Zone zone)
