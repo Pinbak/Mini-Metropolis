@@ -94,7 +94,10 @@ namespace Needs.Buildings
                 if (agent.AgentType == need)
                 {
                     if (agent.AgentState is AtPrimary)
+                    {
                         agent.GoTo(building);
+                        return; // only one should go
+                    }
                 }
             }
         }

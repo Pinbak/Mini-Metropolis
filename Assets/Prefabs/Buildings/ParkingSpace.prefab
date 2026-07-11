@@ -110,4 +110,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.ParkingSpace
   <ParentPositionGameObject>k__BackingField: {fileID: 645900177075425269}
   <RoadConnectionGameObject>k__BackingField: {fileID: 6679249922694513902}
-  <IsFree>k__BackingField: 0
+  <IsFree>k__BackingField: 1
+  <IsBeingTaken>k__BackingField: 0
+  <IsReserved>k__BackingField: 0
