@@ -15,10 +15,9 @@ namespace Needs.Buildings
 
         private float _upgradeThreshold = 90f;
         private float _downgradeThreshold = 10f;
-        private float _gettingLowThreshold = 50f;
 
-        [SerializeField] private float _retryPollTimer = 0f;
-        [SerializeField] private float _retryTime = 10f;
+        [SerializeField] private float retryPollTimer = 8f;
+        [SerializeField] private float retryTime = 10f;
 
         public void Init(AgentType type)
         {
@@ -33,11 +32,11 @@ namespace Needs.Buildings
         public void Update()
         {
             Amount -= Time.deltaTime;
-            _retryPollTimer += Time.deltaTime;
+            retryPollTimer += Time.deltaTime;
 
-            if (!(_retryPollTimer > _retryTime)) return;
+            if (!(retryPollTimer > retryTime)) return;
             
-            _retryPollTimer = 0f;
+            retryPollTimer = 0f;
             GettingLow?.Invoke(this);
             
             if (Amount < _downgradeThreshold)

@@ -16,7 +16,6 @@ namespace Needs.Buildings
         [SerializeField] private Agent[] supplies;
         [SerializeField] private Agent[] demands;
         private Agent[] _agents;
-        [SerializeField] private float startingNeed;
         
         public NodeType[,] Layout { get; private set; }
         public Node BottomLeft { get; private set; }

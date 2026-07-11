@@ -48,3 +48,5 @@ MonoBehaviour:
   residentialPixelAtlasPosition: {x: 128, y: 960}
   commercialPixelAtlasPosition: {x: 448, y: 960}
   industrialPixelAtlasPosition: {x: 320, y: 960}
+  specialBuildingsPixelAtlasPosition: {x: 64, y: 960}
+  invalidPixelAtlasPosition: {x: 576, y: 960}

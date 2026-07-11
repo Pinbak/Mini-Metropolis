@@ -42,6 +42,14 @@ public class GridManager : MonoBehaviour
         
     }
 
+    public bool IsWorldPositionOutsideOfGrid(Vector3 worldPosition)
+    {
+        var gridPosition = WorldToGrid(worldPosition);
+        if (gridPosition.x >= Width || gridPosition.x < 0) return true;
+        if (gridPosition.y >= height || gridPosition.y < 0) return true;
+        return false;
+    }
+
     public Node WorldToNode(Vector3 worldPosition)
     {
         var gridPosition = WorldToGrid(worldPosition);
