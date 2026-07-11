@@ -10,6 +10,8 @@ public class InputManager : MonoBehaviour
     public Action<Vector3> OnMouseHold { get; set; }
     public Action OnMouseUp { get; set; }
     
+    public Action<Vector3> MousePosition { get; set; }
+    
     public Action<KeyboardKeys> KeyboardPress { get; set; }
 
     [SerializeField] private InputActionReference leftMouseButton;
@@ -42,6 +44,10 @@ public class InputManager : MonoBehaviour
     {
         if (_isMouseBeingHeld)
             IsPointerHold();
+        
+        var groundPosition = RaycastGround();
+        if (groundPosition is null) return;
+        MousePosition.Invoke((Vector3)groundPosition);
     }
 
     private void GetInputs()

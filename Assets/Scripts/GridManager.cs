@@ -51,8 +51,8 @@ public class GridManager : MonoBehaviour
     public Vector2Int WorldToGrid(Vector3 worldPosition)
     {
         return new Vector2Int(
-            (int)worldPosition.x + _offsetX,
-            (int)worldPosition.z + _offsetY
+            Mathf.RoundToInt(worldPosition.x + _offsetX),
+            Mathf.RoundToInt(worldPosition.z + _offsetY)
         );
     } 
     

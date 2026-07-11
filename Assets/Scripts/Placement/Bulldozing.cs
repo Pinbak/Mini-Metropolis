@@ -5,7 +5,7 @@ namespace Placement
 {
     public class Bulldozing : IPlacementState
     {
-        private PlacementManager _context;
+        private readonly PlacementManager _context;
         
         public Bulldozing(PlacementManager context)
         {
@@ -28,7 +28,12 @@ namespace Placement
         public void KeyboardPress(KeyboardKeys key)
         {
         }
-        
+
+        public void MouseMove(Vector3 position)
+        {
+            
+        }
+
         private void RemoveNode(Vector3 position)
         {
             var intPosition = new Vector3Int(Mathf.RoundToInt(position.x), 0, Mathf.RoundToInt(position.z));

@@ -10,6 +10,9 @@ namespace Needs.Buildings
         [field:SerializeField] public int Width { get; set; }
         [field:SerializeField] public int Height { get; set; }
         [SerializeField] private LineRenderer lineRenderer;
+        [SerializeField] private ColourSampler colourSampler;
+        
+        
         public Node BottomLeft { get; private set; }
         public Vector3 WorldPosition { get; set; }
         
@@ -31,10 +34,15 @@ namespace Needs.Buildings
             GenerateOutline();
         }
 
-        public void GenerateOutline()
+        private void GenerateOutline()
         {
-            var offset = -0.5f;
-            var height = .1f;
+            // runs once
+            const float offset = -0.5f;
+            const float height = .1f;
+
+            var colour = colourSampler.GetColourByBuildingType(Builds.Type);
+            lineRenderer.startColor = colour;
+            lineRenderer.endColor = colour;
             lineRenderer.SetPosition(0, new Vector3(offset, height, offset));
             lineRenderer.SetPosition(1, new Vector3(Width + offset, height, offset));
             lineRenderer.SetPosition(2, new Vector3(Width + offset, height, Height + offset));

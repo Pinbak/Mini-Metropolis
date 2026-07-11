@@ -36,7 +36,12 @@ namespace Placement
         public void KeyboardPress(KeyboardKeys key)
         {
         }
-        
+
+        public void MouseMove(Vector3 position)
+        {
+            
+        }
+
         private void CheckPlacingRoad(Vector3 position)
         {
             var distance = Vector3.Distance(_startingPosition, position);

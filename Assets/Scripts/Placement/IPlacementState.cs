@@ -8,5 +8,6 @@ namespace Placement
         void MouseRelease();
         void MouseClick(Vector3 position);
         void KeyboardPress(KeyboardKeys key);
+        void MouseMove(Vector3 position);
     }
 }

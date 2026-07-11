@@ -5,54 +5,55 @@ namespace Placement
 {
     public class BuildingZone : IPlacementState
     {
-        public BuildingType Places { get; set; } = BuildingType.Residential;
+        public Building Places { get; private set; }
         private readonly PlacementManager _context;
+        private const float IndicatorGroundClearance = .1f;
+        private const float IndicatorLerpSpeed = .1f;
+
+        public void ChangePlacementBuilding(Building building)
+        {
+            Places = building;
+            var colour = _context.ColourSampler.GetColourByBuildingType(building.Type);
+            var width = building.Width;
+            var height = building.Height;
+            
+            _context.PlacementIndicator.startColor = colour;
+            _context.PlacementIndicator.endColor = colour;
+            const float offset = -0.5f;
+            _context.PlacementIndicator.SetPosition(0, new Vector3(offset, IndicatorGroundClearance, offset));
+            _context.PlacementIndicator.SetPosition(1, new Vector3(width + offset, IndicatorGroundClearance, offset));
+            _context.PlacementIndicator.SetPosition(2, new Vector3(width + offset, IndicatorGroundClearance, height + offset));
+            _context.PlacementIndicator.SetPosition(3, new Vector3(offset, IndicatorGroundClearance, height + offset));
+            _context.PlacementIndicator.enabled = true;
+        }
         
         public BuildingZone(PlacementManager context)
         {
             _context = context;
         }
         
-        public void MouseDown(Vector3 position)
-        {
-        }
+        public void MouseDown(Vector3 position) { }
 
-        public void MouseRelease()
-        {
-        }
+        public void MouseRelease() { }
 
         public void MouseClick(Vector3 position)
         {
-            switch (Places)
-            {
-                case BuildingType.Residential:
-                    CreateResidentialZone(_context.GridManager.WorldToNode(position));
-                    break;
-                case BuildingType.Industrial:
-                    CreateIndustrialZone(_context.GridManager.WorldToNode(position));
-                    break;
-            }
+            CreateZone(_context.GridManager.WorldToNode(position), Places);
         }
 
-        public void KeyboardPress(KeyboardKeys key)
+        public void KeyboardPress(KeyboardKeys key) { }
+
+        public void MouseMove(Vector3 position)
         {
+            var gridPosition = new Vector3(
+                Mathf.RoundToInt(position.x),
+                IndicatorGroundClearance,
+                Mathf.RoundToInt(position.z)
+            );
+            _context.PlacementIndicator.transform.position = gridPosition;
+                // Vector3.Lerp(_context.PlacementIndicator.transform.position, gridPosition, IndicatorLerpSpeed);
         }
         
-        public void CreateResidentialZone(Node position)
-        {
-            CreateZone(position, _context.ResidentialLowWealthPrefab);
-        }
-    
-        public void CreateCommercialZone(Node position)
-        {
-            // CreateZone(position, );
-        }
-
-        public void CreateIndustrialZone(Node position)
-        {
-            CreateZone(position, _context.IndustrialLowWealthPrefab);
-        }
-
         private void CreateZone(Node position, Building type)
         {
             var width = type.Width;

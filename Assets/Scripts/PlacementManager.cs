@@ -12,8 +12,9 @@ public class PlacementManager : MonoBehaviour
     
     [field:SerializeField] public Zone ZonePrefab { get; set; }
     [field:SerializeField] public ResidentialBuilding ResidentialLowWealthPrefab { get; set; }
-    [field:SerializeField] public ResidentialBuilding ResidentialHighWealthPrefab { get; set; }
     [field:SerializeField] public IndustrialBuilding IndustrialLowWealthPrefab { get; set; }
+
+    [field:SerializeField] public ColourSampler ColourSampler { get; set; }
     
     // states
     private IPlacementState _mode;
@@ -27,6 +28,11 @@ public class PlacementManager : MonoBehaviour
         _bulldozingState = new Bulldozing(this);
         _buildingZoneState = new BuildingZone(this);
         _mode = _buildingRoadState;
+    }
+    
+    public void MouseMove(Vector3 position)
+    {
+        _mode.MouseMove(position);
     }
     
     public void HandleKeyboardPress(KeyboardKeys key)
@@ -56,17 +62,18 @@ public class PlacementManager : MonoBehaviour
             _mode = _bulldozingState;
         else if (_mode is Bulldozing)
         {
-            _buildingZoneState.Places = BuildingType.Residential;
+            _buildingZoneState.ChangePlacementBuilding(ResidentialLowWealthPrefab);
             _mode = _buildingZoneState;
         }
-        else if (_mode is BuildingZone && _buildingZoneState.Places is BuildingType.Residential)
+        else if (_mode is BuildingZone && _buildingZoneState.Places.Type is BuildingType.Residential)
         {
-            _buildingZoneState.Places = BuildingType.Industrial;
+            _buildingZoneState.ChangePlacementBuilding(IndustrialLowWealthPrefab);
             _mode = _buildingZoneState;
         }
-        else if (_mode is BuildingZone && _buildingZoneState.Places is BuildingType.Industrial)
+        else if (_mode is BuildingZone && _buildingZoneState.Places.Type is BuildingType.Industrial)
         {
             _mode = _buildingRoadState;
+            PlacementIndicator.enabled = false;
         }
         Debug.Log($"Changed mode to {_mode.GetType()}");
     }

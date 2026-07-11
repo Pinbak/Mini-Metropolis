@@ -12,6 +12,12 @@ public class GameManager : MonoBehaviour
         inputManager.OnMouseUp += HandleMouseRelease;
         inputManager.OnMouseHold += HandleMouseHeldDown;
         inputManager.KeyboardPress += HandleKeyboardPress;
+        inputManager.MousePosition += HandleMousePosition;
+    }
+
+    private void HandleMousePosition(Vector3 position)
+    {
+        placementManager.MouseMove(position);
     }
 
     private void HandleKeyboardPress(KeyboardKeys key)
