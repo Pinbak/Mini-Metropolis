@@ -1,5 +1,5 @@
-﻿using Intersections;
-using Needs.Buildings;
+﻿using Buildings;
+using Intersections;
 using Placement;
 using UnityEngine;
 
@@ -11,8 +11,9 @@ public class PlacementManager : MonoBehaviour
     [field:SerializeField] public BuildingManager BuildingManager { get; set; }
     
     [field:SerializeField] public Zone ZonePrefab { get; set; }
-    [field:SerializeField] public ResidentialBuilding ResidentialLowWealthPrefab { get; set; }
-    [field:SerializeField] public IndustrialBuilding IndustrialLowWealthPrefab { get; set; }
+    [field:SerializeField] public Building ResidentialLowWealthPrefab { get; set; }
+    [field:SerializeField] public Building CommercialLowWealthPrefab { get; set; }
+    [field:SerializeField] public Building IndustrialLowWealthPrefab { get; set; }
 
     [field:SerializeField] public ColourSampler ColourSampler { get; set; }
     
@@ -71,6 +72,11 @@ public class PlacementManager : MonoBehaviour
             _mode = _buildingZoneState;
         }
         else if (_mode is BuildingZone && _buildingZoneState.Places.Type is BuildingType.Industrial)
+        {
+            _buildingZoneState.ChangePlacementBuilding(CommercialLowWealthPrefab);
+            _mode = _buildingZoneState;
+        }
+        else if (_mode is BuildingZone && _buildingZoneState.Places.Type is BuildingType.Commercial)
         {
             _mode = _buildingRoadState;
             PlacementIndicator.enabled = false;

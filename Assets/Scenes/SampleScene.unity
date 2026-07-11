@@ -153,8 +153,9 @@ MonoBehaviour:
   <PlacementIndicator>k__BackingField: {fileID: 831928379}
   <BuildingManager>k__BackingField: {fileID: 2009150915}
   <ZonePrefab>k__BackingField: {fileID: 5880385975944513002, guid: 00fc84f64b810424d903d0980b721dd1, type: 3}
-  <ResidentialLowWealthPrefab>k__BackingField: {fileID: 3066291411998591043, guid: e52968b8fd081584185356fa1e0d61ba, type: 3}
-  <IndustrialLowWealthPrefab>k__BackingField: {fileID: 4249458409379074798, guid: 33f3d0854f0b75b42a55122c8dbc5f18, type: 3}
+  <ResidentialLowWealthPrefab>k__BackingField: {fileID: 7954161561114834557, guid: e52968b8fd081584185356fa1e0d61ba, type: 3}
+  <CommercialLowWealthPrefab>k__BackingField: {fileID: 8202541092475174367, guid: 3d44de1850898cb40b6ddecec887a67d, type: 3}
+  <IndustrialLowWealthPrefab>k__BackingField: {fileID: 8202541092475174367, guid: 33f3d0854f0b75b42a55122c8dbc5f18, type: 3}
   <ColourSampler>k__BackingField: {fileID: 8497033175703650509, guid: 746487f14bc7cf74da15ddcf1db866d6, type: 3}
 --- !u!4 &267754612
 Transform:

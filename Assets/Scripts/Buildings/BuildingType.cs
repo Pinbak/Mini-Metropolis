@@ -1,4 +1,4 @@
-﻿namespace Needs.Buildings
+﻿namespace Buildings
 {
     public enum BuildingType
     {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Buildings;
 using Intersections;
-using Needs.Buildings;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
-namespace Needs
+namespace Agents
 {
     public class PathMover
     {

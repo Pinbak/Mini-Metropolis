@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Agents;
+using Buildings;
 using Intersections;
-using Needs.Agents;
-using Needs.Buildings;
 using Placement;
 using UnityEngine;
 
@@ -69,6 +69,15 @@ public class BuildingManager : MonoBehaviour
             {
                 BaseResidentialDemand -= 2f;
                 BuildFromZone(residentialZone);
+            }
+        }
+        
+        foreach (var commercialZone in CommercialZones.ToList())
+        {
+            if (CommercialDemand >= 0f && BaseCommercialDemand > 2f)
+            {
+                BaseCommercialDemand -= 2f;
+                BuildFromZone(commercialZone);
             }
         }
         

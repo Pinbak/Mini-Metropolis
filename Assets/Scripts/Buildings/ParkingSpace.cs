@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Agents;
+using UnityEngine;
 
-namespace Needs.Buildings
+namespace Buildings
 {
     public class ParkingSpace : MonoBehaviour
     {

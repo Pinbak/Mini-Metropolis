@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-namespace Needs.Buildings
+namespace Buildings
 {
     public class Zone : MonoBehaviour
     {

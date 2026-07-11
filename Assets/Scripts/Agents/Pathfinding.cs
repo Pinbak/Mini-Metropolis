@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Needs
+namespace Agents
 {
     /// <summary>
     ///     Implementation of A*

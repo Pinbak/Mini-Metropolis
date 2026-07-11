@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Needs.Agents;
+using Agents;
 using UnityEngine;
 
-namespace Needs.Buildings
+namespace Buildings
 {
-    public abstract class Building : MonoBehaviour
+    public class Building : MonoBehaviour
     {
         [field:SerializeField] public BuildingType Type { get; set; }
         [field:SerializeField] public Building UpgradesTo { get; set; }

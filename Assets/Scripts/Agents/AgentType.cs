@@ -1,4 +1,4 @@
-namespace Needs.Agents
+namespace Agents
 {
     public enum AgentType
     {

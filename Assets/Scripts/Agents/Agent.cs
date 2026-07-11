@@ -1,19 +1,12 @@
-using System;
-using Needs.Buildings;
+using Buildings;
 using UnityEngine;
 
-namespace Needs.Agents
+namespace Agents
 {
-    public abstract class Agent : MonoBehaviour
+    public class Agent : MonoBehaviour
     {
         [field:SerializeField] public AgentType AgentType { get; set; }
-        [field:SerializeField] public BuildingType DemandedBy { get; set; }
-        [field:SerializeField] public BuildingType SuppliedBy { get; set; }
-        [field:SerializeField] public float UpgradeThreshold { get; set; }
-        [field:SerializeField] public float DowngradeThreshold { get; set; }
-        [field:SerializeField] public string PrimaryNeedName { get; set; }
-        [field:SerializeField] public string SecondaryNeedName { get; set; }
-        [field:SerializeField] public float MovementSpeed { get; set; }= 1f;
+        [field:SerializeField] public float MovementSpeed { get; set; } = 1f;
         [field:SerializeField] public float TimeToSpendAtSecondary { get; set; }
         [field:SerializeField] public float TimeToWaitUntilRetryingRoute { get; set; } = 5f;
         [field:SerializeField] public float NeedIncrease { get; set; } = 10f;
@@ -56,8 +49,6 @@ namespace Needs.Agents
         {
             SecondaryLocation = null;
         }
-
-        public abstract void FindSecondaryLocation();
 
         public void ChangeState(IAgentState newState)
         {

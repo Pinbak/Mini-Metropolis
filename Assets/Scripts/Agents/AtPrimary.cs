@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace Needs.Agents
+namespace Agents
 {
     public class AtPrimary : IAgentState
     {

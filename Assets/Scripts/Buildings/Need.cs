@@ -1,8 +1,8 @@
 using System;
-using Needs.Agents;
+using Agents;
 using UnityEngine;
 
-namespace Needs.Buildings
+namespace Buildings
 {
     [Serializable]
     public class Need

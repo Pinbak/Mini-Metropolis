@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Needs
+namespace Agents
 {
     /// <summary>
     ///     Converts an A* found path of <see cref="Node"/>s into a <see cref="Vector3"/> path to be followed by an agent
