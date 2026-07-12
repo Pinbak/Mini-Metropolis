@@ -5,5 +5,6 @@
         Residential,
         Commercial,
         Industrial,
+        School
     }
 }

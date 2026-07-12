@@ -50,6 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Building
   <Type>k__BackingField: 2
   <UpgradesTo>k__BackingField: {fileID: 0}
+  <IsGrowable>k__BackingField: 1
   <Width>k__BackingField: 2
   <Height>k__BackingField: 2
   <ParkingSpaces>k__BackingField:

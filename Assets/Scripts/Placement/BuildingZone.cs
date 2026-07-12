@@ -42,7 +42,10 @@ namespace Placement
 
         public void MouseClick(Vector3 position)
         {
-            CreateZone(_context.GridManager.WorldToNode(position), Places);
+            if (Places.IsGrowable)
+                CreateZone(_context.GridManager.WorldToNode(position), Places);
+            else
+                CreateBuilding(_context.GridManager.WorldToNode(position), Places);
         }
 
         public void KeyboardPress(KeyboardKeys key) { }
@@ -73,7 +76,18 @@ namespace Placement
             _context.PlacementIndicator.transform.position = gridPosition;
                 // Vector3.Lerp(_context.PlacementIndicator.transform.position, gridPosition, IndicatorLerpSpeed);
         }
-        
+
+        private void CreateBuilding(Node position, Building type)
+        {
+            var width = type.Width;
+            var height = type.Height;
+            if (!IsSpaceAvailable(width, height, position)) return;
+            var building = Object.Instantiate(type, _context.GridManager.NodeToWorld(position), Quaternion.identity,
+                _context.BuildingManager.transform);
+            building.Init(_context.BuildingManager);
+            PlaceBuilding(building, _context);
+        }
+
         private void CreateZone(Node position, Building type)
         {
             var width = type.Width;

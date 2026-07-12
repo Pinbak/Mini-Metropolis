@@ -9,6 +9,7 @@ namespace Buildings
     {
         [field:SerializeField] public BuildingType Type { get; set; }
         [field:SerializeField] public Building UpgradesTo { get; set; }
+        [field:SerializeField] public bool IsGrowable { get; set; }
         [field:SerializeField] public int Width { get; set; }
         [field:SerializeField] public int Height { get; set; }
         [field:SerializeField] public ParkingSpace[] ParkingSpaces { get; set; }
