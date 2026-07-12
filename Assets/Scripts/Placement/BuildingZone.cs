@@ -12,6 +12,9 @@ namespace Placement
         private Color _zoneColour;
         private Color _invalidPlacementColour;
         private Node _currentPosition;
+        private Building _previewBuilding;
+        private Building _previewBuildingPrefab;
+        private bool _justCreatedPreview;
 
         public void ChangePlacementBuilding(Building building)
         {
@@ -20,6 +23,7 @@ namespace Placement
             _invalidPlacementColour = _context.ColourSampler.GetInvalidColour();
             var width = building.Width;
             var height = building.Height;
+            _previewBuildingPrefab = building;
             
             _context.PlacementIndicator.startColor = _zoneColour;
             _context.PlacementIndicator.endColor = _zoneColour;
@@ -34,6 +38,19 @@ namespace Placement
         public BuildingZone(PlacementManager context)
         {
             _context = context;
+        }
+        
+        public void EnterState()
+        {
+            _previewBuilding = Object.Instantiate(_previewBuildingPrefab, Vector3.zero, Quaternion.identity,
+                _context.transform);
+            _justCreatedPreview = true;
+        }
+
+        public void ExitState()
+        {
+            if (_previewBuilding is null) return;
+            Object.Destroy(_previewBuilding.gameObject);
         }
         
         public void MouseDown(Vector3 position) { }
@@ -55,9 +72,16 @@ namespace Placement
             if (_context.GridManager.IsWorldPositionOutsideOfGrid(position)) return;
             var currentNode = _context.GridManager.WorldToNode(position);
             _currentPosition ??= currentNode;
-            if (currentNode == _currentPosition) return; // haven't moved the mouse
-            _currentPosition = currentNode;
-            if (IsSpaceAvailable(Places.Width, Places.Height, currentNode))
+            if (currentNode == _currentPosition && !_justCreatedPreview) return; // haven't moved the mouse
+            _justCreatedPreview = false;
+            UpdateIndicator(position);
+        }
+
+        private void UpdateIndicator(Vector3 mousePosition)
+        {
+            var nodePosition = _context.GridManager.WorldToNode(mousePosition);
+            _currentPosition = nodePosition;
+            if (IsSpaceAvailable(Places.Width, Places.Height, nodePosition))
             {
                 _context.PlacementIndicator.startColor = _zoneColour;
                 _context.PlacementIndicator.endColor = _zoneColour;
@@ -69,12 +93,16 @@ namespace Placement
             }
             
             var gridPosition = new Vector3(
-                Mathf.RoundToInt(position.x),
+                Mathf.RoundToInt(mousePosition.x),
                 IndicatorGroundClearance,
-                Mathf.RoundToInt(position.z)
+                Mathf.RoundToInt(mousePosition.z)
             );
+            if (_previewBuilding is not null)
+            {
+                _previewBuilding.transform.position = gridPosition;
+            }
             _context.PlacementIndicator.transform.position = gridPosition;
-                // Vector3.Lerp(_context.PlacementIndicator.transform.position, gridPosition, IndicatorLerpSpeed);
+            // Vector3.Lerp(_context.PlacementIndicator.transform.position, gridPosition, IndicatorLerpSpeed);
         }
 
         private void CreateBuilding(Node position, Building type)
