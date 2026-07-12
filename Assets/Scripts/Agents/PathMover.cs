@@ -52,6 +52,7 @@ namespace Agents
             _intersectionManager = intersectionManager;
             _buildingInformation = buildingInformation;
             ParkedAt = initialParking;
+            initialParking.ParkedAgent = this;
             CurrentPosition = gridManager.WorldToNode(initialParking.ParentPosition);
         }
         
@@ -83,6 +84,7 @@ namespace Agents
             if (_pathGenerator.PathGenerated)
             {
                 ParkedAt.IsFree = true;
+                ParkedAt.ParkedAgent = null;
                 ParkedAt.IsBeingTaken = false;
                 Destination.IsBeingTaken = true; // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
                 ParkedAt = null;
@@ -167,13 +169,21 @@ namespace Agents
             }
         }
 
-        public void TeleportHome()
+        public void TeleportToPrimary()
         {
             if (!_agent.PrimaryLocation.GetFreeParkingSpace(out var parkingSpace)) return;
             _currentNodePointer = 0;
             HasValidPath = false;
             ParkedAt = parkingSpace;
-            parkingSpace.IsFree = true;
+            if (Destination is not null)
+            {
+                Destination.IsFree = true;
+                Destination.ParkedAgent = null;
+                Destination.IsBeingTaken = false;
+                Destination.IsReserved = false;
+            }
+            parkingSpace.IsFree = false;
+            parkingSpace.ParkedAgent = this;
             _agent.transform.rotation = parkingSpace.transform.rotation;
             _agent.transform.position = parkingSpace.transform.position;
             CurrentPosition = _gridManager.WorldToNode(parkingSpace.ParentPosition);
@@ -190,6 +200,7 @@ namespace Agents
             // we have reached the destination
             ParkedAt = Destination;
             ParkedAt.IsFree = false;
+            ParkedAt.ParkedAgent = this;
             _agent.transform.rotation = Destination.transform.rotation;
             Arrived?.Invoke(CurrentPosition);
         }
@@ -217,7 +228,7 @@ namespace Agents
                 // the road has been removed since setting out
                 if (NextPosition.Type is not NodeType.Road && NextPosition.Type is not NodeType.Parking)
                 {
-                    TeleportHome();
+                    TeleportToPrimary();
                     // if (!_attemptRecalculatePath)
                     // {
                     //     _attemptRecalculatePath = true;

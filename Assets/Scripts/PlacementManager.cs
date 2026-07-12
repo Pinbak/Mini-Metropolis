@@ -91,9 +91,14 @@ public class PlacementManager : MonoBehaviour
                GridManager.Grid[gridPosition.x, gridPosition.y].Type == NodeType.Road;
     }
 
-    public bool IsPositionInBound(Vector3Int position)
+    public bool IsPositionInBound(Vector3 position)
     {
         var gridPosition = GridManager.WorldToGrid(position);
+        return gridPosition.x >= 0 && gridPosition.x < GridManager.Width && gridPosition.y >= 0 && gridPosition.y < GridManager.Height;
+    }
+    
+    public bool IsPositionInBound(Vector2Int gridPosition)
+    {
         return gridPosition.x >= 0 && gridPosition.x < GridManager.Width && gridPosition.y >= 0 && gridPosition.y < GridManager.Height;
     }
 }

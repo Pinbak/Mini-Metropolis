@@ -14,34 +14,30 @@ namespace Placement
         
         public void MouseDown(Vector3 position)
         {
-            RemoveNode(position);
+            var gridPosition = _context.GridManager.WorldToGrid(position);
+            if (!_context.IsPositionInBound(gridPosition)) return;
+            var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
+            if (node.Type is NodeType.Road) RemoveNode(node);
+            else if (node.Type is NodeType.Building or NodeType.Parking) RemoveBuilding(node);
         }
 
-        public void MouseRelease()
+        public void MouseRelease() { }
+
+        public void MouseClick(Vector3 position) { }
+
+        public void KeyboardPress(KeyboardKeys key) { }
+
+        public void MouseMove(Vector3 position) { }
+
+        private void RemoveBuilding(Node node)
         {
+            var buildingToRemove = _context.BuildingManager.AllBuildings[node.X, node.Y];
+            if (buildingToRemove is null) return; // must be a zone instead of building 
+            _context.BuildingManager.RemoveBuilding(buildingToRemove);
         }
 
-        public void MouseClick(Vector3 position)
+        private void RemoveNode(Node nodeToRemove)
         {
-        }
-
-        public void KeyboardPress(KeyboardKeys key)
-        {
-        }
-
-        public void MouseMove(Vector3 position)
-        {
-            
-        }
-
-        private void RemoveNode(Vector3 position)
-        {
-            var intPosition = new Vector3Int(Mathf.RoundToInt(position.x), 0, Mathf.RoundToInt(position.z));
-            if (!_context.IsPositionInBound(intPosition)) return;
-            var gridPosition = _context.GridManager.WorldToGrid(intPosition);
-            var nodeToRemove = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
-            if (nodeToRemove.Type is not NodeType.Road) return;
-
             var toRemove = new List<Node>{nodeToRemove};
             var toUpdate = new List<(int, int)> {(nodeToRemove.X, nodeToRemove.Y)};
             foreach (var neighbour in nodeToRemove.Neighbours)
