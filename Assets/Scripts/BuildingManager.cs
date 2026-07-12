@@ -25,7 +25,7 @@ public class BuildingManager : MonoBehaviour
     public List<Zone> CommercialZones { get; } = new();
     public List<Zone> IndustrialZones { get; }= new();
     private readonly List<Building> _buildingsWithAvailableParking = new();
-    public Building[,] AllBuildings { get; set; }
+    public Building[,] AllBuildings { get; private set; }
     private Dictionary<AgentType, Queue<Building>> _demands = new();
     private Dictionary<AgentType, Queue<Building>> _supplies = new();
     private Dictionary<AgentType, BuildingType> _rciSupplies = new()
@@ -51,7 +51,9 @@ public class BuildingManager : MonoBehaviour
             if (!_demands.TryGetValue(type, out var demand)) continue;
             if (demand.Count == 0) continue;
             var supplyBuilding = _supplies[type].Dequeue();
+            if (supplyBuilding.ToRemove) return;
             var demandBuilding = _demands[type].Dequeue();
+            if (demandBuilding.ToRemove) return;
             supplyBuilding.GoTo(demandBuilding, type);
         }
         
@@ -183,7 +185,10 @@ public class BuildingManager : MonoBehaviour
         var building = Instantiate(buildingPrefab, zone.transform.position, Quaternion.identity, transform);
         building.Init(this);
         BuildingZone.PlaceBuilding(building, placementManager);
-        AllBuildings[zone.BottomLeft.X, zone.BottomLeft.Y] = building;
+        for (var x = 0; x < building.Width; x++)
+        for (var y = 0; y < building.Height; y++)
+            AllBuildings[zone.BottomLeft.X + x, zone.BottomLeft.Y + y] = building; // keep track of what buildings position is
+        
         Destroy(zone.gameObject);
         if (zone.Builds.Type is BuildingType.Residential)
             ResidentialZones.Remove(zone);
@@ -192,5 +197,19 @@ public class BuildingManager : MonoBehaviour
         else if (zone.Builds.Type is BuildingType.Industrial)
             IndustrialZones.Remove(zone);
     }
-    
+
+    public void RemoveBuilding(Building buildingToRemove)
+    {
+        for (var x = 0; x < buildingToRemove.Width; x++)
+        for (var y = 0; y < buildingToRemove.Height; y++)
+        {
+            var xPositionInGrid = buildingToRemove.BottomLeft.X + x;
+            var yPositionInGrid = buildingToRemove.BottomLeft.Y + y;
+            AllBuildings[xPositionInGrid, yPositionInGrid] = null;
+            GridManager.Grid[xPositionInGrid, yPositionInGrid].Type = NodeType.Empty;
+        }
+        
+        buildingToRemove.RemoveBuilding();
+        Destroy(buildingToRemove.gameObject);
+    }
 }

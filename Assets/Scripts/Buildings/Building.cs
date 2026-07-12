@@ -15,6 +15,7 @@ namespace Buildings
         [SerializeField] private Agent[] supplies;
         [SerializeField] private Agent[] demands;
         private Agent[] _agents;
+        public bool ToRemove { get; private set; }
         
         public NodeType[,] Layout { get; private set; }
         public Node BottomLeft { get; private set; }
@@ -49,8 +50,19 @@ namespace Buildings
             
         }
 
+        public void RemoveBuilding()
+        {
+            foreach (var parkingSpace in ParkingSpaces)
+            {
+                parkingSpace.ParkedAgent?.TeleportToPrimary();
+            }
+
+            ToRemove = true;
+        }
+
         private void Update()
         {
+            if (ToRemove) return;
             foreach (var supply in Supplies)
             {
                 supply.Update();
@@ -173,7 +185,8 @@ namespace Buildings
             freeParkingSpace = null;
             foreach (var parkingSpace in ParkingSpaces)
             {
-                if (parkingSpace.IsBeingTaken || parkingSpace.IsReserved) continue;
+                if (parkingSpace.IsBeingTaken || parkingSpace.IsReserved ||
+                    parkingSpace.ParkedAgent is not null) continue;
                 freeParkingSpace = parkingSpace;
                 return true;
             }
