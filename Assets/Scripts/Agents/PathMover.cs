@@ -16,6 +16,7 @@ namespace Agents
         public Node NextPosition { get; private set; } // the node that the agent is moving to
         public bool MovingInJunction { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
+        public bool AgentExists => _agent is not null;
         public ParkingSpace ParkedAt { get; private set; } // the space this agent is currently in
         public ParkingSpace Destination { get; private set; }
         public Action<Node> Arrived { get; set; } // invoked when the agent has arrived at its intended destination
@@ -95,6 +96,7 @@ namespace Agents
 
         public void Go()
         {
+            if (_agent is null) return;
             MovingInJunction = true;
             _speedMultiplier = 1f;
             _approachingJunction = false;

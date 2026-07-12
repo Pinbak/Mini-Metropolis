@@ -32,8 +32,15 @@ namespace Placement
         private void RemoveBuilding(Node node)
         {
             var buildingToRemove = _context.BuildingManager.AllBuildings[node.X, node.Y];
-            if (buildingToRemove is null) return; // must be a zone instead of building 
-            _context.BuildingManager.RemoveBuilding(buildingToRemove);
+            if (buildingToRemove is null)
+            {
+                var zoneToRemove = _context.BuildingManager.AllZones[node.X, node.Y];
+                _context.BuildingManager.RemoveZone(zoneToRemove);
+            }
+            else
+            {
+                _context.BuildingManager.RemoveBuilding(buildingToRemove);
+            }
         }
 
         private void RemoveNode(Node nodeToRemove)

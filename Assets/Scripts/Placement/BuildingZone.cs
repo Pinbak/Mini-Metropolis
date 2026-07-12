@@ -125,10 +125,12 @@ namespace Placement
             for (var x = 0; x < building.Width; x++)
             for (var y = 0; y < building.Height; y++)
             {
+                context.BuildingManager.AllBuildings[building.BottomLeft.X + x, building.BottomLeft.Y + y] = building; // keep track of what buildings position is
                 var gridPosition = new Vector2Int(building.BottomLeft.X + x, building.BottomLeft.Y + y);
                 var node = context.GridManager.Grid[gridPosition.x, gridPosition.y];
                 node.Type = building.Layout[x, y];
             }
+                
         }
 
         private void PlaceZone(Zone zone)
@@ -136,6 +138,7 @@ namespace Placement
             for (var x = 0; x < zone.Width; x++)
             for (var y = 0; y < zone.Height; y++)
             {
+                _context.BuildingManager.AllZones[zone.BottomLeft.X + x, zone.BottomLeft.Y + y] = zone;
                 var gridPosition = new Vector2Int(zone.BottomLeft.X + x, zone.BottomLeft.Y + y);
                 var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
                 if (node.Type is not NodeType.Empty) return;
