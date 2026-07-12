@@ -49,6 +49,7 @@ namespace Placement
 
         public void ExitState()
         {
+            _context.PlacementIndicator.enabled = false;
             if (_previewBuilding is null) return;
             Object.Destroy(_previewBuilding.gameObject);
         }

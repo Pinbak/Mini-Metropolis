@@ -7,6 +7,7 @@ namespace Placement
     public class BuildingRoad : IPlacementState
     {
         public Action FinishedBuildingRoads { get; set; } 
+        private const float IndicatorGroundClearance = .1f;
         
         private readonly PlacementManager _context;
         private Vector3Int _startingPosition;
@@ -17,9 +18,16 @@ namespace Placement
         {
             _context = context;
         }
-        public void EnterState() { }
 
-        public void ExitState() { }
+        public void EnterState()
+        {
+            _context.SpriteIndicator.enabled = true;
+        }
+
+        public void ExitState()
+        {
+            _context.SpriteIndicator.enabled = false;
+        }
         
         public void MouseDown(Vector3 position)
         {
@@ -42,7 +50,12 @@ namespace Placement
 
         public void MouseMove(Vector3 position)
         {
-            
+            var gridPosition = new Vector3(
+                Mathf.RoundToInt(position.x),
+                IndicatorGroundClearance,
+                Mathf.RoundToInt(position.z)
+            );
+            _context.SpriteIndicator.transform.position = gridPosition;
         }
 
         private void CheckPlacingRoad(Vector3 position)
