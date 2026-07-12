@@ -48,7 +48,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Buildings.Building
   <Type>k__BackingField: 0
-  <UpgradesTo>k__BackingField: {fileID: 0}
+  <UpgradesTo>k__BackingField: {fileID: 7954161561114834557, guid: f4dd8158295bcc740a75644375d8c58b, type: 3}
+  <DowngradesTo>k__BackingField: {fileID: 0}
   <IsGrowable>k__BackingField: 1
   <Width>k__BackingField: 2
   <Height>k__BackingField: 1
@@ -71,7 +72,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.1
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
       propertyPath: m_LocalPosition.y
@@ -164,7 +165,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 9bef4ea3fd6b3fd44b51814a0f5e21e4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9bef4ea3fd6b3fd44b51814a0f5e21e4, type: 3}
       propertyPath: m_LocalPosition.y
@@ -230,7 +231,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.1
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 4102878250872018288, guid: fcaffe83838899a4c8c8dbbc2400d546, type: 3}
       propertyPath: m_LocalPosition.y

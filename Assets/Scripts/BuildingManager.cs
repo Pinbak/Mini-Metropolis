@@ -31,11 +31,15 @@ public class BuildingManager : MonoBehaviour
     private Dictionary<AgentType, Queue<Building>> _supplies = new();
     private Dictionary<AgentType, BuildingType> _rciSupplies = new()
     {
-        {AgentType.Commuter, BuildingType.Residential}
+        {AgentType.Commuter, BuildingType.Residential},
+        {AgentType.Shopper, BuildingType.Residential},
+        {AgentType.Student, BuildingType.Residential},
     };
     private Dictionary<AgentType, BuildingType> _rciSDemands = new()
     {
-        {AgentType.Commuter, BuildingType.Industrial}
+        {AgentType.Commuter, BuildingType.Industrial},
+        {AgentType.Shopper, BuildingType.Commercial},
+        {AgentType.Student, BuildingType.School},
     };
 
     
@@ -194,6 +198,14 @@ public class BuildingManager : MonoBehaviour
             CommercialZones.Remove(zone);
         else if (zone.Builds.Type is BuildingType.Industrial)
             IndustrialZones.Remove(zone);
+    }
+
+    public void ChangeBuilding(Building currentBuilding, Building buildingToChangeTo)
+    {
+        var building = Instantiate(buildingToChangeTo, currentBuilding.transform.position, Quaternion.identity, transform);
+        RemoveBuilding(currentBuilding);
+        building.Init(this);
+        BuildingZone.PlaceBuilding(building, placementManager);
     }
 
     public void RemoveBuilding(Building buildingToRemove)
