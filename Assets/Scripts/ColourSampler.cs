@@ -9,6 +9,7 @@ public class ColourSampler : MonoBehaviour
     [SerializeField] private Vector2Int industrialPixelAtlasPosition;
     [SerializeField] private Vector2Int specialBuildingsPixelAtlasPosition;
     [SerializeField] private Vector2Int invalidPixelAtlasPosition;
+    [SerializeField] private Vector2Int roadPixelAtlasPosition;
 
     public Color GetColourByBuildingType(BuildingType type)
     {
@@ -28,5 +29,10 @@ public class ColourSampler : MonoBehaviour
     public Color GetInvalidColour()
     {
         return colourAtlas.GetPixel(invalidPixelAtlasPosition.x, invalidPixelAtlasPosition.y);
+    }
+    
+    public Color GetRoadColour()
+    {
+        return colourAtlas.GetPixel(roadPixelAtlasPosition.x, roadPixelAtlasPosition.y);
     }
 }

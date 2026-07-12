@@ -28,6 +28,10 @@ namespace Placement
             _context.PlacementIndicator.startColor = _zoneColour;
             _context.PlacementIndicator.endColor = _zoneColour;
             const float offset = -0.5f;
+            _context.PlacementIndicator.positionCount = 4;
+            _context.PlacementIndicator.loop = true;
+            _context.PlacementIndicator.startWidth = .1f;
+            _context.PlacementIndicator.endWidth = .1f;
             _context.PlacementIndicator.SetPosition(0, new Vector3(offset, IndicatorGroundClearance, offset));
             _context.PlacementIndicator.SetPosition(1, new Vector3(width + offset, IndicatorGroundClearance, offset));
             _context.PlacementIndicator.SetPosition(2, new Vector3(width + offset, IndicatorGroundClearance, height + offset));
@@ -45,6 +49,7 @@ namespace Placement
             _previewBuilding = Object.Instantiate(_previewBuildingPrefab, Vector3.zero, Quaternion.identity,
                 _context.transform);
             _justCreatedPreview = true;
+            _context.PlacementIndicator.enabled = true;
         }
 
         public void ExitState()

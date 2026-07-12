@@ -21,12 +21,21 @@ namespace Placement
 
         public void EnterState()
         {
-            _context.SpriteIndicator.enabled = true;
+            var colour = _context.ColourSampler.GetRoadColour();
+            _context.PlacementIndicator.startColor = colour;
+            _context.PlacementIndicator.endColor = colour;
+            _context.PlacementIndicator.positionCount = 2;
+            _context.PlacementIndicator.startWidth = .4f;
+            _context.PlacementIndicator.endWidth = .4f;
+            _context.PlacementIndicator.loop = false;
+            _context.PlacementIndicator.SetPosition(0, new Vector3(0f, IndicatorGroundClearance, 0f));
+            _context.PlacementIndicator.SetPosition(1, new Vector3(0f, IndicatorGroundClearance, .05f));
+            _context.PlacementIndicator.enabled = true;
         }
 
         public void ExitState()
         {
-            _context.SpriteIndicator.enabled = false;
+            _context.PlacementIndicator.enabled = false;
         }
         
         public void MouseDown(Vector3 position)
@@ -55,7 +64,7 @@ namespace Placement
                 IndicatorGroundClearance,
                 Mathf.RoundToInt(position.z)
             );
-            _context.SpriteIndicator.transform.position = gridPosition;
+            _context.PlacementIndicator.transform.position = gridPosition;
         }
 
         private void CheckPlacingRoad(Vector3 position)
