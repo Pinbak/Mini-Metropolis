@@ -16,7 +16,7 @@ namespace Agents
         public Node NextPosition { get; private set; } // the node that the agent is moving to
         public bool MovingInJunction { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
-        public ParkingSpace ParkedAt { get; private set; }// the space this agent is currently in
+        public ParkingSpace ParkedAt { get; private set; } // the space this agent is currently in
         public ParkingSpace Destination { get; private set; }
         public Action<Node> Arrived { get; set; } // invoked when the agent has arrived at its intended destination
         
@@ -32,7 +32,7 @@ namespace Agents
         private readonly PathGenerator _pathGenerator; // the vector3 generator to create points along the path of nodes to be followed
         private Vector3 _currentTargetPosition; // the position that we are currently driving towards
         private const float TargetTolerance = .01f;
-        private readonly GameObject _agent; // a reference to the object this is affecting
+        private readonly Agent _agent; // a reference to the object this is affecting
         private readonly GridManager _gridManager;
         private readonly IntersectionManager _intersectionManager;
         private float _currentSpeed;
@@ -42,7 +42,7 @@ namespace Agents
         private Building _buildingInformation; // the building that this car belongs to
 
         public PathMover(Building buildingInformation, GridManager gridManager,
-            IntersectionManager intersectionManager, GameObject agent,
+            IntersectionManager intersectionManager, Agent agent,
             LayerMask agentLayer, ParkingSpace initialParking)
         {
             _pathGenerator = new PathGenerator(gridManager, this);
@@ -167,9 +167,31 @@ namespace Agents
             }
         }
 
-        private Vector3 ParkUp()
+        public void TeleportHome()
         {
-            return ParkedAt.transform.position;
+            if (!_agent.PrimaryLocation.GetFreeParkingSpace(out var parkingSpace)) return;
+            _currentNodePointer = 0;
+            HasValidPath = false;
+            ParkedAt = parkingSpace;
+            parkingSpace.IsFree = true;
+            _agent.transform.rotation = parkingSpace.transform.rotation;
+            _agent.transform.position = parkingSpace.transform.position;
+            CurrentPosition = _gridManager.WorldToNode(parkingSpace.ParentPosition);
+            _agent.Returning();
+            _agent.ChangeState(_agent.AtPrimary);
+        }
+        
+        private void ArrivedAtLocation()
+        {
+            // if (Vector3.Distance(WorldPosition, ParkedAt.transform.position) > TargetTolerance)
+            //     return ParkUp();
+            _currentNodePointer = 0;
+            HasValidPath = false;
+            // we have reached the destination
+            ParkedAt = Destination;
+            ParkedAt.IsFree = false;
+            _agent.transform.rotation = Destination.transform.rotation;
+            Arrived?.Invoke(CurrentPosition);
         }
         
         /// <summary>
@@ -185,17 +207,8 @@ namespace Agents
                 _currentNodePointer++;
                 if (_currentNodePointer == _pathGenerator.NodePath.Length)
                 {
-                    // if (Vector3.Distance(WorldPosition, ParkedAt.transform.position) > TargetTolerance)
-                    //     return ParkUp();
-                    _currentNodePointer = 0;
-                    HasValidPath = false;
-                    // we have reached the adjacent road
-                    ParkedAt = Destination;
-                    ParkedAt.IsFree = false;
-                    _agent.transform.rotation = Destination.transform.rotation;
-                    Arrived?.Invoke(CurrentPosition);
+                    ArrivedAtLocation();
                     return Vector3.zero;
-
                 }
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
                 _targetNodePosition = _gridManager.NodeToWorld(NextPosition);
@@ -204,8 +217,7 @@ namespace Agents
                 // the road has been removed since setting out
                 if (NextPosition.Type is not NodeType.Road && NextPosition.Type is not NodeType.Parking)
                 {
-                    _currentNodePointer = 0;
-                    HasValidPath = false;
+                    TeleportHome();
                     // if (!_attemptRecalculatePath)
                     // {
                     //     _attemptRecalculatePath = true;

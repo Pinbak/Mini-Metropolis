@@ -35,7 +35,7 @@ namespace Agents
             AgentState.EnterState(this);
             CarAcceleration = buildingManager.CarAcceleration;
             PrimaryLocation = primaryLocation;
-            PathMover = new PathMover(primaryLocation, _gridManager, buildingManager.IntersectionManager, gameObject,
+            PathMover = new PathMover(primaryLocation, _gridManager, buildingManager.IntersectionManager, this,
                 buildingManager.AgentLayer, initialParkingSpace);
         }
 
