@@ -17,6 +17,9 @@ namespace Placement
         {
             _context = context;
         }
+        public void EnterState() { }
+
+        public void ExitState() { }
         
         public void MouseDown(Vector3 position)
         {

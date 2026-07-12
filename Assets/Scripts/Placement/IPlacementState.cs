@@ -4,6 +4,8 @@ namespace Placement
 {
     public interface IPlacementState
     {
+        void EnterState();
+        void ExitState();
         void MouseDown(Vector3 position);
         void MouseRelease();
         void MouseClick(Vector3 position);
