@@ -82,7 +82,6 @@ namespace Placement
             {
                 _context.GridManager.BuildChunk(chunkX, chunkY);
             }
-        
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Buildings
     {
         [field:SerializeField] public BuildingType Type { get; set; }
         [field:SerializeField] public Building UpgradesTo { get; set; }
+        [field:SerializeField] public Building DowngradesTo { get; set; }
         [field:SerializeField] public bool IsGrowable { get; set; }
         [field:SerializeField] public int Width { get; set; }
         [field:SerializeField] public int Height { get; set; }
@@ -26,6 +27,7 @@ namespace Buildings
         [field:SerializeField] public List<Need> Demands { get; private set; } = new();
         
         protected BuildingManager BuildingManager { get; private set; }
+        private bool _isChanging;
 
         public void Init(BuildingManager buildingManager)
         {
@@ -85,6 +87,11 @@ namespace Buildings
                 var need = new Need();
                 need.Init(uniqueSupply.AgentType);
                 need.GettingLow += NeedGettingLow;
+                if (IsGrowable)
+                {
+                    need.AboveThreshold += UpgradeBuilding;
+                    need.BelowThreshold += DowngradeBuilding;
+                }
                 Supplies.Add(need);
             }
             
@@ -93,6 +100,11 @@ namespace Buildings
                 var need = new Need();
                 need.Init(uniqueDemand.AgentType);
                 need.GettingLow += NeedGettingLow;
+                if (IsGrowable)
+                {
+                    need.AboveThreshold += UpgradeBuilding; // todo needs to unsubscribe?
+                    need.BelowThreshold += DowngradeBuilding;
+                }
                 Demands.Add(need);
             }
             
@@ -132,6 +144,22 @@ namespace Buildings
                 }
             }
             
+        }
+        
+        private void DowngradeBuilding(Need need)
+        {
+            if (DowngradesTo is null || _isChanging) return;
+            _isChanging = true;
+            BuildingManager.ChangeBuilding(this, DowngradesTo);
+        }
+
+        private void UpgradeBuilding(Need need)
+        {
+            if (UpgradesTo is null || _isChanging) return;
+            _isChanging = true;
+            if (Supplies.Any(supply => !supply.IsAboveThreshold()))return;
+            if (Demands.Any(demand => !demand.IsAboveThreshold()))return;
+            BuildingManager.ChangeBuilding(this, UpgradesTo);
         }
 
         private void NeedGettingLow(Need need)

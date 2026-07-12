@@ -8,7 +8,7 @@ namespace Buildings
     public class Need
     {
         [field:SerializeField] public AgentType Type { get; set; }
-        [field:SerializeField] public float Amount { get; set; } = 100f;
+        [field:SerializeField] public float Amount { get; set; } = 50f;
         public Action<Need> BelowThreshold { get; set; }
         public Action<Need> GettingLow { get; set; }
         public Action<Need> AboveThreshold { get; set; }
@@ -22,6 +22,11 @@ namespace Buildings
         public void Init(AgentType type)
         {
             Type = type;
+            retryTime = type switch
+            {
+                AgentType.Student => 100f,
+                _ => 10f
+            };
         }
 
         public void Increase(float amount)
@@ -44,11 +49,16 @@ namespace Buildings
                 BelowThreshold?.Invoke(this);
             }
 
-            if (Amount > _upgradeThreshold)
+            if (IsAboveThreshold())
             {
                 AboveThreshold?.Invoke(this);
             }
             
+        }
+
+        public bool IsAboveThreshold()
+        {
+            return Amount > _upgradeThreshold;
         }
         
         

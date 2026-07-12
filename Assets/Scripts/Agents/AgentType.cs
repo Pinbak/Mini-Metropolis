@@ -4,6 +4,6 @@ namespace Agents
     {
         Commuter,
         Shopper,
-        
+        Student,
     }
 }
