@@ -21,16 +21,17 @@ namespace Intersections
         {
             foreach (var pathMover in _agents)
             {
+                if (pathMover is null) return;
                 Debug.DrawLine(
                     new Vector3(pathMover.WorldPosition.x, pathMover.WorldPosition.y + 1f,
                         pathMover.WorldPosition.z), pathMover.WorldPosition, Color.purple);
             }
             
-            if (_lastSent is not null)
+            if (_lastSent is not null && _lastSent.AgentExists)
                 Debug.DrawLine(new Vector3(_lastSent.WorldPosition.x, _lastSent.WorldPosition.y + 1f,
                     _lastSent.WorldPosition.z), _lastSent.WorldPosition, Color.orange);
             
-            if (_lastSent is not null)
+            if (_lastSent is not null && _lastSent.AgentExists)
             {
                 Debug.DrawLine(new Vector3(_position.x, _position.y + 1f, _position.z), _position, Color.blue);
                 if (_lastSent.NextPosition != _node) // if the next position is no longer the junction
@@ -45,8 +46,7 @@ namespace Intersections
             if (_agents.Count == 0) return; // nobody waiting at intersection
             // if nothing is currently in the junction, send the next car that is waiting through
             _lastSent = _agents.Dequeue();
-            _lastSent.Go();
-
+            _lastSent?.Go();
         }
 
         public void AddToQueue(PathMover agentToAdd)
