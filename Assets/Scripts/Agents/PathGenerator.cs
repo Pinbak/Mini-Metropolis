@@ -51,24 +51,28 @@ namespace Agents
         {
             if (currentNode == 0)
             {
-                GenerateStartPath(NodePath, currentNode);
+                GenerateStartPath();
                 return;
             }
             if (currentNode == NodePath.Length - 1)
             {
-                GenerateEndPath(NodePath, currentNode);
+                GenerateEndPath();
                 return;
             }
             
             Path = new List<Vector3>();
 
-            var position =
+            Vector3 position =
                 _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
                     NodePath[currentNode].Y));
-            var nextPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode + 1].X,
+            Vector3 nextPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode + 1].X,
                 NodePath[currentNode + 1].Y));
-            var previousPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode - 1].X,
+            Vector3 previousPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode - 1].X,
                 NodePath[currentNode - 1].Y));
+            if (currentNode == 1)
+                previousPosition = GetStartNode(); // second node from start
+            if (currentNode == NodePath.Length - 2)
+                nextPosition = GetEndNode(); // penultimate
                 
             // todo add the ability to swap road sides
             Vector3 directionToNextPosition = nextPosition - position;
@@ -105,30 +109,18 @@ namespace Agents
 
         }
         
-        // todo these two
-        private void GenerateStartPath(Node[] nodePath, int currentNode)
+        private void GenerateStartPath()
         {
-            Path = new List<Vector3> { _agent.WorldPosition };
-            // Path = new List<Vector3>();
-            // var position =
-            //     _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
-            //         NodePath[currentNode].Y));
-            // var nextPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode + 1].X,
-            //     NodePath[currentNode + 1].Y));
-            // Vector3 directionToNextPosition = nextPosition - position;
-            // directionToNextPosition.Normalize();
-            // var nextPerpendicular = Vector3.Cross(Vector3.up, directionToNextPosition);
-            // var movedPosition = position + nextPerpendicular * ((PathWidth - PathInset)  * .5f); // the centre of the node that is shifted to the correct lane
-            // Path.Add(movedPosition);
+            Path = new List<Vector3> { GetStartNode() };
         }
 
-        private void GenerateEndPath(Node[] nodePath, int currentNode)
+        private Vector3 GetStartNode() => _agent.WorldPosition;
+
+        private void GenerateEndPath()
         {
-            Path = new List<Vector3> { _agent.Destination.transform.position};
-            // var position =
-            //     _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode].X,
-            //         NodePath[currentNode].Y));
-            // Path.Add(position);
+            Path = new List<Vector3> { GetEndNode() };
         }
+
+        private Vector3 GetEndNode() => _agent.Destination.transform.position;
     }
 }
