@@ -215,7 +215,8 @@ namespace Agents
         private Vector3 GetNextPosition() // todo it's a bit of a mess
         {
             _currentPositionPointer++;
-            Maneuvering = _currentNodePointer == _pathGenerator.NodePath.Length - 1 || _currentNodePointer == 0;
+            Maneuvering = _currentNodePointer == _pathGenerator.NodePath.Length - 1 || _currentNodePointer == 0 ||
+                          _currentNodePointer == 1;
             if (_currentPositionPointer == Path.Count)
             {
                 _currentPositionPointer = 0;
