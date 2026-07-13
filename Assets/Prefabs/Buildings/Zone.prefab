@@ -49,6 +49,7 @@ MonoBehaviour:
   <Height>k__BackingField: 0
   lineRenderer: {fileID: 9062503365495805939}
   colourSampler: {fileID: 8497033175703650509, guid: 746487f14bc7cf74da15ddcf1db866d6, type: 3}
+  arrowIndicator: {fileID: 153160477971805928, guid: ee83dc03e6582b047855c5dff870cfd1, type: 3}
 --- !u!1001 &307031294757030738
 PrefabInstance:
   m_ObjectHideFlags: 0

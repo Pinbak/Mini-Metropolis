@@ -8,35 +8,18 @@ namespace Placement
         public Building Places { get; private set; }
         private readonly PlacementManager _context;
         private const float IndicatorGroundClearance = .1f;
-        private const float IndicatorLerpSpeed = .1f;
         private Color _zoneColour;
         private Color _invalidPlacementColour;
-        private Node _currentPosition;
         private Building _previewBuilding;
         private Building _previewBuildingPrefab;
-        private bool _justCreatedPreview;
+        private Zone _previewZone;
 
         public void ChangePlacementBuilding(Building building)
         {
             Places = building;
             _zoneColour = _context.ColourSampler.GetColourByBuildingType(building.Type);
             _invalidPlacementColour = _context.ColourSampler.GetInvalidColour();
-            var width = building.Width;
-            var height = building.Height;
             _previewBuildingPrefab = building;
-            
-            _context.PlacementIndicator.startColor = _zoneColour;
-            _context.PlacementIndicator.endColor = _zoneColour;
-            const float offset = -0.5f;
-            _context.PlacementIndicator.positionCount = 4;
-            _context.PlacementIndicator.loop = true;
-            _context.PlacementIndicator.startWidth = .1f;
-            _context.PlacementIndicator.endWidth = .1f;
-            _context.PlacementIndicator.SetPosition(0, new Vector3(offset, IndicatorGroundClearance, offset));
-            _context.PlacementIndicator.SetPosition(1, new Vector3(width + offset, IndicatorGroundClearance, offset));
-            _context.PlacementIndicator.SetPosition(2, new Vector3(width + offset, IndicatorGroundClearance, height + offset));
-            _context.PlacementIndicator.SetPosition(3, new Vector3(offset, IndicatorGroundClearance, height + offset));
-            _context.PlacementIndicator.enabled = true;
         }
         
         public BuildingZone(PlacementManager context)
@@ -48,15 +31,15 @@ namespace Placement
         {
             _previewBuilding = Object.Instantiate(_previewBuildingPrefab, Vector3.zero, Quaternion.identity,
                 _context.transform);
-            _justCreatedPreview = true;
-            _context.PlacementIndicator.enabled = true;
+            _previewZone = Object.Instantiate(_context.ZonePrefab, Vector3.zero, Quaternion.identity,
+                _context.transform);
+            _previewZone.Init(_context.BuildingManager, _previewBuildingPrefab);
         }
 
         public void ExitState()
         {
-            _context.PlacementIndicator.enabled = false;
-            if (_previewBuilding is null) return;
-            Object.Destroy(_previewBuilding.gameObject);
+            if (_previewZone is not null) Object.Destroy(_previewZone.gameObject);
+            if (_previewBuilding is not null) Object.Destroy(_previewBuilding.gameObject);
         }
         
         public void MouseDown(Vector3 position) { }
@@ -76,39 +59,23 @@ namespace Placement
         public void MouseMove(Vector3 position)
         {
             if (_context.GridManager.IsWorldPositionOutsideOfGrid(position)) return;
-            var currentNode = _context.GridManager.WorldToNode(position);
-            _currentPosition ??= currentNode;
-            if (currentNode == _currentPosition && !_justCreatedPreview) return; // haven't moved the mouse
-            _justCreatedPreview = false;
             UpdateIndicator(position);
         }
 
         private void UpdateIndicator(Vector3 mousePosition)
         {
             var nodePosition = _context.GridManager.WorldToNode(mousePosition);
-            _currentPosition = nodePosition;
-            if (IsSpaceAvailable(Places.Width, Places.Height, nodePosition))
-            {
-                _context.PlacementIndicator.startColor = _zoneColour;
-                _context.PlacementIndicator.endColor = _zoneColour;
-            }
-            else
-            {
-                _context.PlacementIndicator.startColor = _invalidPlacementColour;
-                _context.PlacementIndicator.endColor = _invalidPlacementColour;
-            }
-            
+            _previewZone.SetOutlineColour(IsSpaceAvailable(Places.Width, Places.Height, nodePosition)
+                ? _zoneColour
+                : _invalidPlacementColour);
+
             var gridPosition = new Vector3(
                 Mathf.RoundToInt(mousePosition.x),
                 IndicatorGroundClearance,
                 Mathf.RoundToInt(mousePosition.z)
             );
-            if (_previewBuilding is not null)
-            {
-                _previewBuilding.transform.position = gridPosition;
-            }
-            _context.PlacementIndicator.transform.position = gridPosition;
-            // Vector3.Lerp(_context.PlacementIndicator.transform.position, gridPosition, IndicatorLerpSpeed);
+            if (_previewBuilding is not null) _previewBuilding.transform.position = gridPosition;
+            if (_previewZone is not null) _previewZone.transform.position = gridPosition;
         }
 
         private void CreateBuilding(Node position, Building type)

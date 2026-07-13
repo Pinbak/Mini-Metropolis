@@ -7,7 +7,6 @@ public class PlacementManager : MonoBehaviour
 {
     [field:SerializeField] public GridManager GridManager { get; set; }
     [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
-    [field:SerializeField] public LineRenderer PlacementIndicator { get; set; }
     [field:SerializeField] public BuildingManager BuildingManager { get; set; }
     
     [field:SerializeField] public Zone ZonePrefab { get; set; }
