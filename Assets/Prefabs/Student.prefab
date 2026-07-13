@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Agents.Agent
   <AgentType>k__BackingField: 2
+  <Income>k__BackingField: 2
   <MovementSpeed>k__BackingField: 1
   <TimeToSpendAtSecondary>k__BackingField: 10
   <TimeToWaitUntilRetryingRoute>k__BackingField: 5
