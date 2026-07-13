@@ -73,7 +73,7 @@ namespace Buildings
             foreach (var parkingSpace in Builds.ParkingSpaces)
             {
                 var direction = parkingSpace.RoadConnection - parkingSpace.ParentPosition;
-                uniquePositions.Add((parkingSpace.ParentPosition, direction));
+                uniquePositions.Add((parkingSpace.ParentPosition + transform.position, direction));
             }
 
             var offsetHeight = new Vector3(0f, OffsetHeight, 0f);
