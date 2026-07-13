@@ -13,10 +13,12 @@ namespace Placement
         private Building _previewBuilding;
         private Building _previewBuildingPrefab;
         private Zone _previewZone;
+        private int _cost;
 
         public void ChangePlacementBuilding(Building building)
         {
             Places = building;
+            _cost = Places.Cost;
             _zoneColour = _context.ColourSampler.GetColourByBuildingType(building.Type);
             _invalidPlacementColour = _context.ColourSampler.GetInvalidColour();
             _previewBuildingPrefab = building;
@@ -48,6 +50,7 @@ namespace Placement
 
         public void MouseClick(Vector3 position)
         {
+            if (_cost > _context.BuildingManager.Balance) return; // can't afford it
             if (Places.IsGrowable)
                 CreateZone(_context.GridManager.WorldToNode(position), Places);
             else
@@ -65,9 +68,10 @@ namespace Placement
         private void UpdateIndicator(Vector3 mousePosition)
         {
             var nodePosition = _context.GridManager.WorldToNode(mousePosition);
-            _previewZone.SetOutlineColour(IsSpaceAvailable(Places.Width, Places.Height, nodePosition)
-                ? _zoneColour
-                : _invalidPlacementColour);
+            _previewZone.SetOutlineColour(
+                IsSpaceAvailable(Places.Width, Places.Height, nodePosition) && _cost <= _context.BuildingManager.Balance
+                    ? _zoneColour
+                    : _invalidPlacementColour);
 
             var gridPosition = new Vector3(
                 Mathf.RoundToInt(mousePosition.x),
@@ -86,6 +90,7 @@ namespace Placement
             var building = Object.Instantiate(type, _context.GridManager.NodeToWorld(position), Quaternion.identity,
                 _context.BuildingManager.transform);
             building.Init(_context.BuildingManager);
+            _context.BuildingManager.Balance -= _cost;
             PlaceBuilding(building, _context);
         }
 
@@ -99,6 +104,7 @@ namespace Placement
             var newZone = Object.Instantiate(_context.ZonePrefab, _context.GridManager.NodeToWorld(position),
                 Quaternion.identity, _context.BuildingManager.transform);
             newZone.Init(_context.BuildingManager, type);
+            _context.BuildingManager.Balance -= _cost;
             PlaceZone(newZone);
 
             switch (type.Type)

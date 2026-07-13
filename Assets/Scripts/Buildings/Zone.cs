@@ -12,7 +12,7 @@ namespace Buildings
         [field:SerializeField] public int Height { get; set; }
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private ColourSampler colourSampler;
-        [SerializeField] private ArrowIndicator arrowIndicator;
+        [SerializeField] private ArrowIndicator arrowIndicatorPrefab;
         private Color _color;
         private const float OffsetHeight = .1f;
         
@@ -79,7 +79,7 @@ namespace Buildings
             var offsetHeight = new Vector3(0f, OffsetHeight, 0f);
             foreach (var uniquePosition in uniquePositions)
             {
-                var arrow = Instantiate(arrowIndicator, uniquePosition.position + offsetHeight,
+                var arrow = Instantiate(arrowIndicatorPrefab, uniquePosition.position + offsetHeight,
                     Quaternion.LookRotation(uniquePosition.direction) * Quaternion.Euler(90, 0, 0), transform);
                 arrow.SetColour(_color);
             }

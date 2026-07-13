@@ -8,6 +8,7 @@ using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
 {
+    [field:SerializeField] public int Balance { get; set; }
     [field:SerializeField] public float ResidentialDemand { get; set; }
     [field:SerializeField] public float BaseResidentialDemand { get; set; }
     [field:SerializeField] public float CommercialDemand { get; set; }
@@ -134,8 +135,6 @@ public class BuildingManager : MonoBehaviour
                     IndustrialDemand -= buildings.Count;
                     break;
             }
-
-
         }
         foreach (var (type, buildings) in _supplies)
         {

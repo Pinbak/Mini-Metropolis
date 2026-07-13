@@ -912,6 +912,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a00b413de1524c279d0b43b9f4bd5979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarManager
+  <Balance>k__BackingField: 500
   <ResidentialDemand>k__BackingField: 0
   <BaseResidentialDemand>k__BackingField: 0
   <CommercialDemand>k__BackingField: 0

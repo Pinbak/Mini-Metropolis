@@ -8,6 +8,7 @@ namespace Buildings
     public class Building : MonoBehaviour
     {
         [field:SerializeField] public BuildingType Type { get; set; }
+        [field:SerializeField] public int Cost { get; set; }
         [field:SerializeField] public Building UpgradesTo { get; set; }
         [field:SerializeField] public Building DowngradesTo { get; set; }
         [field:SerializeField] public bool IsGrowable { get; set; }
@@ -130,18 +131,17 @@ namespace Buildings
             
             foreach (var supply in Supplies)
             {
-                if (supply.Type == need.AgentType)
-                {
-                    supply.Increase(amount);
-                }
+                if (supply.Type != need.AgentType) continue;
+                supply.Increase(amount);
+                BuildingManager.Balance += need.Income;
+                return;
             }
             
             foreach (var demand in Demands)
             {
-                if (demand.Type == need.AgentType)
-                {
-                    demand.Increase(amount);
-                }
+                if (demand.Type != need.AgentType) continue;
+                demand.Increase(amount);
+                return;
             }
             
         }

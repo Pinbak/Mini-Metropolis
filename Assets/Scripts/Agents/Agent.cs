@@ -6,6 +6,7 @@ namespace Agents
     public class Agent : MonoBehaviour
     {
         [field:SerializeField] public AgentType AgentType { get; set; }
+        [field:SerializeField] public int Income { get; set; }
         [field:SerializeField] public float MovementSpeed { get; set; } = 1f;
         [field:SerializeField] public float TimeToSpendAtSecondary { get; set; }
         [field:SerializeField] public float TimeToWaitUntilRetryingRoute { get; set; } = 5f;
