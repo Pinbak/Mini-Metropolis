@@ -8,17 +8,19 @@ using Vector3 = UnityEngine.Vector3;
 
 namespace Agents
 {
+    [Serializable]
     public class PathMover
     {
-        public bool HasValidPath { get; private set; }
+        [field:SerializeField] public bool HasValidPath { get; private set; }
         public IReadOnlyCollection<Vector3> Path => _pathGenerator.Path.AsReadOnly();
         public Node CurrentPosition { get; private set; } // the node that the agent is currently on
         public Node NextPosition { get; private set; } // the node that the agent is moving to
-        public bool MovingInJunction { get; set; }
+        [field:SerializeField] public bool MovingInJunction { get; set; }
+        [field:SerializeField] public bool Maneuvering { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
         public bool AgentExists => _agent is not null;
-        public ParkingSpace ParkedAt { get; private set; } // the space this agent is currently in
-        public ParkingSpace Destination { get; private set; }
+        [field:SerializeField] public ParkingSpace ParkedAt { get; private set; } // the space this agent is currently in
+        [field:SerializeField] public ParkingSpace Destination { get; private set; }
         public Action<Node> Arrived { get; set; } // invoked when the agent has arrived at its intended destination
         
         private Vector3 _targetNodePosition;
@@ -121,7 +123,7 @@ namespace Agents
                 var rotationSpeed = movementSpeed * 10f;
                 var adjustedSpeed = movementSpeed;
                 var acceleration = _acceleration;
-                if (!MovingInJunction)
+                if (!MovingInJunction && !Maneuvering)
                 {
                     if (_speedMultiplier == 0f)
                     {
@@ -213,6 +215,7 @@ namespace Agents
         private Vector3 GetNextPosition() // todo it's a bit of a mess
         {
             _currentPositionPointer++;
+            Maneuvering = _currentNodePointer == _pathGenerator.NodePath.Length - 1 || _currentNodePointer == 0;
             if (_currentPositionPointer == Path.Count)
             {
                 _currentPositionPointer = 0;

@@ -22,7 +22,7 @@ namespace Agents
         
         public Building PrimaryLocation { get; private set; }
         public Building SecondaryLocation { get; protected set; }
-        public PathMover PathMover { get; private set; } // the ability to move along a path
+        [field:SerializeField] public PathMover PathMover { get; private set; } // the ability to move along a path
         public AnimationCurve CarAcceleration { get; private set; }
         
         private GridManager _gridManager;
