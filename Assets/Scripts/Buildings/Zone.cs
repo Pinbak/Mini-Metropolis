@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Placement;
 using UnityEngine;
 
 namespace Buildings
@@ -10,7 +12,9 @@ namespace Buildings
         [field:SerializeField] public int Height { get; set; }
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private ColourSampler colourSampler;
-        
+        [SerializeField] private ArrowIndicator arrowIndicator;
+        private Color _color;
+        private const float OffsetHeight = .1f;
         
         public Node BottomLeft { get; private set; }
         public Vector3 WorldPosition { get; set; }
@@ -31,21 +35,26 @@ namespace Buildings
             Height = builds.Height;
             GenerateLayout();
             GenerateOutline();
+            CreateArrowForParking();
         }
 
         private void GenerateOutline()
         {
             // runs once
             const float offset = -0.5f;
-            const float height = .1f;
 
-            var colour = colourSampler.GetColourByBuildingType(Builds.Type);
+            _color = colourSampler.GetColourByBuildingType(Builds.Type);
+            SetOutlineColour(_color);
+            lineRenderer.SetPosition(0, new Vector3(offset, OffsetHeight, offset));
+            lineRenderer.SetPosition(1, new Vector3(Width + offset, OffsetHeight, offset));
+            lineRenderer.SetPosition(2, new Vector3(Width + offset, OffsetHeight, Height + offset));
+            lineRenderer.SetPosition(3, new Vector3(offset, OffsetHeight, Height + offset));
+        }
+
+        public void SetOutlineColour(Color colour)
+        {
             lineRenderer.startColor = colour;
             lineRenderer.endColor = colour;
-            lineRenderer.SetPosition(0, new Vector3(offset, height, offset));
-            lineRenderer.SetPosition(1, new Vector3(Width + offset, height, offset));
-            lineRenderer.SetPosition(2, new Vector3(Width + offset, height, Height + offset));
-            lineRenderer.SetPosition(3, new Vector3(offset, height, Height + offset));
         }
 
         private void GenerateLayout()
@@ -57,5 +66,25 @@ namespace Buildings
                 Layout[x, y] = NodeType.Building;
             }
         }
+
+        private void CreateArrowForParking()
+        {
+            var uniquePositions = new HashSet<(Vector3 position, Vector3 direction)>();
+            foreach (var parkingSpace in Builds.ParkingSpaces)
+            {
+                var direction = parkingSpace.RoadConnection - parkingSpace.ParentPosition;
+                uniquePositions.Add((parkingSpace.ParentPosition, direction));
+            }
+
+            var offsetHeight = new Vector3(0f, OffsetHeight, 0f);
+            foreach (var uniquePosition in uniquePositions)
+            {
+                var arrow = Instantiate(arrowIndicator, uniquePosition.position + offsetHeight,
+                    Quaternion.LookRotation(uniquePosition.direction) * Quaternion.Euler(90, 0, 0), transform);
+                arrow.SetColour(_color);
+            }
+        }
+        
+        
     }
 }
