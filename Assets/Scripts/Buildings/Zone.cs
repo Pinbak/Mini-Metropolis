@@ -80,7 +80,7 @@ namespace Buildings
             foreach (var uniquePosition in uniquePositions)
             {
                 var arrow = Instantiate(arrowIndicatorPrefab, uniquePosition.position + offsetHeight,
-                    Quaternion.LookRotation(uniquePosition.direction) * Quaternion.Euler(90, 0, 0), transform);
+                    Quaternion.LookRotation(uniquePosition.direction) * Quaternion.Euler(90f, 0f, 0f), transform);
                 arrow.SetColour(_color);
             }
         }
