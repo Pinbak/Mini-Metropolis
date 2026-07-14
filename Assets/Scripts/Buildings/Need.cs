@@ -8,25 +8,26 @@ namespace Buildings
     public class Need
     {
         [field:SerializeField] public AgentType Type { get; set; }
-        [field:SerializeField] public float Amount { get; set; } = 50f;
+        [field:SerializeField] public float Amount { get; set; }
         public Action<Need> BelowThreshold { get; set; }
         public Action<Need> GettingLow { get; set; }
         public Action<Need> AboveThreshold { get; set; }
 
-        private float _upgradeThreshold = 90f;
-        private float _downgradeThreshold = 10f;
+        private float _upgradeThreshold;
+        private float _downgradeThreshold;
+        private const float InitialDelay = 5f;
 
-        [SerializeField] private float retryPollTimer = 8f;
-        [SerializeField] private float retryTime = 10f;
+        [SerializeField] private float retryPollTimer;
+        [SerializeField] private float retryTime;
 
-        public void Init(AgentType type)
+        public void Init(Agent agent)
         {
-            Type = type;
-            retryTime = type switch
-            {
-                AgentType.Student => 100f,
-                _ => 10f
-            };
+            Type = agent.AgentType;
+            retryTime = agent.RequestTime;
+            _upgradeThreshold = agent.UpgradeAmount;
+            _downgradeThreshold = agent.DowngradeAmount;
+            retryPollTimer = agent.RequestTime - InitialDelay;
+            Amount = (int)(_upgradeThreshold * .5f);
         }
 
         public void Increase(float amount)

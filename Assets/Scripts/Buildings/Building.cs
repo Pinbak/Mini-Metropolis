@@ -86,7 +86,7 @@ namespace Buildings
             foreach (var uniqueSupply in uniqueSupplies)
             {
                 var need = new Need();
-                need.Init(uniqueSupply.AgentType);
+                need.Init(uniqueSupply);
                 need.GettingLow += NeedGettingLow;
                 if (IsGrowable)
                 {
@@ -99,7 +99,7 @@ namespace Buildings
             foreach (var uniqueDemand in uniqueDemands)
             {
                 var need = new Need();
-                need.Init(uniqueDemand.AgentType);
+                need.Init(uniqueDemand);
                 need.GettingLow += NeedGettingLow;
                 if (IsGrowable)
                 {
@@ -140,7 +140,7 @@ namespace Buildings
             foreach (var demand in Demands)
             {
                 if (demand.Type != need.AgentType) continue;
-                demand.Increase(amount);
+                demand.Increase(amount / ParkingSpaces.Length);
                 return;
             }
             

@@ -49,10 +49,17 @@ MonoBehaviour:
   <AgentType>k__BackingField: 0
   <Income>k__BackingField: 1
   <MovementSpeed>k__BackingField: 1
-  <TimeToSpendAtSecondary>k__BackingField: 10
-  <TimeToWaitUntilRetryingRoute>k__BackingField: 5
-  <NeedIncrease>k__BackingField: 10
+  <RequestTime>k__BackingField: 100
+  <TimeToSpendAtSecondary>k__BackingField: 100
+  <TimeToWaitUntilRetryingRoute>k__BackingField: 10
+  <NeedIncrease>k__BackingField: 250
   <InQueue>k__BackingField: 0
+  <PathMover>k__BackingField:
+    <HasValidPath>k__BackingField: 0
+    <MovingInJunction>k__BackingField: 0
+    <Maneuvering>k__BackingField: 0
+    <ParkedAt>k__BackingField: {fileID: 0}
+    <Destination>k__BackingField: {fileID: 0}
 --- !u!65 &5619498843596990357
 BoxCollider:
   m_ObjectHideFlags: 0
