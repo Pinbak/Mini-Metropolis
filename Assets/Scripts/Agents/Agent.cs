@@ -8,9 +8,12 @@ namespace Agents
         [field:SerializeField] public AgentType AgentType { get; set; }
         [field:SerializeField] public int Income { get; set; }
         [field:SerializeField] public float MovementSpeed { get; set; } = 1f;
+        [field:SerializeField] public float RequestTime { get; set; }
         [field:SerializeField] public float TimeToSpendAtSecondary { get; set; }
         [field:SerializeField] public float TimeToWaitUntilRetryingRoute { get; set; } = 5f;
-        [field:SerializeField] public float NeedIncrease { get; set; } = 10f;
+        [field:SerializeField] public float NeedIncrease { get; set; } = 250f;
+        [field:SerializeField] public float UpgradeAmount { get; set; } = 1000f;
+        [field:SerializeField] public float DowngradeAmount { get; set; }
         [field:SerializeField] public bool InQueue { get; set; } // queueing for need
 
         // States
