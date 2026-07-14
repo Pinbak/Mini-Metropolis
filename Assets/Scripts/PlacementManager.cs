@@ -16,6 +16,7 @@ public class PlacementManager : MonoBehaviour
     [field:SerializeField] public Building SchoolPrefab { get; set; }
 
     [field:SerializeField] public ColourSampler ColourSampler { get; set; }
+    [field:SerializeField] public LineDrawer LineDrawer { get; set; }
 
 
     // states

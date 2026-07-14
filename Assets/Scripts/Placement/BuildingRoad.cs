@@ -6,13 +6,13 @@ namespace Placement
 {
     public class BuildingRoad : IPlacementState
     {
-        public Action FinishedBuildingRoads { get; set; } 
         private const float IndicatorGroundClearance = .1f;
         
         private readonly PlacementManager _context;
         private Vector3Int _startingPosition;
         private Vector3Int _lastSuccessfulPosition;
         private List<(int x, int y)> _validNeighbourNodes = new();
+        private bool _mouseDown;
 
         public BuildingRoad(PlacementManager context)
         {
@@ -21,10 +21,13 @@ namespace Placement
 
         public void EnterState()
         {
+            _context.LineDrawer.ShowRenderer();
+            _context.LineDrawer.ResetLength();
         }
 
         public void ExitState()
         {
+            _context.LineDrawer.HideRenderer();
         }
         
         public void MouseDown(Vector3 position)
@@ -34,11 +37,13 @@ namespace Placement
 
         public void MouseRelease()
         {
-            RemoveStartingNode();
+            _mouseDown = false;
+            _context.LineDrawer.ResetLength();
         }
 
         public void MouseClick(Vector3 position)
         {
+            _mouseDown = true;
             StartRoadPlacement(Vector3Int.RoundToInt(position));
         }
 
@@ -48,18 +53,21 @@ namespace Placement
 
         public void MouseMove(Vector3 position)
         {
+            if (_mouseDown) return;
             var gridPosition = new Vector3(
                 Mathf.RoundToInt(position.x),
                 IndicatorGroundClearance,
                 Mathf.RoundToInt(position.z)
             );
+            _context.LineDrawer.transform.position = gridPosition;
         }
 
         private void CheckPlacingRoad(Vector3 position)
         {
+            _context.LineDrawer.DrawLine(_startingPosition, position);
             var distance = Vector3.Distance(_startingPosition, position);
             if (!(distance > 1)) return;
-        
+            
             var direction = position - _startingPosition;
             direction.Normalize();
             var targetPosition = _startingPosition + new Vector3Int(
@@ -80,9 +88,7 @@ namespace Placement
         {
             if (!_context.IsPositionInBound(position)) return;
             if (!_context.IsPositionFreeOrRoad(position)) return;
-        
-            RemoveStartingNode();
-
+            
             var gridPosition = _context.GridManager.WorldToGrid(position);
             _validNeighbourNodes = _context.GridManager.Grid.GetAdjacentCells(gridPosition.x, gridPosition.y);
             RemoveIllegalPlacements(position); // removes the ability to cross an existing road
@@ -118,20 +124,16 @@ namespace Placement
             StartRoadPlacement(_lastSuccessfulPosition);
         }
         
-        public void RemoveStartingNode()
-        {
-            FinishedBuildingRoads?.Invoke();
-        }
-        
         private void PlaceStartingNode(Vector3Int position)
         {
             _startingPosition = position;
             _lastSuccessfulPosition = position;
+            _context.LineDrawer.transform.position = position;
         }
 
         private void RemoveIllegalPlacements(Vector3Int position)
         {
-            var gridPosition = _context.GridManager.WorldToGrid(position); // todo make into field
+            var gridPosition = _context.GridManager.WorldToGrid(position);
             var diagonals = _context.GridManager.Grid.GetDiagonalCells(gridPosition.x, gridPosition.y);
             var illegalPlacements = new List<(int x, int y)>();
 
