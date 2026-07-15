@@ -21,18 +21,26 @@ namespace Roads
         }
 
         public void UpdateStartPosition(Vector3 startPosition) => _placementMesh.UpdateStartPosition(startPosition);
-
         public void RemoveMesh() => _mesh.Clear();
+
+        public void DrawCircleAtPosition(Vector3 currentPosition)
+        {
+            UpdateStartPosition(currentPosition);
+            _placementMesh.CalculateTrianglesForCircle();
+            CreateMeshFromTriangles(_placementMesh.Triangles);
+        }
         
-        public void RegenerateMesh(Vector3 currentPosition)
+        public void DrawLineFromToPosition(Vector3 currentPosition)
+        {
+            _placementMesh.CalculateTrianglesFromToPosition(currentPosition);
+            CreateMeshFromTriangles(_placementMesh.Triangles);
+        }
+
+        private void CreateMeshFromTriangles(List<Triangle> tris)
         {
             if (_mesh is null) return;
-            
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
-            
-            _placementMesh.CalculateTriangles(currentPosition);
-            var tris = _placementMesh.Triangles;
             
             var startingIndex = vertices.Count;
             vertices.Add(tris[0].A1); // add the centre point
