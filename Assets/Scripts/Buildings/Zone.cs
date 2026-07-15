@@ -15,11 +15,12 @@ namespace Buildings
         [SerializeField] private ArrowIndicator arrowIndicatorPrefab;
         private Color _color;
         private const float OffsetHeight = .1f;
+        private readonly List<ArrowIndicator> _arrows = new();
         
         public Node BottomLeft { get; private set; }
         public Vector3 WorldPosition { get; set; }
         
-        public NodeType[,] Layout { get; private set; }
+        public LayoutPosition[] Layout { get; set; }
         
         private BuildingManager BuildingManager { get; set; }
 
@@ -33,9 +34,7 @@ namespace Buildings
             Builds = builds;
             Width = builds.Width;
             Height = builds.Height;
-            GenerateLayout();
             GenerateOutline();
-            CreateArrowForParking();
         }
 
         private void GenerateOutline()
@@ -57,20 +56,12 @@ namespace Buildings
             lineRenderer.endColor = colour;
         }
 
-        private void GenerateLayout()
+        public void UpdateArrowParkingIndicators(ParkingSpace[] parkingSpaces)
         {
-            Layout = new NodeType[Width, Height];
-            for (var x = 0; x < Width; x++)
-            for (var y = 0; y < Height; y++)
-            {
-                Layout[x, y] = NodeType.Building;
-            }
-        }
-
-        private void CreateArrowForParking()
-        {
+            foreach (var arrowIndicator in _arrows) Destroy(arrowIndicator.gameObject); // remove existing
+            
             var uniquePositions = new HashSet<(Vector3 position, Vector3 direction)>();
-            foreach (var parkingSpace in Builds.ParkingSpaces)
+            foreach (var parkingSpace in parkingSpaces)
             {
                 var direction = parkingSpace.RoadConnection - parkingSpace.ParentPosition;
                 uniquePositions.Add((parkingSpace.ParentPosition + transform.position, direction));
@@ -82,9 +73,8 @@ namespace Buildings
                 var arrow = Instantiate(arrowIndicatorPrefab, uniquePosition.position + offsetHeight,
                     Quaternion.LookRotation(uniquePosition.direction) * Quaternion.Euler(90f, 0f, 0f), transform);
                 arrow.SetColour(_color);
+                _arrows.Add(arrow);
             }
         }
-        
-        
     }
 }

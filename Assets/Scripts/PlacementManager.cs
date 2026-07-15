@@ -34,13 +34,13 @@ public class PlacementManager : MonoBehaviour
     private IPlacementState _mode;
     private Bulldozing _bulldozingState;
     private BuildingRoad _buildingRoadState;
-    private BuildingZone _buildingZoneState;
+    public BuildingZone BuildingZoneState { get; private set; }
 
     private void Start()
     {
         _buildingRoadState = new BuildingRoad(this);
         _bulldozingState = new Bulldozing(this);
-        _buildingZoneState = new BuildingZone(this);
+        BuildingZoneState = new BuildingZone(this);
         Mode = _buildingRoadState;
     }
     
@@ -76,25 +76,25 @@ public class PlacementManager : MonoBehaviour
             Mode = _bulldozingState;
         else if (Mode is Bulldozing)
         {
-            _buildingZoneState.ChangePlacementBuilding(ResidentialLowWealthPrefab);
-            Mode = _buildingZoneState;
+            BuildingZoneState.ChangePlacementBuilding(ResidentialLowWealthPrefab);
+            Mode = BuildingZoneState;
         }
-        else if (Mode is BuildingZone && _buildingZoneState.Places.Type is BuildingType.Residential)
+        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.Residential)
         {
-            _buildingZoneState.ChangePlacementBuilding(IndustrialLowWealthPrefab);
-            Mode = _buildingZoneState;
+            BuildingZoneState.ChangePlacementBuilding(IndustrialLowWealthPrefab);
+            Mode = BuildingZoneState;
         }
-        else if (Mode is BuildingZone && _buildingZoneState.Places.Type is BuildingType.Industrial)
+        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.Industrial)
         {
-            _buildingZoneState.ChangePlacementBuilding(CommercialLowWealthPrefab);
-            Mode = _buildingZoneState;
+            BuildingZoneState.ChangePlacementBuilding(CommercialLowWealthPrefab);
+            Mode = BuildingZoneState;
         }
-        else if (Mode is BuildingZone && _buildingZoneState.Places.Type is BuildingType.Commercial)
+        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.Commercial)
         {
-            _buildingZoneState.ChangePlacementBuilding(SchoolPrefab);
-            Mode = _buildingZoneState;
+            BuildingZoneState.ChangePlacementBuilding(SchoolPrefab);
+            Mode = BuildingZoneState;
         }
-        else if (Mode is BuildingZone && _buildingZoneState.Places.Type is BuildingType.School)
+        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.School)
         {
             Mode = _buildingRoadState;
         }
