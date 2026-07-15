@@ -14,13 +14,13 @@ namespace Buildings
         [field:SerializeField] public bool IsGrowable { get; set; }
         [field:SerializeField] public int Width { get; set; }
         [field:SerializeField] public int Height { get; set; }
-        [field:SerializeField] public ParkingSpace[] ParkingSpaces { get; set; }
+        public ParkingSpace[] ParkingSpaces { get; private set; }
         [SerializeField] private Agent[] supplies;
         [SerializeField] private Agent[] demands;
         private Agent[] _agents;
         public bool ToRemove { get; private set; }
-        
-        public NodeType[,] Layout { get; private set; }
+
+        public LayoutPosition[] Layout { get; private set; }
         public Node BottomLeft { get; private set; }
         public Vector3 WorldPosition { get; set; }
 
@@ -29,6 +29,12 @@ namespace Buildings
         
         protected BuildingManager BuildingManager { get; private set; }
         private bool _isChanging;
+
+        private void Awake()
+        {
+            ParkingSpaces = GetComponentsInChildren<ParkingSpace>();
+            Layout = GetComponentsInChildren<LayoutPosition>();
+        }
 
         public void Init(BuildingManager buildingManager)
         {
@@ -41,13 +47,13 @@ namespace Buildings
             WorldPosition = gridManager.NodeToWorld(bottomLeft);
             _agents = new Agent[supplies.Length];
             
-            GenerateLayout();
             SetupNeeds();
 
             for (var i = 0; i < supplies.Length; i++)
             {
                 var agentPrefab = supplies[i];
-                var agent = Instantiate(agentPrefab, ParkingSpaces[i].transform.position, Quaternion.identity, transform);
+                var agent = Instantiate(agentPrefab, ParkingSpaces[i].transform.position, transform.rotation,
+                    transform);
                 agent.Init(this, buildingManager, ParkingSpaces[i]);
                 _agents[i] = agent;
             }
@@ -190,25 +196,6 @@ namespace Buildings
             }
         }
 
-        private void GenerateLayout()
-        {
-            Layout = new NodeType[Width, Height];
-            for (var x = 0; x < Width; x++)
-            for (var y = 0; y < Height; y++)
-            {
-                Layout[x, y] = NodeType.Building;
-            }
-
-            foreach (var parkingSpace in ParkingSpaces)
-            {
-                var parkingPosition = BuildingManager.GridManager.WorldToNode(parkingSpace.ParentPosition);
-                // have to shift real world position by buildings position for relative local position
-                var localGridPosition =
-                    new Vector2Int(parkingPosition.X - BottomLeft.X, parkingPosition.Y - BottomLeft.Y);
-                Layout[localGridPosition.x, localGridPosition.y] = NodeType.Parking;
-            }
-        }
-
         public bool GetFreeParkingSpace(out ParkingSpace freeParkingSpace)
         {
             freeParkingSpace = null;
@@ -231,22 +218,23 @@ namespace Buildings
                     reservedSpace = parkingSpace;
         }
         
-        private void OnDrawGizmos()
-        {
-            for (var x = 0; x < Width; x++)
-            for (var y = 0; y < Height; y++)
-            {
-                var gridPosition = new Vector2Int(BottomLeft.X + x, BottomLeft.Y + y);
-                var node = BuildingManager.GridManager.Grid[gridPosition.x, gridPosition.y];
-                var worldPosition = BuildingManager.GridManager.NodeToWorld(node);
-                Gizmos.color = Color.red;
-
-                if (node.Type is NodeType.Parking)
-                    Gizmos.color = Color.blue;
-                
-                Gizmos.DrawSphere(new Vector3(worldPosition.x, worldPosition.y + 1f, worldPosition.z), .1f);
-            }
-            
-        }
+        // private void OnDrawGizmos()
+        // {
+        //     if (BottomLeft is null) return;
+        //     for (var x = 0; x < Width; x++)
+        //     for (var y = 0; y < Height; y++)
+        //     {
+        //         var gridPosition = new Vector2Int(BottomLeft.X + x, BottomLeft.Y + y);
+        //         var node = BuildingManager.GridManager.Grid[gridPosition.x, gridPosition.y];
+        //         var worldPosition = BuildingManager.GridManager.NodeToWorld(node);
+        //         Gizmos.color = Color.red;
+        //
+        //         if (node.Type is NodeType.Parking)
+        //             Gizmos.color = Color.blue;
+        //         
+        //         Gizmos.DrawSphere(new Vector3(worldPosition.x, worldPosition.y + 1f, worldPosition.z), .1f);
+        //     }
+        //     
+        // }
     }
 }

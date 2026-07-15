@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Roads;
 using UnityEngine;
@@ -131,5 +132,25 @@ public class GridManager : MonoBehaviour
     private (int x, int y) GetGridPositionFromChunk(int chunkX, int chunkY)
     {
         return (chunkX * _chunkWidth, chunkY * _chunkHeight);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (Grid is null) return;
+        for (var x = 0; x < Width; x++)
+        for (var y = 0; y < Height; y++)
+        {
+            switch (Grid[x, y].Type)
+            {
+                case NodeType.Parking:
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawSphere(NodeToWorld(Grid[x, y]), .1f);
+                    break;
+                case NodeType.Building:
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawSphere(NodeToWorld(Grid[x, y]), .1f);
+                    break;
+            }
+        }
     }
 }

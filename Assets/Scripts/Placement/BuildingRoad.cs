@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +5,6 @@ namespace Placement
 {
     public class BuildingRoad : IPlacementState
     {
-        private const float IndicatorGroundClearance = .02f;
-        
         private readonly PlacementManager _context;
         private Vector3Int _startingPosition;
         private Vector3Int _lastSuccessfulPosition;

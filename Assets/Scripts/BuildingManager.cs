@@ -187,9 +187,9 @@ public class BuildingManager : MonoBehaviour
     private void BuildFromZone(Zone zone)
     {
         var buildingPrefab = zone.Builds;
-        var building = Instantiate(buildingPrefab, zone.transform.position, Quaternion.identity, transform);
+        var building = Instantiate(buildingPrefab, zone.transform.position, zone.transform.rotation, transform);
         building.Init(this);
-        BuildingZone.PlaceBuilding(building, placementManager);
+        placementManager.BuildingZoneState.Place(building.Layout);
         Destroy(zone.gameObject);
         if (zone.Builds.Type is BuildingType.Residential)
             ResidentialZones.Remove(zone);
@@ -201,10 +201,11 @@ public class BuildingManager : MonoBehaviour
 
     public void ChangeBuilding(Building currentBuilding, Building buildingToChangeTo)
     {
-        var building = Instantiate(buildingToChangeTo, currentBuilding.transform.position, Quaternion.identity, transform);
+        var building = Instantiate(buildingToChangeTo, currentBuilding.transform.position,
+            currentBuilding.transform.rotation, transform);
         RemoveBuilding(currentBuilding);
         building.Init(this);
-        BuildingZone.PlaceBuilding(building, placementManager);
+        placementManager.BuildingZoneState.Place(building.Layout);
     }
 
     public void RemoveBuilding(Building buildingToRemove)

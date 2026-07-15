@@ -14,6 +14,7 @@ namespace Placement
         private Building _previewBuildingPrefab;
         private Zone _previewZone;
         private int _cost;
+        private Quaternion _rotation = Quaternion.Euler(0f, 90f, 0f);
 
         public void ChangePlacementBuilding(Building building)
         {
@@ -31,11 +32,12 @@ namespace Placement
         
         public void EnterState()
         {
-            _previewBuilding = Object.Instantiate(_previewBuildingPrefab, Vector3.zero, Quaternion.identity,
+            _previewBuilding = Object.Instantiate(_previewBuildingPrefab, Vector3.zero, _rotation,
                 _context.transform);
-            _previewZone = Object.Instantiate(_context.ZonePrefab, Vector3.zero, Quaternion.identity,
+            _previewZone = Object.Instantiate(_context.ZonePrefab, Vector3.zero, _rotation,
                 _context.transform);
             _previewZone.Init(_context.BuildingManager, _previewBuildingPrefab);
+            _previewZone.UpdateArrowParkingIndicators(_previewBuilding.ParkingSpaces);
         }
 
         public void ExitState()
@@ -67,9 +69,8 @@ namespace Placement
 
         private void UpdateIndicator(Vector3 mousePosition)
         {
-            var nodePosition = _context.GridManager.WorldToNode(mousePosition);
             _previewZone.SetOutlineColour(
-                IsSpaceAvailable(Places.Width, Places.Height, nodePosition) && _cost <= _context.BuildingManager.Balance
+                IsSpaceAvailable(_previewBuilding.Layout) && _cost <= _context.BuildingManager.Balance
                     ? _zoneColour
                     : _invalidPlacementColour);
 
@@ -84,28 +85,24 @@ namespace Placement
 
         private void CreateBuilding(Node position, Building type)
         {
-            var width = type.Width;
-            var height = type.Height;
-            if (!IsSpaceAvailable(width, height, position)) return;
-            var building = Object.Instantiate(type, _context.GridManager.NodeToWorld(position), Quaternion.identity,
+            if (!IsSpaceAvailable(_previewBuilding.Layout)) return;
+            var building = Object.Instantiate(type, _context.GridManager.NodeToWorld(position), _rotation,
                 _context.BuildingManager.transform);
             building.Init(_context.BuildingManager);
             _context.BuildingManager.Balance -= _cost;
-            PlaceBuilding(building, _context);
+            Place(building.Layout);
         }
 
         private void CreateZone(Node position, Building type)
         {
-            var width = type.Width;
-            var height = type.Height;
-            if (!IsSpaceAvailable(width, height, position)) return;
+            if (!IsSpaceAvailable(_previewBuilding.Layout)) return;
 
-            // todo using object check that that's fine
-            var newZone = Object.Instantiate(_context.ZonePrefab, _context.GridManager.NodeToWorld(position),
-                Quaternion.identity, _context.BuildingManager.transform);
+            var newZone = Object.Instantiate(_context.ZonePrefab, _context.GridManager.NodeToWorld(position), _rotation,
+                _context.BuildingManager.transform);
             newZone.Init(_context.BuildingManager, type);
             _context.BuildingManager.Balance -= _cost;
-            PlaceZone(newZone);
+            newZone.Layout = _previewBuilding.Layout;
+            Place(newZone.Layout);
 
             switch (type.Type)
             {
@@ -120,50 +117,31 @@ namespace Placement
                     _context.BuildingManager.IndustrialZones.Add(newZone);
                     break;
             }
-        
         }
 
-        private bool IsSpaceAvailable(int width, int height, Node bottomLeft)
+        private bool IsSpaceAvailable(LayoutPosition[] layout)
         {
-            for (var x = 0; x < width; x++)
-            for (var y = 0; y < height; y++)
+            foreach (var layoutPosition in layout)
             {
-                var gridPosition = new Vector2Int(bottomLeft.X + x, bottomLeft.Y + y);
+                var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
                 if (gridPosition.x >= _context.GridManager.Width || gridPosition.x < 0) return false;
                 if (gridPosition.y >= _context.GridManager.Height || gridPosition.y < 0) return false;
                 var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
                 if (node.Type is not NodeType.Empty) return false;
             }
-
             return true;
         }
 
         /// <summary>
         ///     Warning is destructive!
         /// </summary>
-        public static void PlaceBuilding(Building building, PlacementManager context)
+        public void Place(LayoutPosition[] layout)
         {
-            for (var x = 0; x < building.Width; x++)
-            for (var y = 0; y < building.Height; y++)
+            foreach (var layoutPosition in layout)
             {
-                context.BuildingManager.AllBuildings[building.BottomLeft.X + x, building.BottomLeft.Y + y] = building; // keep track of what buildings position is
-                var gridPosition = new Vector2Int(building.BottomLeft.X + x, building.BottomLeft.Y + y);
-                var node = context.GridManager.Grid[gridPosition.x, gridPosition.y];
-                node.Type = building.Layout[x, y];
-            }
-                
-        }
-
-        private void PlaceZone(Zone zone)
-        {
-            for (var x = 0; x < zone.Width; x++)
-            for (var y = 0; y < zone.Height; y++)
-            {
-                _context.BuildingManager.AllZones[zone.BottomLeft.X + x, zone.BottomLeft.Y + y] = zone;
-                var gridPosition = new Vector2Int(zone.BottomLeft.X + x, zone.BottomLeft.Y + y);
+                var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
                 var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
-                if (node.Type is not NodeType.Empty) return;
-                node.Type = zone.Layout[x, y];
+                node.Type = layoutPosition.Type;
             }
         }
     }
