@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleKeyboardPress(KeyboardKeys key)
     {
-        placementManager.ChangeMode();
+        placementManager.HandleKeyboardPress(key);
     }
 
     private void HandleMouseHeldDown(Vector3 position)

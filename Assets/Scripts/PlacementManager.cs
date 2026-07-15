@@ -51,7 +51,9 @@ public class PlacementManager : MonoBehaviour
     
     public void HandleKeyboardPress(KeyboardKeys key)
     {
-        Mode.KeyboardPress(key);
+        if (key is KeyboardKeys.B) ChangeMode();
+        else
+            Mode.KeyboardPress(key);
     }
 
     public void HandleMouseHeldDown(Vector3 position)
@@ -69,7 +71,7 @@ public class PlacementManager : MonoBehaviour
         Mode.MouseRelease();
     }
 
-    public void ChangeMode()
+    private void ChangeMode()
     {
         // todo is temporary
         if (Mode is BuildingRoad)
