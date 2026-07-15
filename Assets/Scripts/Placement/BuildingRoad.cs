@@ -6,13 +6,14 @@ namespace Placement
 {
     public class BuildingRoad : IPlacementState
     {
-        private const float IndicatorGroundClearance = .1f;
+        private const float IndicatorGroundClearance = .02f;
         
         private readonly PlacementManager _context;
         private Vector3Int _startingPosition;
         private Vector3Int _lastSuccessfulPosition;
         private List<(int x, int y)> _validNeighbourNodes = new();
         private bool _mouseDown;
+        private Vector2Int _previousPosition;
 
         public BuildingRoad(PlacementManager context)
         {
@@ -21,13 +22,12 @@ namespace Placement
 
         public void EnterState()
         {
-            _context.LineDrawer.ShowRenderer();
-            _context.LineDrawer.ResetLength();
+            _previousPosition = Vector2Int.zero;
         }
 
         public void ExitState()
         {
-            _context.LineDrawer.HideRenderer();
+            _context.PlacementIndicator.RemoveMesh();
         }
         
         public void MouseDown(Vector3 position)
@@ -38,7 +38,7 @@ namespace Placement
         public void MouseRelease()
         {
             _mouseDown = false;
-            _context.LineDrawer.ResetLength();
+            _previousPosition = Vector2Int.zero;
         }
 
         public void MouseClick(Vector3 position)
@@ -54,17 +54,19 @@ namespace Placement
         public void MouseMove(Vector3 position)
         {
             if (_mouseDown) return;
+            var nodePosition = _context.GridManager.WorldToGrid(position);
+            if (_previousPosition == nodePosition) return;
+            _previousPosition = nodePosition;
+            
             var gridPosition = new Vector3(
-                Mathf.RoundToInt(position.x),
-                IndicatorGroundClearance,
-                Mathf.RoundToInt(position.z)
+                Mathf.RoundToInt(position.x), 0f, Mathf.RoundToInt(position.z)
             );
-            _context.LineDrawer.transform.position = gridPosition;
+            _context.PlacementIndicator.DrawCircleAtPosition(gridPosition);
         }
 
         private void CheckPlacingRoad(Vector3 position)
         {
-            _context.LineDrawer.DrawLine(_startingPosition, position);
+            _context.PlacementIndicator.DrawLineFromToPosition(position);
             var distance = Vector3.Distance(_startingPosition, position);
             if (!(distance > 1)) return;
             
@@ -128,7 +130,7 @@ namespace Placement
         {
             _startingPosition = position;
             _lastSuccessfulPosition = position;
-            _context.LineDrawer.transform.position = position;
+            _context.PlacementIndicator.UpdateStartPosition(position);
         }
 
         private void RemoveIllegalPlacements(Vector3Int position)

@@ -1,6 +1,7 @@
 ﻿using Buildings;
 using Intersections;
 using Placement;
+using Roads;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
@@ -16,9 +17,8 @@ public class PlacementManager : MonoBehaviour
     [field:SerializeField] public Building SchoolPrefab { get; set; }
 
     [field:SerializeField] public ColourSampler ColourSampler { get; set; }
-    [field:SerializeField] public LineDrawer LineDrawer { get; set; }
-
-
+    [field:SerializeField] public PlacementIndicator PlacementIndicator { get; set; }
+    
     // states
     private IPlacementState Mode
     {

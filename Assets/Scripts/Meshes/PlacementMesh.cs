@@ -11,8 +11,19 @@ namespace Meshes
         {
             meshCentreInWorld = startPosition;
         }
+
+        public void CalculateTrianglesForCircle()
+        {
+            Triangles = new List<Triangle>();
+            var direction = Vector3.forward * .5f - meshCentreInWorld;
+            direction.Normalize();
+            var newPosition = meshCentreInWorld + direction * (CapLength * .5f);
+            Triangles.AddRange(CreateCap(meshCentreInWorld, newPosition, false));
+            Triangles.AddRange(CreateCap(newPosition, meshCentreInWorld, false));
+            Triangles.AddRange(FillTheRemainingGaps(false));
+        }
         
-        public void CalculateTriangles(Vector3 currentPosition)
+        public void CalculateTrianglesFromToPosition(Vector3 currentPosition)
         {
             Triangles = new List<Triangle>();
             var direction = currentPosition - meshCentreInWorld;
@@ -24,7 +35,9 @@ namespace Meshes
             var right = meshCentreInWorld + perpendicular * (GlobalRoadWidth * .5f);
             right = direction * distance + right;
             Triangles.Add(new Triangle(meshCentreInWorld, left, right));
-            CreateDeadEndCap(currentPosition);
+            Triangles.AddRange(CreateDeadEndCap(currentPosition));
+            Triangles.AddRange(CreateCap(currentPosition, meshCentreInWorld, false));
+            Triangles.AddRange(FillTheRemainingGaps(false));
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Meshes
         private const float RightAngleCornerLength = .3f;
         private const float ObtuseCornerLength = .25f;
         private const float ComplexCornerLength = .2f;
-        private const float CapLength = .3f;
+        protected const float CapLength = .3f;
         private const float Curviness = .25f;
         private readonly float _meshResolution;
 
@@ -46,7 +46,7 @@ namespace Meshes
                 if (useBezier)
                 {
                     var movedCentre = Vector3.Lerp((a + b) / 2, meshCentreInWorld, Curviness);
-                    triangles.AddRange(GenerateTrianglesFromBezierPoints(a, b, movedCentre));
+                    triangles.AddRange(GenerateTrianglesFromBezierPoints(a, b, movedCentre, meshCentreInWorld));
                 }
                 else
                 {
@@ -57,29 +57,32 @@ namespace Meshes
 
             return triangles;
         }
-
+        
         protected List<Triangle> CreateDeadEndCap(Vector3 neighbourPosition, bool isPointed = false)
+            => CreateCap(meshCentreInWorld, neighbourPosition, isPointed);
+
+        protected List<Triangle> CreateCap(Vector3 start, Vector3 end, bool isPointed)
         {
-            var direction = neighbourPosition - meshCentreInWorld;
+            var direction = end - start;
             direction.Normalize();
             direction *= -1; // flip the direction
             var perpendicular = Vector3.Cross(Vector3.up, direction);
-            var a = meshCentreInWorld - perpendicular * (GlobalRoadWidth * .5f);
-            var b = meshCentreInWorld + perpendicular * (GlobalRoadWidth * .5f);
-            var c = meshCentreInWorld + direction * CapLength;
-
+            var a = start - perpendicular * (GlobalRoadWidth * .5f);
+            var b = start + perpendicular * (GlobalRoadWidth * .5f);
+            var c = start + direction * CapLength;
             // creates a rounded Bezier end cap
-            if (!isPointed) return GenerateTrianglesFromBezierPoints(a, b, c);
+            if (!isPointed) return GenerateTrianglesFromBezierPoints(a, b, c, start);
             
             // creates a simple pointed end cap
             var tris = new List<Triangle>
             {
-                new(meshCentreInWorld, a, c),
-                new(meshCentreInWorld, c, b)
+                new(start, a, c),
+                new(start, c, b)
             };
             return tris;
+            
         }
-
+        
         protected List<Triangle> CreateSmoothCorners(JunctionType junctionType)
         {
             var direction = _averagePosition - meshCentreInWorld;
@@ -120,20 +123,20 @@ namespace Meshes
             var a = prevTri.A3;
             var b = nextTri.A2;
 
-            return GenerateTrianglesFromBezierPoints(a, b, cornerPosition);
+            return GenerateTrianglesFromBezierPoints(a, b, cornerPosition, meshCentreInWorld);
         }
 
         /// <summary>
         ///     Given <see cref="BezierCurve"/> points, a, b, centre, creates a curve using <see cref="_meshResolution"/>,
         ///     and then generating triangles from centre
         /// </summary>
-        private List<Triangle> GenerateTrianglesFromBezierPoints(Vector3 a, Vector3 b, Vector3 centre)
+        private List<Triangle> GenerateTrianglesFromBezierPoints(Vector3 a, Vector3 b, Vector3 bezierControlPoint, Vector3 start)
         {
             var tris = new List<Triangle>();
             var bezierPoints = new List<Vector3>();
             for (var t = _meshResolution; t < 1f; t += _meshResolution)
             {
-                var point = BezierCurve.EvaluateQuadratic(a, centre, b, t);
+                var point = BezierCurve.EvaluateQuadratic(a, bezierControlPoint, b, t);
                 bezierPoints.Add(point);
             }
                 
@@ -142,17 +145,17 @@ namespace Meshes
                 // start of the bezier
                 if (i == 0)
                 {
-                    tris.Add(new Triangle(meshCentreInWorld, a, bezierPoints[i]));
+                    tris.Add(new Triangle(start, a, bezierPoints[i]));
                 }
                 // all points in the bezier
                 if (i != bezierPoints.Count - 1)
                 {
-                    tris.Add(new Triangle(meshCentreInWorld, bezierPoints[i], bezierPoints[i + 1]));
+                    tris.Add(new Triangle(start, bezierPoints[i], bezierPoints[i + 1]));
                 }
                 // last point of the bezier
                 else if (i == bezierPoints.Count - 1)
                 {
-                    tris.Add(new Triangle(meshCentreInWorld, bezierPoints[i], b));
+                    tris.Add(new Triangle(start, bezierPoints[i], b));
                 }
             }
 
