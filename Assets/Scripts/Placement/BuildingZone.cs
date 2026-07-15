@@ -14,7 +14,7 @@ namespace Placement
         private Building _previewBuildingPrefab;
         private Zone _previewZone;
         private int _cost;
-        private Quaternion _rotation = Quaternion.Euler(0f, 90f, 0f);
+        private Quaternion _rotation = Quaternion.Euler(0f, 0f, 0f);
 
         public void ChangePlacementBuilding(Building building)
         {
@@ -45,6 +45,14 @@ namespace Placement
             if (_previewZone is not null) Object.Destroy(_previewZone.gameObject);
             if (_previewBuilding is not null) Object.Destroy(_previewBuilding.gameObject);
         }
+
+        private void Rotate(float angle)
+        {
+            if (_previewBuilding is null || _previewZone is null) return;
+            _previewBuilding.transform.Rotate(Vector3.up, angle);
+            _previewZone.transform.Rotate(Vector3.up, angle);
+            _rotation = _previewZone.transform.rotation;
+        }
         
         public void MouseDown(Vector3 position) { }
 
@@ -59,7 +67,10 @@ namespace Placement
                 CreateBuilding(_context.GridManager.WorldToNode(position), Places);
         }
 
-        public void KeyboardPress(KeyboardKeys key) { }
+        public void KeyboardPress(KeyboardKeys key)
+        {
+            if (key is KeyboardKeys.R) Rotate(90f);
+        }
 
         public void MouseMove(Vector3 position)
         {
@@ -79,7 +90,8 @@ namespace Placement
                 IndicatorGroundClearance,
                 Mathf.RoundToInt(mousePosition.z)
             );
-            if (_previewBuilding is not null) _previewBuilding.transform.position = gridPosition;
+            if (_previewBuilding is not null)
+                _previewBuilding.transform.position = gridPosition - new Vector3(0f, IndicatorGroundClearance, 0f);
             if (_previewZone is not null) _previewZone.transform.position = gridPosition;
         }
 

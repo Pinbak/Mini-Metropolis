@@ -470,6 +470,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
   leftMouseButton: {fileID: 8110675386255103649, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   keyboardB: {fileID: -6967216744572209317, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  keyboardR: {fileID: -8613918933582556176, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   mainCamera: {fileID: 330585545}
   ground:
     serializedVersion: 2

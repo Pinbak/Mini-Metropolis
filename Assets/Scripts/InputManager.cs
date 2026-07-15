@@ -16,6 +16,7 @@ public class InputManager : MonoBehaviour
 
     [SerializeField] private InputActionReference leftMouseButton;
     [SerializeField] private InputActionReference keyboardB;
+    [SerializeField] private InputActionReference keyboardR;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private LayerMask ground;
     private Vector2 _cameraMovementVector;
@@ -27,6 +28,7 @@ public class InputManager : MonoBehaviour
         // leftMouseButton.action.performed += IsPointerHold;
         leftMouseButton.action.canceled += IsPointerUp;
         keyboardB.action.performed += _ => KeyboardPress?.Invoke(KeyboardKeys.B); 
+        keyboardR.action.performed += _ => KeyboardPress?.Invoke(KeyboardKeys.R); 
         leftMouseButton.action.Enable();
         keyboardB.action.Enable();
     }
@@ -38,6 +40,7 @@ public class InputManager : MonoBehaviour
         leftMouseButton.action.canceled -= IsPointerUp;
         leftMouseButton.action.Disable();
         keyboardB.action.Disable();
+        keyboardR.action.Disable();
     }
 
     private void Update()
