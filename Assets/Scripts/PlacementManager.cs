@@ -32,14 +32,14 @@ public class PlacementManager : MonoBehaviour
     }
 
     private IPlacementState _mode;
-    private Bulldozing _bulldozingState;
     private BuildingRoad _buildingRoadState;
+    public Bulldozing BulldozingState { get; set; }
     public BuildingZone BuildingZoneState { get; private set; }
 
     private void Start()
     {
         _buildingRoadState = new BuildingRoad(this);
-        _bulldozingState = new Bulldozing(this);
+        BulldozingState = new Bulldozing(this);
         BuildingZoneState = new BuildingZone(this);
         Mode = _buildingRoadState;
     }
@@ -75,7 +75,7 @@ public class PlacementManager : MonoBehaviour
     {
         // todo is temporary
         if (Mode is BuildingRoad)
-            Mode = _bulldozingState;
+            Mode = BulldozingState;
         else if (Mode is Bulldozing)
         {
             BuildingZoneState.ChangePlacementBuilding(ResidentialLowWealthPrefab);

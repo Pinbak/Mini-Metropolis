@@ -45,8 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f23746d7c9724d3fb95a962e49b12a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Zone
-  <Width>k__BackingField: 0
-  <Height>k__BackingField: 0
   lineRenderer: {fileID: 9062503365495805939}
   colourSampler: {fileID: 8497033175703650509, guid: 746487f14bc7cf74da15ddcf1db866d6, type: 3}
   arrowIndicatorPrefab: {fileID: 153160477971805928, guid: ee83dc03e6582b047855c5dff870cfd1, type: 3}
@@ -101,6 +99,10 @@ PrefabInstance:
     - target: {fileID: 8482800878346200261, guid: f43a7791f9b3383418a601ef254be0e9, type: 3}
       propertyPath: m_Name
       value: Outline
+      objectReference: {fileID: 0}
+    - target: {fileID: 8756881818952866977, guid: f43a7791f9b3383418a601ef254be0e9, type: 3}
+      propertyPath: m_UseWorldSpace
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

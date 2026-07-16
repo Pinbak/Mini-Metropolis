@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Buildings;
 using UnityEngine;
 
 namespace Placement
@@ -39,11 +40,11 @@ namespace Placement
             if (buildingToRemove is null)
             {
                 var zoneToRemove = _context.BuildingManager.AllZones[node.X, node.Y];
-                _context.BuildingManager.RemoveZone(zoneToRemove);
+                RemoveZone(zoneToRemove);
             }
             else
             {
-                _context.BuildingManager.RemoveBuilding(buildingToRemove);
+                RemoveBuilding(buildingToRemove);
             }
         }
 
@@ -82,6 +83,37 @@ namespace Placement
             {
                 _context.GridManager.BuildChunk(chunkX, chunkY);
             }
+        }
+        
+        public void RemoveBuilding(Building building)
+        {
+            foreach (var layoutPosition in building.Layout)
+            {
+                var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
+                var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
+                _context.BuildingManager.AllBuildings[node.X, node.Y] = null;
+                node.Type = NodeType.Empty;
+            }
+            building.RemoveBuilding();
+            Object.Destroy(building.gameObject);
+        }
+
+        private void RemoveZone(Zone zone)
+        {
+            foreach (var layoutPosition in zone.Layout)
+            {
+                var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
+                var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
+                _context.BuildingManager.AllZones[node.X, node.Y] = null;
+                node.Type = NodeType.Empty;
+            }
+            if (_context.BuildingManager.ResidentialZones.Contains(zone))
+                _context.BuildingManager.ResidentialZones.Remove(zone);
+            if (_context.BuildingManager.CommercialZones.Contains(zone))
+                _context.BuildingManager.CommercialZones.Remove(zone);
+            if (_context.BuildingManager.IndustrialZones.Contains(zone))
+                _context.BuildingManager.IndustrialZones.Remove(zone);
+            Object.Destroy(zone.gameObject);
         }
     }
 }

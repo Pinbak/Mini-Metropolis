@@ -12,8 +12,6 @@ namespace Buildings
         [field:SerializeField] public Building UpgradesTo { get; set; }
         [field:SerializeField] public Building DowngradesTo { get; set; }
         [field:SerializeField] public bool IsGrowable { get; set; }
-        [field:SerializeField] public int Width { get; set; }
-        [field:SerializeField] public int Height { get; set; }
         public ParkingSpace[] ParkingSpaces { get; private set; }
         [SerializeField] private Agent[] supplies;
         [SerializeField] private Agent[] demands;
@@ -63,10 +61,9 @@ namespace Buildings
         public void RemoveBuilding()
         {
             foreach (var parkingSpace in ParkingSpaces)
-            {
                 parkingSpace.ParkedAgent?.TeleportToPrimary();
-            }
-
+            foreach (var agent in _agents)
+                agent.PathMover.TeleportToPrimary();
             ToRemove = true;
         }
 
@@ -189,7 +186,7 @@ namespace Buildings
                 {
                     if (GetFreeParkingSpace(out var space))
                     {
-                        space.IsReserved = true;
+                        space.Queue();
                         BuildingManager.AddToDemandQueue(this, need);
                     }
                 }
@@ -201,7 +198,7 @@ namespace Buildings
             freeParkingSpace = null;
             foreach (var parkingSpace in ParkingSpaces)
             {
-                if (parkingSpace.IsBeingTaken || parkingSpace.IsReserved ||
+                if (parkingSpace.IsBeingTaken || parkingSpace.InQueue ||
                     parkingSpace.ParkedAgent is not null) continue;
                 freeParkingSpace = parkingSpace;
                 return true;
@@ -214,7 +211,7 @@ namespace Buildings
         {
             reservedSpace = null;
             foreach (var parkingSpace in ParkingSpaces)
-                if (parkingSpace.IsReserved)
+                if (parkingSpace.InQueue)
                     reservedSpace = parkingSpace;
         }
         

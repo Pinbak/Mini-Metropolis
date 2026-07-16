@@ -36,8 +36,7 @@ namespace Placement
                 _context.transform);
             _previewZone = Object.Instantiate(_context.ZonePrefab, Vector3.zero, _rotation,
                 _context.transform);
-            _previewZone.Init(_context.BuildingManager, _previewBuildingPrefab);
-            _previewZone.UpdateArrowParkingIndicators(_previewBuilding.ParkingSpaces);
+            _previewZone.Init(_context.BuildingManager, _previewBuildingPrefab, _previewBuilding);
         }
 
         public void ExitState()
@@ -81,7 +80,7 @@ namespace Placement
         private void UpdateIndicator(Vector3 mousePosition)
         {
             _previewZone.SetOutlineColour(
-                IsSpaceAvailable(_previewBuilding.Layout) && _cost <= _context.BuildingManager.Balance
+                IsSpaceAvailable(_previewZone.Layout) && _cost <= _context.BuildingManager.Balance
                     ? _zoneColour
                     : _invalidPlacementColour);
 
@@ -102,19 +101,18 @@ namespace Placement
                 _context.BuildingManager.transform);
             building.Init(_context.BuildingManager);
             _context.BuildingManager.Balance -= _cost;
-            Place(building.Layout);
+            PlaceBuilding(building);
         }
 
         private void CreateZone(Node position, Building type)
         {
-            if (!IsSpaceAvailable(_previewBuilding.Layout)) return;
+            if (!IsSpaceAvailable(_previewZone.Layout)) return;
 
             var newZone = Object.Instantiate(_context.ZonePrefab, _context.GridManager.NodeToWorld(position), _rotation,
                 _context.BuildingManager.transform);
-            newZone.Init(_context.BuildingManager, type);
+            newZone.Init(_context.BuildingManager, type, _previewBuilding);
             _context.BuildingManager.Balance -= _cost;
-            newZone.Layout = _previewBuilding.Layout;
-            Place(newZone.Layout);
+            PlaceZone(newZone);
 
             switch (type.Type)
             {
@@ -147,12 +145,24 @@ namespace Placement
         /// <summary>
         ///     Warning is destructive!
         /// </summary>
-        public void Place(LayoutPosition[] layout)
+        public void PlaceZone(Zone zone)
         {
-            foreach (var layoutPosition in layout)
+            foreach (var layoutPosition in zone.Layout)
             {
                 var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
                 var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
+                _context.BuildingManager.AllZones[gridPosition.x, gridPosition.y] = zone;
+                node.Type = layoutPosition.Type;
+            }
+        }
+        
+        public void PlaceBuilding(Building building)
+        {
+            foreach (var layoutPosition in building.Layout)
+            {
+                var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
+                var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
+                _context.BuildingManager.AllBuildings[gridPosition.x, gridPosition.y] = building;
                 node.Type = layoutPosition.Type;
             }
         }

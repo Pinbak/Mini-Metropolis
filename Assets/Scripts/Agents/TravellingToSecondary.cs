@@ -29,10 +29,9 @@ namespace Agents
         private void AttemptMoveToSecondaryLocation(Agent context)
         {
             _foundPath = false;
-            if (context.PathMover.HasValidPath) Debug.Log("Attempting to travel to work while travelling");
             context.SecondaryLocation.GetReservedParkingSpace(out var parkingSpace);
             context.PathMover.GeneratePath(parkingSpace);
-            parkingSpace.IsReserved = false;
+            parkingSpace.Dequeue();
             
             if (context.PathMover.HasValidPath)
             {
@@ -44,7 +43,6 @@ namespace Agents
                 // failed to find a path
                 context.Returning();
                 _context.ChangeState(_context.AtPrimary);
-                
             }
         }
 
