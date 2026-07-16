@@ -189,7 +189,7 @@ public class BuildingManager : MonoBehaviour
         var buildingPrefab = zone.Builds;
         var building = Instantiate(buildingPrefab, zone.transform.position, zone.transform.rotation, transform);
         building.Init(this);
-        placementManager.BuildingZoneState.Place(building.Layout);
+        placementManager.BuildingZoneState.PlaceBuilding(building);
         Destroy(zone.gameObject);
         if (zone.Builds.Type is BuildingType.Residential)
             ResidentialZones.Remove(zone);
@@ -203,40 +203,8 @@ public class BuildingManager : MonoBehaviour
     {
         var building = Instantiate(buildingToChangeTo, currentBuilding.transform.position,
             currentBuilding.transform.rotation, transform);
-        RemoveBuilding(currentBuilding);
+        placementManager.BulldozingState.RemoveBuilding(currentBuilding);
         building.Init(this);
-        placementManager.BuildingZoneState.Place(building.Layout);
-    }
-
-    public void RemoveBuilding(Building buildingToRemove)
-    {
-        for (var x = 0; x < buildingToRemove.Width; x++)
-        for (var y = 0; y < buildingToRemove.Height; y++)
-        {
-            var xPositionInGrid = buildingToRemove.BottomLeft.X + x;
-            var yPositionInGrid = buildingToRemove.BottomLeft.Y + y;
-            AllBuildings[xPositionInGrid, yPositionInGrid] = null;
-            GridManager.Grid[xPositionInGrid, yPositionInGrid].Type = NodeType.Empty;
-        }
-        
-        buildingToRemove.RemoveBuilding();
-        Destroy(buildingToRemove.gameObject);
-    }
-
-    public void RemoveZone(Zone zone)
-    {
-        for (var x = 0; x < zone.Width; x++)
-        for (var y = 0; y < zone.Height; y++)
-        {
-            var xPositionInGrid = zone.BottomLeft.X + x;
-            var yPositionInGrid = zone.BottomLeft.Y + y;
-            AllZones[xPositionInGrid, yPositionInGrid] = null;
-            GridManager.Grid[xPositionInGrid, yPositionInGrid].Type = NodeType.Empty;
-        }
-
-        if (ResidentialZones.Contains(zone)) ResidentialZones.Remove(zone);
-        if (CommercialZones.Contains(zone)) CommercialZones.Remove(zone);
-        if (IndustrialZones.Contains(zone)) IndustrialZones.Remove(zone);
-        Destroy(zone.gameObject);
+        placementManager.BuildingZoneState.PlaceBuilding(building);
     }
 }

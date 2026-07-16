@@ -19,9 +19,18 @@ namespace Agents
         [field:SerializeField] public bool Maneuvering { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
         public bool AgentExists => _agent is not null;
-        [field:SerializeField] public ParkingSpace ParkedAt { get; private set; } // the space this agent is currently in
-        [field:SerializeField] public ParkingSpace Destination { get; private set; }
         public Action<Node> Arrived { get; set; } // invoked when the agent has arrived at its intended destination
+        public ParkingSpace Destination { get; private set; }
+        public ParkingSpace ParkedAt
+        {
+            get => _parkedAt;
+            private set
+            {
+                if (value is null) _parkedAt.Leave();
+                else value.Park(this);
+                _parkedAt = value;
+            }
+        } // the space this agent is currently in
         
         private Vector3 _targetNodePosition;
         private int _currentNodePointer;
@@ -43,6 +52,7 @@ namespace Agents
         private float _acceleration = 1f;
         private const float DistanceToAgentInFront = .3f; // how close the agent gets to another agent before fully stopping
         private Building _buildingInformation; // the building that this car belongs to
+        private ParkingSpace _parkedAt;
 
         public PathMover(Building buildingInformation, GridManager gridManager,
             IntersectionManager intersectionManager, Agent agent,
@@ -55,7 +65,6 @@ namespace Agents
             _intersectionManager = intersectionManager;
             _buildingInformation = buildingInformation;
             ParkedAt = initialParking;
-            initialParking.ParkedAgent = this;
             CurrentPosition = gridManager.WorldToNode(initialParking.ParentPosition);
         }
         
@@ -86,11 +95,8 @@ namespace Agents
             _pathGenerator.GeneratePath(modifiedStart, modifiedEnd, start, end);
             if (_pathGenerator.PathGenerated)
             {
-                ParkedAt.IsFree = true;
-                ParkedAt.ParkedAgent = null;
-                ParkedAt.IsBeingTaken = false;
-                Destination.IsBeingTaken = true; // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
                 ParkedAt = null;
+                Destination.Reserve(); // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
                 _currentTargetPosition = _pathGenerator.Path[0];
                 HasValidPath = true;
             }
@@ -175,19 +181,12 @@ namespace Agents
 
         public void TeleportToPrimary()
         {
+            if (_agent.AgentState == _agent.AtPrimary) return; // if already at primary
             if (!_agent.PrimaryLocation.GetFreeParkingSpace(out var parkingSpace)) return;
             _currentNodePointer = 0;
             HasValidPath = false;
             ParkedAt = parkingSpace;
-            if (Destination is not null)
-            {
-                Destination.IsFree = true;
-                Destination.ParkedAgent = null;
-                Destination.IsBeingTaken = false;
-                Destination.IsReserved = false;
-            }
-            parkingSpace.IsFree = false;
-            parkingSpace.ParkedAgent = this;
+            Destination?.Leave();
             _agent.transform.rotation = parkingSpace.transform.rotation;
             _agent.transform.position = parkingSpace.transform.position;
             CurrentPosition = _gridManager.WorldToNode(parkingSpace.ParentPosition);
@@ -197,14 +196,9 @@ namespace Agents
         
         private void ArrivedAtLocation()
         {
-            // if (Vector3.Distance(WorldPosition, ParkedAt.transform.position) > TargetTolerance)
-            //     return ParkUp();
             _currentNodePointer = 0;
             HasValidPath = false;
-            // we have reached the destination
             ParkedAt = Destination;
-            ParkedAt.IsFree = false;
-            ParkedAt.ParkedAgent = this;
             _agent.transform.rotation = Destination.transform.rotation;
             Arrived?.Invoke(CurrentPosition);
         }

@@ -13,10 +13,29 @@ namespace Buildings
         public Vector3 RoadConnection => RoadConnectionGameObject.transform.position;
         
         [Tooltip("Whether there is anyone parked here.")]
-        [field:SerializeField] public bool IsFree { get; set; }
-        [field:SerializeField] public bool IsBeingTaken { get; set; }
-        public PathMover ParkedAgent { get; set; }
-        [field:SerializeField] public bool IsReserved { get; set; }
-        
+        [field:SerializeField] public bool IsFree { get; private set; }
+        [field:SerializeField] public bool IsBeingTaken { get; private set; }
+        public PathMover ParkedAgent { get; private set; }
+        [field:SerializeField] public bool InQueue { get; private set; }
+
+        public void Park(PathMover agent)
+        {
+            IsFree = false;
+            IsBeingTaken = false;
+            ParkedAgent = agent;
+        }
+
+        public void Leave()
+        {
+            IsFree = true;
+            ParkedAgent = null;
+            IsBeingTaken = false;
+        }
+
+        public void Queue() => InQueue = true;
+        public void Dequeue() => InQueue = false;
+
+        public void Reserve() => IsBeingTaken = true;
+
     }
 }

@@ -27,7 +27,6 @@ namespace Agents
         private void AttemptMoveToPrimaryLocation(Agent context)
         {
             _foundPath = false;
-            if (context.PathMover.HasValidPath) Debug.Log("Attempting to travel home while travelling");
             if (!context.PrimaryLocation.GetFreeParkingSpace(out var parkingSpace)) return;
             context.PathMover.GeneratePath(parkingSpace);
             
