@@ -16,9 +16,8 @@ namespace Agents
         public Node CurrentPosition { get; private set; } // the node that the agent is currently on
         public Node NextPosition { get; private set; } // the node that the agent is moving to
         [field:SerializeField] public bool MovingInJunction { get; set; }
-        [field:SerializeField] public bool Maneuvering { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
-        public bool AgentExists => _agent is not null;
+        public bool AgentExists => _agent != null;
         public Action<Node> Arrived { get; set; } // invoked when the agent has arrived at its intended destination
         public ParkingSpace Destination { get; private set; }
         public ParkingSpace ParkedAt
@@ -96,7 +95,7 @@ namespace Agents
             if (_pathGenerator.PathGenerated)
             {
                 ParkedAt = null;
-                Destination.Reserve(); // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
+                Destination.Reserve(this); // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
                 _currentTargetPosition = _pathGenerator.Path[0];
                 HasValidPath = true;
             }
@@ -105,7 +104,6 @@ namespace Agents
         public void Go()
         {
             if (_agent is null) return;
-            MovingInJunction = true;
             _speedMultiplier = 1f;
             _approachingJunction = false;
         }
@@ -129,28 +127,24 @@ namespace Agents
                 var rotationSpeed = movementSpeed * 10f;
                 var adjustedSpeed = movementSpeed;
                 var acceleration = _acceleration;
-                if (!MovingInJunction && !Maneuvering)
+                if (_speedMultiplier == 0f)
                 {
-                    if (_speedMultiplier == 0f)
+                    adjustedSpeed = movementSpeed * _speedMultiplier;
+                }
+                else
+                {
+                    if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
+                            _agentLayer))
                     {
-                        adjustedSpeed = movementSpeed * _speedMultiplier;
-                    }
-                    else
-                    {
-                        if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
-                                _agentLayer))
+                        if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
                         {
-                            if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
-                            {
-                                Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
-                                    hit.point, Color.blue);
-                                adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
-                                // make acceleration/deceleration inversely proportional to distance
-                                acceleration = accelerationProfile.Evaluate(hit.distance);
-                            }
+                            Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
+                                hit.point, Color.blue);
+                            adjustedSpeed = movementSpeed * Mathf.Max(.1f, hit.distance - DistanceToAgentInFront);
+                            // make acceleration/deceleration inversely proportional to distance
+                            acceleration = accelerationProfile.Evaluate(hit.distance);
                         }
                     }
-                    
                 }
 
                 if (_approachingJunction)
@@ -209,8 +203,6 @@ namespace Agents
         private Vector3 GetNextPosition() // todo it's a bit of a mess
         {
             _currentPositionPointer++;
-            Maneuvering = _currentNodePointer == _pathGenerator.NodePath.Length - 1 || _currentNodePointer == 0 ||
-                          _currentNodePointer == 1;
             if (_currentPositionPointer == Path.Count)
             {
                 _currentPositionPointer = 0;

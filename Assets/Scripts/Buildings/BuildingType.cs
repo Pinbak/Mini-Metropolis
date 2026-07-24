@@ -5,6 +5,8 @@
         Residential,
         Commercial,
         Industrial,
-        School
+        School,
+        PoliceStation,
+        FireStation
     }
 }

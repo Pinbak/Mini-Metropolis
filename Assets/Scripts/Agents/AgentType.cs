@@ -5,5 +5,7 @@ namespace Agents
         Commuter,
         Shopper,
         Student,
+        Police,
+        Fire
     }
 }

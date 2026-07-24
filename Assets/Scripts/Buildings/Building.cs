@@ -61,7 +61,10 @@ namespace Buildings
         public void RemoveBuilding()
         {
             foreach (var parkingSpace in ParkingSpaces)
+            {
                 parkingSpace.ParkedAgent?.TeleportToPrimary();
+                parkingSpace.IsBeingTakenAgent?.TeleportToPrimary();
+            }
             foreach (var agent in _agents)
                 agent.PathMover.TeleportToPrimary();
             ToRemove = true;
@@ -159,9 +162,9 @@ namespace Buildings
         private void UpgradeBuilding(Need need)
         {
             if (UpgradesTo is null || _isChanging) return;
+            if (Supplies.Any(supply => !supply.IsAboveThreshold())) return;
+            if (Demands.Any(demand => !demand.IsAboveThreshold())) return;
             _isChanging = true;
-            if (Supplies.Any(supply => !supply.IsAboveThreshold()))return;
-            if (Demands.Any(demand => !demand.IsAboveThreshold()))return;
             BuildingManager.ChangeBuilding(this, UpgradesTo);
         }
 

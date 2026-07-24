@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Meshes
 {
-    public class MeshGenerator
+    public abstract class MeshGenerator
     {
         public List<Triangle> Triangles { get; protected set; }
         

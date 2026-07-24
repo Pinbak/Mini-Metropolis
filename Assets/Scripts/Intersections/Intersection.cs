@@ -21,27 +21,26 @@ namespace Intersections
         {
             foreach (var pathMover in _agents)
             {
-                if (pathMover is null) return;
+                if (pathMover is { AgentExists: false }) return;
                 Debug.DrawLine(
                     new Vector3(pathMover.WorldPosition.x, pathMover.WorldPosition.y + 1f,
                         pathMover.WorldPosition.z), pathMover.WorldPosition, Color.purple);
             }
             
-            if (_lastSent is not null && _lastSent.AgentExists)
+            if (_lastSent is { AgentExists: true })
                 Debug.DrawLine(new Vector3(_lastSent.WorldPosition.x, _lastSent.WorldPosition.y + 1f,
                     _lastSent.WorldPosition.z), _lastSent.WorldPosition, Color.orange);
             
-            if (_lastSent is not null && _lastSent.AgentExists)
+            if (_lastSent is { AgentExists: true })
             {
                 Debug.DrawLine(new Vector3(_position.x, _position.y + 1f, _position.z), _position, Color.blue);
                 if (_lastSent.NextPosition != _node) // if the next position is no longer the junction
                 {
-                    _lastSent.MovingInJunction = false;
                     _lastSent = null;
                 }
             }
 
-            if (_lastSent is not null) return;
+            if (_lastSent is { AgentExists: true }) return; // if the agent has been removed since, we can continue
             Debug.DrawLine(new Vector3(_position.x, _position.y + 1f, _position.z), _position, Color.red);
             if (_agents.Count == 0) return; // nobody waiting at intersection
             // if nothing is currently in the junction, send the next car that is waiting through

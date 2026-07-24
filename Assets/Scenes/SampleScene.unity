@@ -156,6 +156,8 @@ MonoBehaviour:
   <CommercialLowWealthPrefab>k__BackingField: {fileID: 8202541092475174367, guid: 3d44de1850898cb40b6ddecec887a67d, type: 3}
   <IndustrialLowWealthPrefab>k__BackingField: {fileID: 8202541092475174367, guid: 33f3d0854f0b75b42a55122c8dbc5f18, type: 3}
   <SchoolPrefab>k__BackingField: {fileID: 8202541092475174367, guid: d3637e3fe57abe4448d58886f5022350, type: 3}
+  <FireStationPrefab>k__BackingField: {fileID: 8202541092475174367, guid: 82fe4b60738aa314e8d4a81a3ab63098, type: 3}
+  <PoliceStationPrefab>k__BackingField: {fileID: 8202541092475174367, guid: 53ad9ed3d2057d14f857662c03e5480f, type: 3}
   <ColourSampler>k__BackingField: {fileID: 8497033175703650509, guid: 746487f14bc7cf74da15ddcf1db866d6, type: 3}
   <PlacementIndicator>k__BackingField: {fileID: 1022017052}
 --- !u!4 &267754612

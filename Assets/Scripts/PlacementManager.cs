@@ -15,6 +15,8 @@ public class PlacementManager : MonoBehaviour
     [field:SerializeField] public Building CommercialLowWealthPrefab { get; set; }
     [field:SerializeField] public Building IndustrialLowWealthPrefab { get; set; }
     [field:SerializeField] public Building SchoolPrefab { get; set; }
+    [field:SerializeField] public Building FireStationPrefab { get; set; }
+    [field:SerializeField] public Building PoliceStationPrefab { get; set; }
 
     [field:SerializeField] public ColourSampler ColourSampler { get; set; }
     [field:SerializeField] public PlacementIndicator PlacementIndicator { get; set; }
@@ -97,6 +99,16 @@ public class PlacementManager : MonoBehaviour
             Mode = BuildingZoneState;
         }
         else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.School)
+        {
+            BuildingZoneState.ChangePlacementBuilding(PoliceStationPrefab);
+            Mode = BuildingZoneState;
+        }
+        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.PoliceStation)
+        {
+            BuildingZoneState.ChangePlacementBuilding(FireStationPrefab);
+            Mode = BuildingZoneState;
+        }
+        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.FireStation)
         {
             Mode = _buildingRoadState;
         }
