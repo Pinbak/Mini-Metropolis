@@ -54,11 +54,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Building
   <Type>k__BackingField: 1
   <Cost>k__BackingField: 5
-  <UpgradesTo>k__BackingField: {fileID: 0}
+  <UpgradesTo>k__BackingField: {fileID: 8202541092475174367, guid: 4bb7d9e1a51db8c47a3d55c0e2bb0bbe, type: 3}
   <DowngradesTo>k__BackingField: {fileID: 0}
   <IsGrowable>k__BackingField: 1
-  <Width>k__BackingField: 2
-  <Height>k__BackingField: 2
   supplies: []
   demands:
   - {fileID: 8748085914756418575, guid: 0d9955db3433639448eb7623c18647c3, type: 3}

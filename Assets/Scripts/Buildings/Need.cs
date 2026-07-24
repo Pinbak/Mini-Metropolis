@@ -59,7 +59,7 @@ namespace Buildings
 
         public bool IsAboveThreshold()
         {
-            return Amount > _upgradeThreshold;
+            return Amount > _upgradeThreshold * 1.1f; // slightly higher to avoid instantly downgrading
         }
         
         

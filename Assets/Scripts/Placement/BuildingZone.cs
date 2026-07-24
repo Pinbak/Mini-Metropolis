@@ -36,7 +36,8 @@ namespace Placement
                 _context.transform);
             _previewZone = Object.Instantiate(_context.ZonePrefab, Vector3.zero, _rotation,
                 _context.transform);
-            _previewZone.Init(_context.BuildingManager, _previewBuildingPrefab, _previewBuilding);
+            _previewZone.Init(_context.BuildingManager, _previewBuildingPrefab, _previewBuilding.Layout,
+                _previewBuilding.ParkingSpaces);
         }
 
         public void ExitState()
@@ -110,7 +111,7 @@ namespace Placement
 
             var newZone = Object.Instantiate(_context.ZonePrefab, _context.GridManager.NodeToWorld(position), _rotation,
                 _context.BuildingManager.transform);
-            newZone.Init(_context.BuildingManager, type, _previewBuilding);
+            newZone.Init(_context.BuildingManager, type, _previewBuilding.Layout, _previewBuilding.ParkingSpaces);
             _context.BuildingManager.Balance -= _cost;
             PlaceZone(newZone);
 

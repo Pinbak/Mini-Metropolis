@@ -16,12 +16,14 @@ namespace Buildings
         [field:SerializeField] public bool IsFree { get; private set; }
         [field:SerializeField] public bool IsBeingTaken { get; private set; }
         public PathMover ParkedAgent { get; private set; }
+        public PathMover IsBeingTakenAgent { get; private set; }
         [field:SerializeField] public bool InQueue { get; private set; }
 
         public void Park(PathMover agent)
         {
             IsFree = false;
             IsBeingTaken = false;
+            IsBeingTakenAgent = null;
             ParkedAgent = agent;
         }
 
@@ -29,13 +31,17 @@ namespace Buildings
         {
             IsFree = true;
             ParkedAgent = null;
+            IsBeingTakenAgent = null;
             IsBeingTaken = false;
         }
 
         public void Queue() => InQueue = true;
         public void Dequeue() => InQueue = false;
 
-        public void Reserve() => IsBeingTaken = true;
-
+        public void Reserve(PathMover agent)
+        {
+            IsBeingTakenAgent = agent;
+            IsBeingTaken = true;
+        }
     }
 }

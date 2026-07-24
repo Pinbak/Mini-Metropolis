@@ -22,7 +22,8 @@ namespace Buildings
         
         private BuildingManager BuildingManager { get; set; }
 
-        public void Init(BuildingManager buildingManager, Building builds, Building preview)
+        public void Init(BuildingManager buildingManager, Building builds, LayoutPosition[] layout,
+            ParkingSpace[] parkingSpaces)
         {
             BuildingManager = buildingManager;
             var position = transform.position;
@@ -31,9 +32,9 @@ namespace Buildings
             WorldPosition = buildingManager.GridManager.NodeToWorld(bottomLeft);
             Builds = builds;
             
-            Layout = CopyLayout(preview.Layout);
+            Layout = CopyLayout(layout);
             GenerateOutline();
-            GenerateArrowParkingIndicators(preview.ParkingSpaces);
+            GenerateArrowParkingIndicators(parkingSpaces);
         }
 
 

@@ -35,12 +35,16 @@ public class BuildingManager : MonoBehaviour
         {AgentType.Commuter, BuildingType.Residential},
         {AgentType.Shopper, BuildingType.Residential},
         {AgentType.Student, BuildingType.Residential},
+        {AgentType.Police, BuildingType.PoliceStation},
+        {AgentType.Fire, BuildingType.FireStation},
     };
     private Dictionary<AgentType, BuildingType> _rciSDemands = new()
     {
         {AgentType.Commuter, BuildingType.Industrial},
         {AgentType.Shopper, BuildingType.Commercial},
         {AgentType.Student, BuildingType.School},
+        {AgentType.Police, BuildingType.Commercial},
+        {AgentType.Fire, BuildingType.Industrial},
     };
 
     
