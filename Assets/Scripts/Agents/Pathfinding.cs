@@ -12,13 +12,6 @@ namespace Agents
         public Node[] Path { get; private set; } = { };
         public bool ValidPathExists { get; private set; }
         
-        private Grid _grid; // todo maybe able to delete
-        
-        public Pathfinding(Grid graph)
-        {
-            _grid = graph;
-        }
-
         private float Heuristic(Node current, Node goal)
         {
             // Manhattan distance
@@ -50,7 +43,7 @@ namespace Agents
             // A* is defined as f(n) = g(n) + h(n)
             // g(n) is the total cost of transitions, which in our case is 1 per transition
             // h(n) is the heuristic which is the measured by the remaining Manhattan distance to the goal position
-
+            
             var open = new Dictionary<Node, float> { [start] = 0f }; // items waiting to be expanded with their corresponding f(n)
             var closed = new List<Node>(); // items that have already been explored
             var cameFrom = new Dictionary<Node, Node>();
