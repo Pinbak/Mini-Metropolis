@@ -21,6 +21,8 @@ public class InputManager : MonoBehaviour
     [SerializeField] private LayerMask ground;
     private Vector2 _cameraMovementVector;
     private bool _isMouseBeingHeld;
+    private EventSystem _eventSystem;
+    private bool _pointerOverUI;
 
     private void OnEnable()
     {
@@ -31,6 +33,7 @@ public class InputManager : MonoBehaviour
         keyboardR.action.performed += _ => KeyboardPress?.Invoke(KeyboardKeys.R); 
         leftMouseButton.action.Enable();
         keyboardB.action.Enable();
+        _eventSystem = EventSystem.current;
     }
 
     private void OnDisable()
@@ -45,6 +48,7 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
+        _pointerOverUI = _eventSystem.IsPointerOverGameObject();
         if (_isMouseBeingHeld)
             IsPointerHold();
         
@@ -60,7 +64,7 @@ public class InputManager : MonoBehaviour
     
     private void IsPointerHold()
     {
-        // if (EventSystem.current.IsPointerOverGameObject()) return;
+        if (_pointerOverUI) return;
         var position = RaycastGround();
         if (position.HasValue)
             OnMouseHold?.Invoke(position.Value);
@@ -68,14 +72,14 @@ public class InputManager : MonoBehaviour
 
     private void IsPointerUp(InputAction.CallbackContext _)
     {
-        // if (EventSystem.current.IsPointerOverGameObject()) return;
+        if (_pointerOverUI) return;
         _isMouseBeingHeld = false;
         OnMouseUp?.Invoke();
     }
 
     private void IsPointerDown(InputAction.CallbackContext _)
     {
-        // if (EventSystem.current.IsPointerOverGameObject()) return;
+        if (_pointerOverUI) return;
         _isMouseBeingHeld = true;
         var position = RaycastGround();
         if (position.HasValue)
