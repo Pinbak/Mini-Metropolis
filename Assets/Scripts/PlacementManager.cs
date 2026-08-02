@@ -35,15 +35,17 @@ public class PlacementManager : MonoBehaviour
 
     private IPlacementState _mode;
     private BuildingRoad _buildingRoadState;
-    public Bulldozing BulldozingState { get; set; }
+    public Bulldozing BulldozingState { get; private set; }
     public BuildingZone BuildingZoneState { get; private set; }
+    private NoBuilding _noBuilding;
 
     private void Start()
     {
         _buildingRoadState = new BuildingRoad(this);
         BulldozingState = new Bulldozing(this);
         BuildingZoneState = new BuildingZone(this);
-        Mode = _buildingRoadState;
+        _noBuilding = new NoBuilding();
+        Mode = _noBuilding;
     }
     
     public void MouseMove(Vector3 position)
@@ -53,9 +55,7 @@ public class PlacementManager : MonoBehaviour
     
     public void HandleKeyboardPress(KeyboardKeys key)
     {
-        if (key is KeyboardKeys.B) ChangeMode();
-        else
-            Mode.KeyboardPress(key);
+        Mode.KeyboardPress(key);
     }
 
     public void HandleMouseHeldDown(Vector3 position)
@@ -73,46 +73,27 @@ public class PlacementManager : MonoBehaviour
         Mode.MouseRelease();
     }
 
-    private void ChangeMode()
+    public void ChangeModeToBulldozing() => ChangeMode(BulldozingState);
+    public void ChangeModeToBuildingRoad() => ChangeMode(_buildingRoadState);
+    public void ChangeModeToResidentialZone() => ChangeModeToBuildingZone(ResidentialLowWealthPrefab);
+    public void ChangeModeToCommercialZone() => ChangeModeToBuildingZone(CommercialLowWealthPrefab);
+    public void ChangeModeToIndustrialZone() => ChangeModeToBuildingZone(IndustrialLowWealthPrefab);
+    public void ChangeModeToSchool() => ChangeModeToBuildingZone(SchoolPrefab);
+    public void ChangeModeToPoliceStation() => ChangeModeToBuildingZone(PoliceStationPrefab);
+    public void ChangeModeToFireStation() => ChangeModeToBuildingZone(FireStationPrefab);
+
+    private void ChangeModeToBuildingZone(Building building)
     {
-        // todo is temporary
-        if (Mode is BuildingRoad)
-            Mode = BulldozingState;
-        else if (Mode is Bulldozing)
-        {
-            BuildingZoneState.ChangePlacementBuilding(ResidentialLowWealthPrefab);
-            Mode = BuildingZoneState;
-        }
-        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.Residential)
-        {
-            BuildingZoneState.ChangePlacementBuilding(IndustrialLowWealthPrefab);
-            Mode = BuildingZoneState;
-        }
-        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.Industrial)
-        {
-            BuildingZoneState.ChangePlacementBuilding(CommercialLowWealthPrefab);
-            Mode = BuildingZoneState;
-        }
-        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.Commercial)
-        {
-            BuildingZoneState.ChangePlacementBuilding(SchoolPrefab);
-            Mode = BuildingZoneState;
-        }
-        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.School)
-        {
-            BuildingZoneState.ChangePlacementBuilding(PoliceStationPrefab);
-            Mode = BuildingZoneState;
-        }
-        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.PoliceStation)
-        {
-            BuildingZoneState.ChangePlacementBuilding(FireStationPrefab);
-            Mode = BuildingZoneState;
-        }
-        else if (Mode is BuildingZone && BuildingZoneState.Places.Type is BuildingType.FireStation)
-        {
-            Mode = _buildingRoadState;
-        }
-        Debug.Log($"Changed mode to {Mode.GetType()}");
+        BuildingZoneState.ChangePlacementBuilding(building);
+        ChangeMode(BuildingZoneState, building);
+    }
+
+    private void ChangeMode(IPlacementState mode, Building building = null)
+    {
+        if (Mode == mode && BuildingZoneState.Places != building)
+            Mode = _noBuilding;
+        else
+            Mode = mode;
     }
 
     public bool IsPositionFreeOrRoad(Vector3Int position)

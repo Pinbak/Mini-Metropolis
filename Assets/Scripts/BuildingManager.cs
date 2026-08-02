@@ -3,12 +3,23 @@ using System.Linq;
 using Agents;
 using Buildings;
 using Intersections;
-using Placement;
+using TMPro;
 using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
 {
-    [field:SerializeField] public int Balance { get; set; }
+    [SerializeField] private int balance;
+
+    public int Balance
+    {
+        get => balance;
+        set
+        {
+            balance = value;
+            BalanceText.text = $"£{value}";
+        }
+    }
+
     [field:SerializeField] public float ResidentialDemand { get; set; }
     [field:SerializeField] public float BaseResidentialDemand { get; set; }
     [field:SerializeField] public float CommercialDemand { get; set; }
@@ -16,6 +27,7 @@ public class BuildingManager : MonoBehaviour
     [field:SerializeField] public float IndustrialDemand { get; set; }
     [field:SerializeField] public float BaseIndustrialDemand { get; set; }
     [field:SerializeField] public LayerMask AgentLayer { get; set; } // the layer the agents are on
+    [field: SerializeField] public TextMeshProUGUI BalanceText { get; set; }
 
     [field:SerializeField] public GridManager GridManager { get; set; }
     [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
@@ -30,6 +42,7 @@ public class BuildingManager : MonoBehaviour
     public Zone[,] AllZones { get; private set; }
     private Dictionary<AgentType, Queue<Building>> _demands = new();
     private Dictionary<AgentType, Queue<Building>> _supplies = new();
+
     private Dictionary<AgentType, BuildingType> _rciSupplies = new()
     {
         {AgentType.Commuter, BuildingType.Residential},
@@ -38,6 +51,7 @@ public class BuildingManager : MonoBehaviour
         {AgentType.Police, BuildingType.PoliceStation},
         {AgentType.Fire, BuildingType.FireStation},
     };
+
     private Dictionary<AgentType, BuildingType> _rciSDemands = new()
     {
         {AgentType.Commuter, BuildingType.Industrial},
@@ -47,11 +61,12 @@ public class BuildingManager : MonoBehaviour
         {AgentType.Fire, BuildingType.Industrial},
     };
 
-    
+
     private void Start()
     {
         AllBuildings = new Building[GridManager.Width, GridManager.Height];
         AllZones = new Zone[GridManager.Width, GridManager.Height];
+        BalanceText.text = $"£{balance}";
     }
 
     private void Update()
