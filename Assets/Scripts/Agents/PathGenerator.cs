@@ -27,7 +27,7 @@ namespace Agents
         public PathGenerator(GridManager gridManager, PathMover agent)
         {
             _gridManager = gridManager;
-            _pathfinding = new Pathfinding(gridManager.Grid);
+            _pathfinding = new Pathfinding();
             _agent = agent;
         }
         
