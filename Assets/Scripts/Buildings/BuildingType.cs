@@ -7,6 +7,7 @@
         Industrial,
         School,
         PoliceStation,
-        FireStation
+        FireStation,
+        Park
     }
 }

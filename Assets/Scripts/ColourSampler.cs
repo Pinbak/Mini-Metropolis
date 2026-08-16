@@ -21,7 +21,8 @@ public class ColourSampler : MonoBehaviour
                 commercialPixelAtlasPosition.y),
             BuildingType.Industrial => colourAtlas.GetPixel(industrialPixelAtlasPosition.x,
                 industrialPixelAtlasPosition.y),
-            _ => Color.red
+            _ => colourAtlas.GetPixel(specialBuildingsPixelAtlasPosition.x,
+                specialBuildingsPixelAtlasPosition.y),
         };
         return colour;
     }

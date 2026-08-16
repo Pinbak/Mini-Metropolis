@@ -17,6 +17,7 @@ public class PlacementManager : MonoBehaviour
     [field:SerializeField] public Building SchoolPrefab { get; set; }
     [field:SerializeField] public Building FireStationPrefab { get; set; }
     [field:SerializeField] public Building PoliceStationPrefab { get; set; }
+    [field:SerializeField] public Building ParkPrefab { get; set; }
 
     [field:SerializeField] public ColourSampler ColourSampler { get; set; }
     [field:SerializeField] public PlacementIndicator PlacementIndicator { get; set; }
@@ -81,6 +82,7 @@ public class PlacementManager : MonoBehaviour
     public void ChangeModeToSchool() => ChangeModeToBuildingZone(SchoolPrefab);
     public void ChangeModeToPoliceStation() => ChangeModeToBuildingZone(PoliceStationPrefab);
     public void ChangeModeToFireStation() => ChangeModeToBuildingZone(FireStationPrefab);
+    public void ChangeModeToPark() => ChangeModeToBuildingZone(ParkPrefab);
 
     private void ChangeModeToBuildingZone(Building building)
     {

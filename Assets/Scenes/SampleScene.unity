@@ -485,6 +485,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 260689290, guid: 2f9f9905c4903bb4b9e1e000e37be66d, type: 3}
+    - target: {fileID: 7907700539517214493, guid: 65397a17db1c8ef4ab51e55a857e94da, type: 3}
+      propertyPath: m_FillAmount
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 8779470550994597883, guid: 65397a17db1c8ef4ab51e55a857e94da, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -537,6 +541,7 @@ MonoBehaviour:
   <SchoolPrefab>k__BackingField: {fileID: 8202541092475174367, guid: d3637e3fe57abe4448d58886f5022350, type: 3}
   <FireStationPrefab>k__BackingField: {fileID: 8202541092475174367, guid: 82fe4b60738aa314e8d4a81a3ab63098, type: 3}
   <PoliceStationPrefab>k__BackingField: {fileID: 8202541092475174367, guid: 53ad9ed3d2057d14f857662c03e5480f, type: 3}
+  <ParkPrefab>k__BackingField: {fileID: 8202541092475174367, guid: f0b6ba4363fe74b4aab7ef9517e45afb, type: 3}
   <ColourSampler>k__BackingField: {fileID: 8497033175703650509, guid: 746487f14bc7cf74da15ddcf1db866d6, type: 3}
   <PlacementIndicator>k__BackingField: {fileID: 1022017052}
 --- !u!4 &267754612
@@ -581,7 +586,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1245135009086528355, guid: a165c7a6184c20446a526d6082766720, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ChangeModeToResidentialZone
+      value: ChangeModeToPark
       objectReference: {fileID: 0}
     - target: {fileID: 1245135009086528355, guid: a165c7a6184c20446a526d6082766720, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -3456,6 +3461,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 1997315212, guid: 2f9f9905c4903bb4b9e1e000e37be66d, type: 3}
+    - target: {fileID: 7907700539517214493, guid: 65397a17db1c8ef4ab51e55a857e94da, type: 3}
+      propertyPath: m_FillAmount
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 8779470550994597883, guid: 65397a17db1c8ef4ab51e55a857e94da, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -4411,6 +4420,10 @@ PrefabInstance:
     - target: {fileID: 7809114433689439547, guid: 65397a17db1c8ef4ab51e55a857e94da, type: 3}
       propertyPath: m_Name
       value: Demand
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907700539517214493, guid: 65397a17db1c8ef4ab51e55a857e94da, type: 3}
+      propertyPath: m_FillAmount
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8779470550994597883, guid: 65397a17db1c8ef4ab51e55a857e94da, type: 3}
       propertyPath: m_AnchorMax.x
