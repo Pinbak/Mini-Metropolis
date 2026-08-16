@@ -15,8 +15,11 @@ public class InputManager : MonoBehaviour
     public Action<KeyboardKeys> KeyboardPress { get; set; }
 
     [SerializeField] private InputActionReference leftMouseButton;
-    [SerializeField] private InputActionReference keyboardB;
     [SerializeField] private InputActionReference keyboardR;
+    [SerializeField] private InputActionReference keyboardW;
+    [SerializeField] private InputActionReference keyboardA;
+    [SerializeField] private InputActionReference keyboardS;
+    [SerializeField] private InputActionReference keyboardD;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private LayerMask ground;
     private Vector2 _cameraMovementVector;
@@ -29,10 +32,8 @@ public class InputManager : MonoBehaviour
         leftMouseButton.action.started += IsPointerDown;
         // leftMouseButton.action.performed += IsPointerHold;
         leftMouseButton.action.canceled += IsPointerUp;
-        keyboardB.action.performed += _ => KeyboardPress?.Invoke(KeyboardKeys.B); 
-        keyboardR.action.performed += _ => KeyboardPress?.Invoke(KeyboardKeys.R); 
+        keyboardR.action.performed += _ => KeyboardPress?.Invoke(KeyboardKeys.R);
         leftMouseButton.action.Enable();
-        keyboardB.action.Enable();
         _eventSystem = EventSystem.current;
     }
 
@@ -42,12 +43,15 @@ public class InputManager : MonoBehaviour
         // leftMouseButton.action.performed -= IsPointerHold;
         leftMouseButton.action.canceled -= IsPointerUp;
         leftMouseButton.action.Disable();
-        keyboardB.action.Disable();
-        keyboardR.action.Disable();
     }
 
     private void Update()
     {
+        if (keyboardW.action.IsPressed()) KeyboardPress?.Invoke(KeyboardKeys.W);
+        if (keyboardA.action.IsPressed()) KeyboardPress?.Invoke(KeyboardKeys.A);
+        if (keyboardS.action.IsPressed()) KeyboardPress?.Invoke(KeyboardKeys.S);
+        if (keyboardD.action.IsPressed()) KeyboardPress?.Invoke(KeyboardKeys.D);
+        
         _pointerOverUI = _eventSystem.IsPointerOverGameObject();
         if (_isMouseBeingHeld)
             IsPointerHold();

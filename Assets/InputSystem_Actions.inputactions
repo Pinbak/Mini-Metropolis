@@ -1022,6 +1022,42 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "KeyboardW",
+                    "type": "Button",
+                    "id": "e2f76ef0-8bc9-4eb3-8560-a699eaa05dd1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "KeyboardA",
+                    "type": "Button",
+                    "id": "79f8c97c-a58a-494b-8dca-d67902ae7ab6",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "KeyboardS",
+                    "type": "Button",
+                    "id": "f20ab3f6-e53e-433d-a40e-d7ad08dd25e6",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "KeyboardD",
+                    "type": "Button",
+                    "id": "c6a24d97-4256-4182-a263-fc769823374e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1055,6 +1091,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "KeyboardR",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e1e5ea35-ad56-4774-b731-0b0fccaaafd9",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "KeyboardW",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d45fbc5c-0631-4c0b-98ee-2e0e82e441b7",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "KeyboardA",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f1279f2b-db0f-4e0a-9f31-fac51ea79082",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "KeyboardS",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b0140189-15ce-400c-b509-73be949f1771",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "KeyboardD",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

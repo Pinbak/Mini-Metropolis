@@ -1,5 +1,9 @@
 ﻿public enum KeyboardKeys
 {
     B,
-    R
+    R,
+    W,
+    A,
+    S,
+    D
 }
