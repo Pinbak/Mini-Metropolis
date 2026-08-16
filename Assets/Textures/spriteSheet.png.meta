@@ -211,9 +211,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 415
-        y: 931
+        y: 932
         width: 91
-        height: 91
+        height: 90
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 8, y: 8, z: 8, w: 8}
@@ -492,6 +492,72 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: residentialDemand
+      rect:
+        serializedVersion: 2
+        x: 881
+        y: 986
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 1, y: 1, z: 1, w: 1}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd58cbef32f985543903517c1c3a74a5
+      internalID: 1647963473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: industrialDemand
+      rect:
+        serializedVersion: 2
+        x: 898
+        y: 986
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 1, y: 1, z: 1, w: 1}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3570d5481244ce4f968e7c755910d2c
+      internalID: 1997315212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: commercialDemand
+      rect:
+        serializedVersion: 2
+        x: 915
+        y: 986
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 1, y: 1, z: 1, w: 1}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98cc2cf9a4f2d7d4ba48f27d2b8940ed
+      internalID: 260689290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -516,13 +582,16 @@ TextureImporter:
       bulldozeButton: 839604579
       button: -1541178745
       commercialButton: -1990113151
+      commercialDemand: 260689290
       fireButton: 1275598855
       greenBackground: -885019223
       industrialButton: 679470510
+      industrialDemand: 1997315212
       parkButton: 732867374
       policeButton: 235797294
       redBackground: 384580803
       residentialButton: -659110902
+      residentialDemand: 1647963473
       roadButton: 64519514
       schoolButton: -2109545641
       squarcle: 1484556235

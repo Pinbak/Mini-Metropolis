@@ -29,6 +29,7 @@ namespace Placement
         
         public void MouseDown(Vector3 position)
         {
+            if (!_mouseDown) return;
             CheckPlacingRoad(position);
         }
 

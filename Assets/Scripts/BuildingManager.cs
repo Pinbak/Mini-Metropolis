@@ -5,6 +5,7 @@ using Buildings;
 using Intersections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BuildingManager : MonoBehaviour
 {
@@ -33,6 +34,10 @@ public class BuildingManager : MonoBehaviour
     [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
     [field:SerializeField] public AnimationCurve CarAcceleration { get; set; }
     [SerializeField] private PlacementManager placementManager;
+
+    [SerializeField] private Slider residentialVisual;
+    [SerializeField] private Slider commercialVisual;
+    [SerializeField] private Slider industrialVisual;
 
     public List<Zone> ResidentialZones { get; } = new();
     public List<Zone> CommercialZones { get; } = new();
@@ -185,6 +190,10 @@ public class BuildingManager : MonoBehaviour
                     break;
             }
         }
+
+        residentialVisual.value = Mathf.Clamp(ResidentialDemand, 0, 5);
+        commercialVisual.value = Mathf.Clamp(CommercialDemand, 0, 5);
+        industrialVisual.value = Mathf.Clamp(IndustrialDemand, 0, 5);
     }
 
     public void AddToSupplyQueue(Building building, Need need)
