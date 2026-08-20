@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+///     A 2-dimensional array that contains nodes. Nodes contain information about function, such as roads, buildings etc.
+/// </summary>
 public class Grid
 {
+    // the actual grid
     private readonly Node[,] _grid;
     private readonly int _width;
     private readonly int _height;
@@ -19,6 +23,7 @@ public class Grid
             _grid[x, y] = new Node(x, y);
     }
 
+    // this allows the use of [x, y] directly on this object, as though itself was like an array
     public Node this[int x, int y]
     {
         get => _grid[x, y];
@@ -35,11 +40,15 @@ public class Grid
         var overlap = adjacent1.Intersect(adjacent2);
         return overlap.ToList();
     }
-
+    
+    /// <summary>
+    ///     Returns a list of nodes that are diagonally connected to the position <see cref="startingX"/>, <see cref="startingY"/>.
+    /// </summary>
     public List<(int x, int y)> GetDiagonalCells(int startingX, int startingY)
     {
         var cells = new List<(int x, int y)>();
         var node = _grid[startingX, startingY];
+        // the positions to check against
         var positions = new List<(int x, int y)> { (1, 1), (-1, -1), (1, -1), (-1, 1) };
         foreach (var (x, y) in positions)
         {
@@ -57,10 +66,15 @@ public class Grid
         return cells;
     }
 
+    /// <summary>
+    ///     Returns a list of all the cells that are adjacent. So, potentially 8 cells. If they are cut off, due to
+    ///     being at the edge of the map, fewer cells are returned.
+    /// </summary>
     public List<(int x, int y)> GetAdjacentCells(int startingX, int startingY, bool ignoreStructures = false)
     {
         var cells = new List<(int x, int y)>();
         var node = _grid[startingX, startingY];
+        // the 8 positions to check
         var positions = new List<(int x, int y)>
             { (1, 0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1) };
         

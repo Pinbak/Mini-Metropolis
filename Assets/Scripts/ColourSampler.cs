@@ -1,6 +1,9 @@
 ﻿using Buildings;
 using UnityEngine;
 
+/// <summary>
+///     A helper class for getting the colours from positional data from the atlas.
+/// </summary>
 public class ColourSampler : MonoBehaviour
 {
     [SerializeField] private Texture2D colourAtlas;
@@ -11,6 +14,9 @@ public class ColourSampler : MonoBehaviour
     [SerializeField] private Vector2Int invalidPixelAtlasPosition;
     [SerializeField] private Vector2Int roadPixelAtlasPosition;
 
+    /// <summary>
+    ///     Returns the colour from a given <see cref="BuildingType"/>. Uses predefined colour positions and the games atlas.
+    /// </summary>
     public Color GetColourByBuildingType(BuildingType type)
     {
         var colour = type switch
@@ -27,11 +33,17 @@ public class ColourSampler : MonoBehaviour
         return colour;
     }
 
+    /// <summary>
+    ///     Returns the colour that is considered invalid. In this case, black.
+    /// </summary>
     public Color GetInvalidColour()
     {
         return colourAtlas.GetPixel(invalidPixelAtlasPosition.x, invalidPixelAtlasPosition.y);
     }
-    
+
+    /// <summary>
+    ///     Returns the colour that is considered the road colour. In this case white.
+    /// </summary>
     public Color GetRoadColour()
     {
         return colourAtlas.GetPixel(roadPixelAtlasPosition.x, roadPixelAtlasPosition.y);

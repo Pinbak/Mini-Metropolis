@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+///     A helper class for evaluating a quadratic Bézier curve.
+/// </summary>
 public static class BezierCurve
 {
     public static Vector3 EvaluateQuadratic(Vector3 a, Vector3 b, Vector3 c, float t)

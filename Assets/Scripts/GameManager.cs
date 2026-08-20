@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+///     A class which links the input manager to the placement and building manager.
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private InputManager inputManager;
@@ -8,6 +11,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // subscribes the input manager to all the inputs needed for building
         inputManager.OnMouseDown += HandleMouseClick;
         inputManager.OnMouseUp += HandleMouseRelease;
         inputManager.OnMouseHold += HandleMouseHeldDown;

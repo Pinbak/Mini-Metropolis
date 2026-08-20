@@ -4,10 +4,11 @@ using Placement;
 using UnityEngine;
 
 /// <summary>
-///     The class for placing buildings and road <see cref="Mode"/> is the current mode.
+///     The class for placing buildings and road. <see cref="Mode"/> is the current mode.
 /// </summary>
 public class PlacementManager : MonoBehaviour
 {
+    // All the objects needed, a lot are needed for the mode
     [field:SerializeField] public GridManager GridManager { get; set; }
     [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
     [field:SerializeField] public BuildingManager BuildingManager { get; set; }
@@ -24,7 +25,7 @@ public class PlacementManager : MonoBehaviour
     [field:SerializeField] public ColourSampler ColourSampler { get; set; }
     [field:SerializeField] public PlacementIndicator PlacementIndicator { get; set; }
     
-    // states
+    // States
     private IPlacementState Mode
     {
         get => _mode;
@@ -44,13 +45,16 @@ public class PlacementManager : MonoBehaviour
 
     private void Start()
     {
+        // create all the states, so that they exist when changed to
         _buildingRoadState = new BuildingRoad(this);
         BulldozingState = new Bulldozing(this);
         BuildingZoneState = new BuildingZone(this);
         _noBuilding = new NoBuilding();
+        // select current state as nothing in particular
         Mode = _noBuilding;
     }
     
+    // Invoke the mode methods for the current mode when certain keys are pressed
     public void MouseMove(Vector3 position)
     {
         Mode.MouseMove(position);
@@ -76,6 +80,7 @@ public class PlacementManager : MonoBehaviour
         Mode.MouseRelease();
     }
 
+    // The methods that are called when clicking the UI buttons
     public void ChangeModeToBulldozing() => ChangeMode(BulldozingState);
     public void ChangeModeToBuildingRoad() => ChangeMode(_buildingRoadState);
     public void ChangeModeToResidentialZone() => ChangeModeToBuildingZone(ResidentialLowWealthPrefab);
@@ -94,12 +99,18 @@ public class PlacementManager : MonoBehaviour
 
     private void ChangeMode(IPlacementState mode, Building building = null)
     {
-        if (Mode == mode && BuildingZoneState.Places != building)
+        if (Mode == mode && BuildingZoneState.Places != building) // todo doesn't work
             Mode = _noBuilding;
         else
             Mode = mode;
     }
-
+    
+    /// <summary>
+    ///     Given a position, check if it is free or a road. It's necessary to check if a road is there, as roads can
+    ///     connect to existing roads.
+    /// </summary>
+    /// <param name="position">The position to check</param>
+    /// <returns>Whether the position is either free or a road.</returns>
     public bool IsPositionFreeOrRoad(Vector3Int position)
     {
         var gridPosition = GridManager.WorldToGrid(position);
@@ -107,12 +118,19 @@ public class PlacementManager : MonoBehaviour
                GridManager.Grid[gridPosition.x, gridPosition.y].Type == NodeType.Road;
     }
 
+    /// <summary>
+    ///     Checks if the given position is within the <see cref="Grid"/>.
+    /// </summary>
     public bool IsPositionInBound(Vector3 position)
     {
         var gridPosition = GridManager.WorldToGrid(position);
+        // bound check
         return gridPosition.x >= 0 && gridPosition.x < GridManager.Width && gridPosition.y >= 0 && gridPosition.y < GridManager.Height;
     }
     
+    /// <summary>
+    ///     Checks if the given grid position is within the <see cref="Grid"/>.
+    /// </summary>
     public bool IsPositionInBound(Vector2Int gridPosition)
     {
         return gridPosition.x >= 0 && gridPosition.x < GridManager.Width && gridPosition.y >= 0 && gridPosition.y < GridManager.Height;
