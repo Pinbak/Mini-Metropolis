@@ -19,9 +19,9 @@ namespace Agents
         private readonly GridManager _gridManager;
         private readonly float _offset;
         private const float PathInset = .2f;
-        private const float PathWidth = .4f; // todo get from elsewhere
-        private const float PathStraightLength = .5f; // todo get from elsewhere
-        private const float PathDiagonalLength = .7071f; // todo get from elsewhere
+        private const float PathWidth = .4f;
+        private const float PathStraightLength = .5f;
+        private const float PathDiagonalLength = .7071f;
         private const float TurnSmoothness = .1f; // lower number is smoother
 
         public PathGenerator(GridManager gridManager, PathMover agent)
