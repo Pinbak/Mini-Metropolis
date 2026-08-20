@@ -21,7 +21,6 @@ namespace Agents
         public Node NextPosition { get; private set; } // the node that the agent is moving to
         [field:SerializeField] public bool MovingInJunction { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
-        public bool AgentExists => _agent != null;
         public Action<Node> Arrived { get; set; } // invoked when the agent has arrived at its intended destination
         public ParkingSpace Destination { get; private set; }
         public ParkingSpace ParkedAt
@@ -35,13 +34,11 @@ namespace Agents
             }
         } // the space this agent is currently in
         
-        private Vector3 _targetNodePosition;
         private int _currentNodePointer;
         private int _currentPositionPointer;
         private bool _attemptRecalculatePath; // if path breaks try once to recalculate
         private readonly LayerMask _agentLayer;
         private readonly float _detectionDistance = .8f; // the distance to check for other agents
-        private bool _approachingJunction;
 
         // Converts a path of nodes into a viable path of vector3 points to follow
         private readonly PathGenerator _pathGenerator; // the vector3 generator to create points along the path of nodes to be followed
@@ -56,6 +53,10 @@ namespace Agents
         private const float DistanceToAgentInFront = .3f; // how close the agent gets to another agent before fully stopping
         private Building _buildingInformation; // the building that this car belongs to
         private ParkingSpace _parkedAt;
+        private const float TeleportHomeRetryTime = 20f;
+        [SerializeField] private float teleportHomeTimer; // if the agent gets stuck in a traffic jam too long, it will teleport to its primary location
+        private Vector3 _lastPosition;
+        private Junction _lastJunctionVisited;
 
         /// <summary>
         ///     Create a new path mover
@@ -109,8 +110,10 @@ namespace Agents
 
         private void GeneratePath(Node modifiedStart, Node modifiedEnd, Node start, Node end)
         {
+            // reset values so the agent will move afresh
             _currentNodePointer = 0;
             _currentPositionPointer = 0;
+            teleportHomeTimer = 0f;
             _pathGenerator.GeneratePath(modifiedStart, modifiedEnd, start, end);
             if (_pathGenerator.PathGenerated)
             {
@@ -118,6 +121,9 @@ namespace Agents
                 Destination.Reserve(this);
                 _currentTargetPosition = _pathGenerator.Path[0];
                 HasValidPath = true;
+                // flip the agent to begin moving forwards
+                _agent.transform.RotateAround(_agent.transform.position, _agent.transform.up, 180f);
+                Go();
             }
         }
 
@@ -126,9 +132,7 @@ namespace Agents
         /// </summary>
         public void Go()
         {
-            if (_agent is null) return;
             _speedMultiplier = 1f;
-            _approachingJunction = false;
         }
 
         /// <summary>
@@ -137,7 +141,6 @@ namespace Agents
         public void Stop()
         {
             _speedMultiplier = 0f;
-            _approachingJunction = true;
         }
 
         /// <summary>
@@ -149,6 +152,21 @@ namespace Agents
         {
             if (!HasValidPath) return;
             if (ParkedAt is not null) return; // this agent is currently parked
+            
+            // if the agent is stuck in the same place for too long, it will teleport to its primary location, but
+            if (teleportHomeTimer > TeleportHomeRetryTime)
+            {
+                TeleportToPrimaryAndRemoveFromJunction();
+            }
+            if (Vector3.Distance(_lastPosition, _agent.transform.position) < .01f)
+            {
+                teleportHomeTimer += Time.deltaTime;
+            }
+            else
+            {
+                // if the agent has moved, reset the timer
+                teleportHomeTimer = 0f;
+            }
 
             var currentPosition = WorldPosition;
             var distanceToNextStep = Vector3.Distance(currentPosition, _currentTargetPosition);
@@ -176,25 +194,18 @@ namespace Agents
                             Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
                                 hit.point, Color.blue);
                             // adjust speed based on the raycasts distance
-                            adjustedSpeed = movementSpeed * Mathf.Max(.1f, hit.distance - DistanceToAgentInFront);
+                            adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
                             // make acceleration/deceleration inversely proportional to distance
                             acceleration = accelerationProfile.Evaluate(hit.distance);
                         }
                     }
                 }
                 
-                // slow down when approaching a junction as well
-                if (_approachingJunction)
-                {
-                    var distanceToJunction = Vector3.Distance(currentPosition, _targetNodePosition);
-                    acceleration = accelerationProfile.Evaluate(Mathf.Min(1f, distanceToJunction));
-                }
-                
-                
                 // slowly change the speed to match the maximum target speed * the distance to the car in front
                 _currentSpeed = Mathf.MoveTowards(_currentSpeed, adjustedSpeed, acceleration * Time.deltaTime);
                 
                 // if the agent is not yet at the target, move it and rotate it
+                _lastPosition = _agent.transform.position;
                 _agent.transform.position =
                     Vector3.MoveTowards(currentPosition, _currentTargetPosition, _currentSpeed * Time.deltaTime);
                 var direction = _currentTargetPosition - currentPosition;
@@ -213,10 +224,11 @@ namespace Agents
         /// <summary>
         ///     Teleports the agent to its primary position, resetting any relevant properties.
         /// </summary>
-        public void TeleportToPrimary()
+        private void TeleportToPrimary()
         {
             if (_agent.AgentState == _agent.AtPrimary) return; // if already at primary
             if (!_agent.PrimaryLocation.GetFreeParkingSpace(out var parkingSpace)) return;
+            teleportHomeTimer = 0f;
             _currentNodePointer = 0;
             HasValidPath = false;
             ParkedAt = parkingSpace;
@@ -226,6 +238,18 @@ namespace Agents
             CurrentPosition = _gridManager.WorldToNode(parkingSpace.ParentPosition);
             _agent.Returning();
             _agent.ChangeState(_agent.AtPrimary);
+        }
+
+        public void TeleportToPrimaryAndRemoveFromJunction()
+        {
+            TeleportToPrimary();
+            _lastJunctionVisited?.RemoveAgentFromQueue(this);
+        }
+        
+        public void PrepareForDeletion()
+        {
+            // this frees parking spaces etc. and removes the agent from the junction it may be waiting at, removing their place from the queue
+            TeleportToPrimaryAndRemoveFromJunction();
         }
         
         private void ArrivedAtLocation()
@@ -260,15 +284,14 @@ namespace Agents
                 
                 // otherwise, the next steps can be gathered from the next node
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
-                _targetNodePosition = _gridManager.NodeToWorld(NextPosition);
                 // if this new node puts the agent in a junction, it will need to register there, handing over control
                 // to the selected junction
-                if (_junctionManager.IsJunction(NextPosition))
-                    _junctionManager.AddToJunctionQueue(this, NextPosition);
+                if (_junctionManager.IsJunction(NextPosition)) 
+                    _lastJunctionVisited = _junctionManager.AddToJunctionQueue(this, NextPosition);
                 // the road has been removed since setting out
                 if (NextPosition.Type is not NodeType.Road && NextPosition.Type is not NodeType.Parking)
                 {
-                    TeleportToPrimary();
+                    TeleportToPrimaryAndRemoveFromJunction();
                     return Vector3.zero;
                 }
                 // generate steps for the new node to follow
@@ -276,6 +299,5 @@ namespace Agents
             }
             return _pathGenerator.Path[_currentPositionPointer];
         }
-        
     }
 }

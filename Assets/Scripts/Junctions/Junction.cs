@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Agents;
 using UnityEngine;
 
@@ -10,48 +11,45 @@ namespace Junctions
     public class Junction
     {
         private readonly Vector3 _position;
-        private readonly Node _node;
+        private readonly Node _thisNode;
         private PathMover _lastSent;
-        private readonly Queue<PathMover> _agents = new();
+        private readonly List<PathMover> _agents = new();
 
-        public Junction(Vector3 position, Node node)
+        public Junction(Vector3 position, Node thisNode)
         {
             _position = position;
-            _node = node;
+            _thisNode = thisNode;
         }
         
         /// <summary>
-        ///     To be called every tick. Caclulates what car should go next and when.
+        ///     To be called every tick. Calculates what car should go next and when.
         /// </summary>
         public void Process()
         {
-            foreach (var pathMover in _agents)
+            if(_lastSent is not null)
             {
-                if (pathMover is { AgentExists: false }) return;
-                Debug.DrawLine(
-                    new Vector3(pathMover.WorldPosition.x, pathMover.WorldPosition.y + 1f,
-                        pathMover.WorldPosition.z), pathMover.WorldPosition, Color.purple);
-            }
-            
-            if (_lastSent is { AgentExists: true })
-                Debug.DrawLine(new Vector3(_lastSent.WorldPosition.x, _lastSent.WorldPosition.y + 1f,
-                    _lastSent.WorldPosition.z), _lastSent.WorldPosition, Color.orange);
-            
-            if (_lastSent is { AgentExists: true })
-            {
-                Debug.DrawLine(new Vector3(_position.x, _position.y + 1f, _position.z), _position, Color.blue);
-                if (_lastSent.NextPosition != _node) // if the next position is no longer the junction
+                if (_lastSent.NextPosition != _thisNode) // if the next position is no longer the junction
                 {
                     _lastSent = null;
                 }
             }
 
-            if (_lastSent is { AgentExists: true }) return; // if the agent has been removed since, we can continue
-            Debug.DrawLine(new Vector3(_position.x, _position.y + 1f, _position.z), _position, Color.red);
-            if (_agents.Count == 0) return; // nobody waiting at intersection
+            if (_agents.Count == 0) return; // nobody waiting at junction
             // if nothing is currently in the junction, send the next car that is waiting through
-            _lastSent = _agents.Dequeue();
+            if (_lastSent is not null) return;
+            _lastSent = _agents[0];
+            _agents.Remove(_lastSent);
             _lastSent?.Go();
+        }
+
+        /// <summary>
+        ///     Remove an agent prematurely from the queue
+        /// </summary>
+        public void RemoveAgentFromQueue(PathMover agent)
+        {
+            _agents.Remove(agent);
+            if (_lastSent == agent)
+                _lastSent = null;
         }
 
         /// <summary>
@@ -59,7 +57,7 @@ namespace Junctions
         /// </summary>
         public void AddToQueue(PathMover agentToAdd)
         {
-            _agents.Enqueue(agentToAdd);
+            _agents.Add(agentToAdd);
             if (agentToAdd != _lastSent)
                 agentToAdd.Stop();
         }

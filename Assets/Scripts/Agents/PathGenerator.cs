@@ -81,8 +81,6 @@ namespace Agents
                 NodePath[currentNode + 1].Y));
             Vector3 previousPosition = _gridManager.GridToWorld(new Vector2Int(NodePath[currentNode - 1].X,
                 NodePath[currentNode - 1].Y));
-            if (currentNode == 1)
-                previousPosition = GetStartNode(); // second node from start
             if (currentNode == NodePath.Length - 2)
                 nextPosition = GetEndNode(); // penultimate
 
@@ -106,7 +104,7 @@ namespace Agents
             previousPoint = directionToPreviousPosition * (previousRoadLength) + previousPoint;
             var movedPosition = position + nextPerpendicular * ((PathWidth - PathInset)  * .5f); // the centre of the node that is shifted to the correct lane
             
-            // for straight roads, we don't need to Bezier
+            // for straight roads, don't need to Bezier
             if (directionToNextPosition == directionToPreviousPosition * -1)
                 Path.Add(movedPosition);
             else

@@ -101,12 +101,12 @@ namespace Buildings
             // for all agents that are parked here or about to be, move them back to their primary location
             foreach (var parkingSpace in ParkingSpaces)
             {
-                parkingSpace.ParkedAgent?.TeleportToPrimary();
-                parkingSpace.IsBeingTakenAgent?.TeleportToPrimary();
+                parkingSpace.ParkedAgent?.TeleportToPrimaryAndRemoveFromJunction();
+                parkingSpace.IsBeingTakenAgent?.TeleportToPrimaryAndRemoveFromJunction();
             }
-            // all the agents that belong to this object are also teleported
+            // all the agents that belong to this object are prepared for deletion, such as removing them from any junction queues, parking spaces etc.
             foreach (var agent in _agents)
-                agent.PathMover.TeleportToPrimary();
+                agent.PathMover.PrepareForDeletion();
             ToRemove = true; // flagged to remove
         }
 

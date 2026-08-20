@@ -32,10 +32,11 @@ namespace Junctions
         /// <summary>
         ///     Add this agent to a junction queue
         /// </summary>
-        public void AddToJunctionQueue(PathMover agentToAdd, Node junctionToAddTo)
+        public Junction AddToJunctionQueue(PathMover agentToAdd, Node junctionToAddTo)
         {
             var junction = _junctions[junctionToAddTo.X, junctionToAddTo.Y];
             junction.AddToQueue(agentToAdd);
+            return junction;
         }
         
         /// <summary>
