@@ -16,6 +16,8 @@ namespace Buildings
         public Action<Need> BelowThreshold { get; set; }
         public Action<Need> GettingLow { get; set; }
         public Action<Need> AboveThreshold { get; set; }
+        
+        public Action<float> AmountChanged { get; set; } // used so the UI can subscribe and show the changes
 
         private float _upgradeThreshold;
         private float _downgradeThreshold;
@@ -37,6 +39,7 @@ namespace Buildings
         public void Increase(float amount)
         {
             Amount += amount;
+            AmountChanged?.Invoke(AmountAsPercentage());
         }
 
         public void Update()
@@ -50,6 +53,7 @@ namespace Buildings
             
             retryPollTimer = 0f;
             GettingLow?.Invoke(this);
+            AmountChanged?.Invoke(AmountAsPercentage());
             
             if (Amount < _downgradeThreshold)
             {
@@ -67,7 +71,7 @@ namespace Buildings
         {
             return Amount > _upgradeThreshold * 1.1f; // slightly higher to avoid instantly downgrading
         }
-        
-        
+
+        public float AmountAsPercentage() => Mathf.InverseLerp(_downgradeThreshold, _upgradeThreshold * 1.1f, Amount);
     }
 }

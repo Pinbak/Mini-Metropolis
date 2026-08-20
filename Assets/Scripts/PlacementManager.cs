@@ -2,6 +2,7 @@
 using Junctions;
 using Placement;
 using UnityEngine;
+using UserInterface;
 
 /// <summary>
 ///     The class for placing buildings and road. <see cref="Mode"/> is the current mode.
@@ -24,6 +25,7 @@ public class PlacementManager : MonoBehaviour
 
     [field:SerializeField] public ColourSampler ColourSampler { get; set; }
     [field:SerializeField] public PlacementIndicator PlacementIndicator { get; set; }
+    [field:SerializeField] public BuildingHoverUserControl BuildingInformation { get; set; }
     
     // States
     private IPlacementState Mode
@@ -49,7 +51,7 @@ public class PlacementManager : MonoBehaviour
         _buildingRoadState = new BuildingRoad(this);
         BulldozingState = new Bulldozing(this);
         BuildingZoneState = new BuildingZone(this);
-        _noBuilding = new NoBuilding();
+        _noBuilding = new NoBuilding(this);
         // select current state as nothing in particular
         Mode = _noBuilding;
     }

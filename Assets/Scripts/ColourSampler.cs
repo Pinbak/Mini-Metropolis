@@ -1,4 +1,5 @@
-﻿using Buildings;
+﻿using Agents;
+using Buildings;
 using UnityEngine;
 
 /// <summary>
@@ -27,6 +28,29 @@ public class ColourSampler : MonoBehaviour
                 commercialPixelAtlasPosition.y),
             BuildingType.Industrial => colourAtlas.GetPixel(industrialPixelAtlasPosition.x,
                 industrialPixelAtlasPosition.y),
+            _ => colourAtlas.GetPixel(specialBuildingsPixelAtlasPosition.x,
+                specialBuildingsPixelAtlasPosition.y),
+        };
+        return colour;
+    }
+
+    /// <summary>
+    ///     Gets colour from a given <see cref="Need"/>.
+    /// </summary>
+    public Color GetColourByNeed(Need need)
+    {
+        var colour = need.Type switch
+        {
+            AgentType.Commuter => colourAtlas.GetPixel(industrialPixelAtlasPosition.x,
+                industrialPixelAtlasPosition.y),
+            AgentType.Fire => colourAtlas.GetPixel(specialBuildingsPixelAtlasPosition.x,
+                specialBuildingsPixelAtlasPosition.y),
+            AgentType.Police => colourAtlas.GetPixel(invalidPixelAtlasPosition.x,
+                invalidPixelAtlasPosition.y),
+            AgentType.Shopper => colourAtlas.GetPixel(commercialPixelAtlasPosition.x,
+                commercialPixelAtlasPosition.y),
+            AgentType.Student => colourAtlas.GetPixel(residentialPixelAtlasPosition.x,
+                residentialPixelAtlasPosition.y),
             _ => colourAtlas.GetPixel(specialBuildingsPixelAtlasPosition.x,
                 specialBuildingsPixelAtlasPosition.y),
         };
