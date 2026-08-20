@@ -11,7 +11,7 @@ namespace Placement
         private readonly PlacementManager _context;
         private Vector2Int _previousPosition;
         private Building _buildingCurrentlyShown;
-        private const float UIOffset = 2f;
+        private const float UIOffset = .5f;
 
         public NoBuilding(PlacementManager context)
         {
@@ -57,8 +57,8 @@ namespace Placement
             // show information about the building
             _buildingCurrentlyShown = buildingHere;
             _context.BuildingInformation.Hide();
-            _context.BuildingInformation.Show(buildingHere, buildingHere.transform.position.x,
-                buildingHere.transform.position.z + UIOffset);
+            var buildingTop = buildingHere.Top;
+            _context.BuildingInformation.Show(buildingHere, buildingTop.x, buildingTop.z + UIOffset);
         }
 
         public void KeyboardPress(KeyboardKeys key) { }

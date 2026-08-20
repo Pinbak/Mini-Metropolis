@@ -26,7 +26,16 @@ namespace Buildings
 
         public LayoutPosition[] Layout { get; private set; }
         public Node BottomLeft { get; private set; }
-        public Vector3 WorldPosition { get; set; }
+
+        public Vector3 Top
+        {
+            get
+            {
+                // get the highest y position in the layout which is effectively the top of the bounding box
+                var max = Layout.Select(layoutPosition => layoutPosition.transform.position.z).Prepend(-Mathf.Infinity).Max();
+                return new Vector3(transform.position.x, transform.position.y, max);
+            }
+        }
 
         [field:SerializeField] public List<Need> Supplies { get; private set; } = new();
         [field:SerializeField] public List<Need> Demands { get; private set; } = new();
@@ -54,7 +63,6 @@ namespace Buildings
             
             var gridManager = buildingManager.GridManager;
             BottomLeft = bottomLeft; // the position is defined by the bottom left of the prefab, this is for consistency
-            WorldPosition = gridManager.NodeToWorld(bottomLeft);
             _agents = new Agent[supplies.Length]; // start to set up the agents
             
             SetupNeeds();

@@ -1,4 +1,5 @@
 ﻿using System;
+using Agents;
 using Buildings;
 using TMPro;
 using UnityEngine;
@@ -12,7 +13,8 @@ namespace UserInterface
     public class NeedUserControl : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI needText;
-        [SerializeField] private Image sliderBackground;
+        [SerializeField] private Image sliderImage;
+        [SerializeField] private Image sliderImageBackground;
         [SerializeField] private ColourSampler colourSampler;
         [SerializeField] private Slider needAmountSlider;
 
@@ -35,7 +37,10 @@ namespace UserInterface
 
         private void SetColour(Need need)
         {
-            sliderBackground.color = colourSampler.GetColourByNeed(need);
+            sliderImage.color = colourSampler.GetColourByNeed(need);
+            // as the colour of the police need is black, the background which is black by default has to be changed to keep the contrast
+            if (need.Type is AgentType.Police)
+                sliderImageBackground.color = colourSampler.GetRoadColour();
         }
 
         private void SetSliderValue(Need need)
