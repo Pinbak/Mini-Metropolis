@@ -2,21 +2,27 @@
 using Agents;
 using UnityEngine;
 
-namespace Intersections
+namespace Junctions
 {
-    public class Intersection
+    /// <summary>
+    ///     A junction is defined as any road cell in the <see cref="Grid"/> that has 3 or more neighbours.
+    /// </summary>
+    public class Junction
     {
         private readonly Vector3 _position;
         private readonly Node _node;
         private PathMover _lastSent;
         private readonly Queue<PathMover> _agents = new();
 
-        public Intersection(Vector3 position, Node node)
+        public Junction(Vector3 position, Node node)
         {
             _position = position;
             _node = node;
         }
-
+        
+        /// <summary>
+        ///     To be called every tick. Caclulates what car should go next and when.
+        /// </summary>
         public void Process()
         {
             foreach (var pathMover in _agents)
@@ -48,6 +54,9 @@ namespace Intersections
             _lastSent?.Go();
         }
 
+        /// <summary>
+        ///     Add the agent to this junction's queue.
+        /// </summary>
         public void AddToQueue(PathMover agentToAdd)
         {
             _agents.Enqueue(agentToAdd);
@@ -55,7 +64,11 @@ namespace Intersections
                 agentToAdd.Stop();
         }
         
-        public void RemoveIntersection()
+        /// <summary>
+        ///     When deleting this junction, this has to be called, as the agents that are currently queueing need to
+        ///     be told they can move.
+        /// </summary>
+        public void RemoveJunction()
         {
             foreach (var pathMover in _agents)
             {

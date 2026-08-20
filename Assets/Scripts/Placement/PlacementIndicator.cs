@@ -4,16 +4,22 @@ using UnityEngine;
 
 namespace Placement
 {
+    /// <summary>
+    ///     This is what is used to show the player where the currently placing road is going.
+    ///     Utilises the <see cref="PlacementMesh"/> to visualise it.
+    /// </summary>
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class PlacementIndicator : MonoBehaviour
     {
         [SerializeField] private GridManager gridManager;
         
+        // the actual mesh that will be used to show the player
         private PlacementMesh _placementMesh;
         private Mesh _mesh;
 
         private void OnEnable()
         {
+            // create and init new mesh
             _mesh = new Mesh();
             GetComponent<MeshFilter>().mesh = _mesh;
             _placementMesh = new PlacementMesh(gridManager, gridManager.MeshResolution);
@@ -24,8 +30,10 @@ namespace Placement
 
         public void DrawCircleAtPosition(Vector3 currentPosition)
         {
+            // draw a circular mesh at the current position (which is the cursor)
             UpdateStartPosition(currentPosition);
             _placementMesh.CalculateTrianglesForCircle();
+            // this is a 2-step process, where the triangles are first generated, and then turned into a mesh here
             CreateMeshFromTriangles(_placementMesh.Triangles);
         }
         
@@ -56,7 +64,7 @@ namespace Placement
             }
             
             _mesh.Clear();
-            _mesh.vertices = vertices.ToArray();
+            _mesh.vertices = vertices.ToArray(); // Unity's built in mesh properties
             _mesh.triangles = triangles.ToArray();
             _mesh.RecalculateNormals();
         }

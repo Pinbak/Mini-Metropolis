@@ -2,7 +2,7 @@
 using System.Linq;
 using Agents;
 using Buildings;
-using Intersections;
+using Junctions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,7 +37,7 @@ public class BuildingManager : MonoBehaviour
     [field: SerializeField] public TextMeshProUGUI BalanceText { get; set; } // the ui text showing the player's money
 
     [field:SerializeField] public GridManager GridManager { get; set; }
-    [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
+    [field:SerializeField] public JunctionManager JunctionManager { get; set; }
     [field:SerializeField] public AnimationCurve CarAcceleration { get; set; } // this is so it can be set in the inspector, passed down to the cars
     [SerializeField] private PlacementManager placementManager;
 

@@ -3,7 +3,7 @@
 namespace Placement
 {
     /// <summary>
-    ///     If the player is not placing anything
+    ///     If the player is not placing anything.
     /// </summary>
     public class NoBuilding : IPlacementState
     {

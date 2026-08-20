@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace Buildings
 {
+    /// <summary>
+    ///     A zone is like a <see cref="Building"/>, but exists to show the player where a growable building may grow.
+    ///     Residential, commercial, and industrial zones are growable. Over time, the zone may turn into a building.
+    ///     This is determined in the <see cref="BuildingManager"/> class and game object.
+    /// </summary>
     public class Zone : MonoBehaviour
     {
         public Building Builds { get; private set; }
@@ -32,6 +37,8 @@ namespace Buildings
             WorldPosition = buildingManager.GridManager.NodeToWorld(bottomLeft);
             Builds = builds;
             
+            // copy the layout from the building it will turn into. This is used as the layout is determined by the
+            // building in the inspector, whereas, there is only one zone prefab
             Layout = CopyLayout(layout);
             GenerateOutline();
             GenerateArrowParkingIndicators(parkingSpaces);
@@ -49,6 +56,7 @@ namespace Buildings
             // runs once
             const float offset = -0.5f;
 
+            // gets the bounding box of the zone which it uses to create an outline for the zone preview
             var minX = Layout.Min(v => v.transform.localPosition.x);
             var maxX = Layout.Max(v => v.transform.localPosition.x);
             var minZ = Layout.Min(v => v.transform.localPosition.z);
@@ -74,13 +82,16 @@ namespace Buildings
         {
             foreach (var arrowIndicator in _arrows) Destroy(arrowIndicator.gameObject); // remove existing
             
+            // get the unique positions of where the parking spaces are, defined as the node position where the parking is on
             var uniquePositions = new HashSet<(Vector3 position, Vector3 direction)>();
             foreach (var parkingSpace in parkingSpaces)
             {
                 var direction = parkingSpace.RoadConnection - parkingSpace.ParentPosition;
                 uniquePositions.Add((parkingSpace.ParentPosition, direction));
             }
-
+            
+            // create an arrow for each of these unique positions to show where road access is needed to the player. Making
+            // sure to look in the direction of the road access
             var offsetHeight = new Vector3(0f, OffsetHeight, 0f);
             foreach (var uniquePosition in uniquePositions)
             {

@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Meshes
 {
+    /// <summary>
+    ///     A part of the <see cref="Grid"/>.
+    /// </summary>
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class Chunk : MonoBehaviour
     {
@@ -17,7 +20,6 @@ namespace Meshes
         
         private GridManager _gridManager;
         private Mesh _mesh;
-        private Vector3[] _vertices; // todo not used at all
         private int[] _triangles;
 
         // because can't have constructor in MonoBehaviour
@@ -43,6 +45,9 @@ namespace Meshes
             GetComponent<MeshFilter>().mesh = _mesh;
         }
 
+        /// <summary>
+        ///     Loop through the relevant grid cells and re-generate them.
+        /// </summary>
         public void RegenerateMesh()
         {
             if (_mesh is null) return;
@@ -79,92 +84,5 @@ namespace Meshes
             _mesh.triangles = triangles.ToArray();
             _mesh.RecalculateNormals();
         }
-
-        // private void OnDrawGizmos()
-        // {
-        //     if (!_gridManager.GridExists()) return;
-        //     for (var x = 0; x < _gridManager.Width; x++)
-        //     for (var y = 0; y < _gridManager.Height; y++)
-        //     {
-        //         var node = _gridManager.Grid[x, y];
-        //         if (node.Type is NodeType.Empty) continue;
-        //         if (node.Neighbours.Count == 0) continue;
-        //         var nodeMesh = new NodeMesh(node, _gridManager, _gridManager.MeshResolution);
-        //         var triangles = nodeMesh.Triangles;
-        //         Gizmos.color = nodeMesh.Type switch
-        //         {
-        //             JunctionType.DeadEnd => Color.green,
-        //             JunctionType.Straight => Color.red,
-        //             JunctionType.AcuteCorner => Color.blue,
-        //             JunctionType.RightAngleCorner => Color.lightBlue,
-        //             JunctionType.RightAngleDiagonalCorner => Color.aquamarine,
-        //             JunctionType.ObtuseCorner => Color.cadetBlue,
-        //             JunctionType.ComplexAcuteCorner => Color.lavenderBlush,
-        //             JunctionType.ComplexCorner => Color.darkSlateBlue,
-        //             JunctionType.Complex => Color.purple,
-        //             _ => Gizmos.color
-        //         };
-        //         foreach (var triangle in triangles)
-        //         {
-        //             // Gizmos.DrawSphere(triangle, meshVertexSize);
-        //             Gizmos.DrawLine(triangle.A1, triangle.A2);
-        //             Gizmos.DrawLine(triangle.A1, triangle.A3);
-        //             Gizmos.DrawLine(triangle.A2, triangle.A3);
-        //             // Gizmos.color = Color.green;
-        //             // Gizmos.DrawSphere(triangle.A2, meshVertexSize);
-        //             // Gizmos.color = Color.blue;
-        //             // Gizmos.DrawSphere(triangle.A3, meshVertexSize);
-        //             // Gizmos.color = Color.red;
-        //         }
-        //     }
-        // }
-
-        // private void OnDrawGizmos()
-        // {
-        //     if (!gridManager.GridExists()) return;
-        //     Gizmos.color = Color.red;
-        //
-        //     for (var x = 0; x < gridManager.Width; x++)
-        //     for (var y = 0; y < gridManager.Height; y++)
-        //     {
-        //         var node = gridManager.Grid[x, y];
-        //         if (node.Type is NodeType.Empty) continue;
-        //         if (node.Neighbours.Count == 0) continue;
-        //         var position = gridManager.GridToWorld(new Vector2Int(x, y));
-        //         // Gizmos.DrawSphere(position, meshVertexSize);
-        //         var nodeMesh = new NodeMesh(node, gridManager, meshResolution);
-        //         var triangles = nodeMesh.Triangles;
-        //         foreach (var nodeNeighbour in node.Neighbours)
-        //         {
-        //             var neighbourPosition = gridManager.GridToWorld(new Vector2Int(nodeNeighbour.X, nodeNeighbour.Y));
-        //             // Gizmos.DrawLine(position, neighbourPosition);
-        //         }
-        //
-        //         Gizmos.color = nodeMesh.JunctionType switch
-        //         {
-        //             JunctionType.DeadEnd => Color.green,
-        //             JunctionType.Straight => Color.red,
-        //             JunctionType.AcuteCorner => Color.blue,
-        //             JunctionType.RightAngleCorner => Color.lightBlue,
-        //             JunctionType.ObtuseCorner => Color.cadetBlue,
-        //             JunctionType.Complex => Color.purple,
-        //             _ => Gizmos.color
-        //         };
-        //         // Gizmos.DrawSphere(position, .1f);
-        //     
-        //         foreach (var triangle in triangles)
-        //         {
-        //             // Gizmos.DrawSphere(triangle, meshVertexSize);
-        //             Gizmos.DrawLine(triangle.A1, triangle.A2);
-        //             Gizmos.DrawLine(triangle.A1, triangle.A3);
-        //             Gizmos.DrawLine(triangle.A2, triangle.A3);
-        //             // Gizmos.color = Color.green;
-        //             // Gizmos.DrawSphere(triangle.A2, meshVertexSize);
-        //             // Gizmos.color = Color.blue;
-        //             // Gizmos.DrawSphere(triangle.A3, meshVertexSize);
-        //             // Gizmos.color = Color.red;
-        //         }
-        //     }
-        // }
     }
 }

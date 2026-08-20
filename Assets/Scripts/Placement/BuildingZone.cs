@@ -3,9 +3,12 @@ using UnityEngine;
 
 namespace Placement
 {
+    /// <summary>
+    ///     Placing a building state.
+    /// </summary>
     public class BuildingZone : IPlacementState
     {
-        public Building Places { get; private set; }
+        public Building Places { get; private set; } // the building that is placed
         private readonly PlacementManager _context;
         private const float IndicatorGroundClearance = .1f;
         private Color _zoneColour;
@@ -16,6 +19,9 @@ namespace Placement
         private int _cost;
         private Quaternion _rotation = Quaternion.Euler(0f, 0f, 0f);
 
+        /// <summary>
+        ///     Change the building that this mode will place
+        /// </summary>
         public void ChangePlacementBuilding(Building building)
         {
             Places = building;
@@ -32,6 +38,7 @@ namespace Placement
         
         public void EnterState()
         {
+            // create a preview to show the player. This preview object will cease to exist, once the state has changed
             _previewBuilding = Object.Instantiate(_previewBuildingPrefab, Vector3.zero, _rotation,
                 _context.transform);
             _previewZone = Object.Instantiate(_context.ZonePrefab, Vector3.zero, _rotation,
@@ -42,12 +49,15 @@ namespace Placement
 
         public void ExitState()
         {
+            // remove the preview object, as it was only for this state
             if (_previewZone is not null) Object.Destroy(_previewZone.gameObject);
             if (_previewBuilding is not null) Object.Destroy(_previewBuilding.gameObject);
         }
 
         private void Rotate(float angle)
         {
+            // rotates the preview, while keeping track of the current rotation, as that will be needed for the
+            // instantiation of the building if placed
             if (_previewBuilding is null || _previewZone is null) return;
             _previewBuilding.transform.Rotate(Vector3.up, angle);
             _previewZone.transform.Rotate(Vector3.up, angle);
@@ -69,17 +79,19 @@ namespace Placement
 
         public void KeyboardPress(KeyboardKeys key)
         {
-            if (key is KeyboardKeys.R) Rotate(90f);
+            if (key is KeyboardKeys.R) Rotate(90f); // rotate with the "R" key
         }
 
         public void MouseMove(Vector3 position)
         {
+            // updates the preview buildings position to where the mouse is, given it is not off the grid
             if (_context.GridManager.IsWorldPositionOutsideOfGrid(position)) return;
             UpdateIndicator(position);
         }
 
         private void UpdateIndicator(Vector3 mousePosition)
         {
+            // update the colour to show if the placement is valid, given its in bounds and the player can afford it
             _previewZone.SetOutlineColour(
                 IsSpaceAvailable(_previewZone.Layout) && _cost <= _context.BuildingManager.Balance
                     ? _zoneColour
@@ -90,6 +102,7 @@ namespace Placement
                 IndicatorGroundClearance,
                 Mathf.RoundToInt(mousePosition.z)
             );
+            // update the preview's transforms
             if (_previewBuilding is not null)
                 _previewBuilding.transform.position = gridPosition - new Vector3(0f, IndicatorGroundClearance, 0f);
             if (_previewZone is not null) _previewZone.transform.position = gridPosition;
@@ -102,6 +115,7 @@ namespace Placement
                 _context.BuildingManager.transform);
             building.Init(_context.BuildingManager);
             _context.BuildingManager.Balance -= _cost;
+            // place the building, which updates the grid to reflect the changes
             PlaceBuilding(building);
         }
 
@@ -132,6 +146,7 @@ namespace Placement
 
         private bool IsSpaceAvailable(LayoutPosition[] layout)
         {
+            // use the layout positions to cross-reference with the grid to see if nothing is there
             foreach (var layoutPosition in layout)
             {
                 var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
@@ -146,8 +161,9 @@ namespace Placement
         /// <summary>
         ///     Warning is destructive!
         /// </summary>
-        public void PlaceZone(Zone zone)
+        private void PlaceZone(Zone zone)
         {
+            // changes the grid to reflect the new zone
             foreach (var layoutPosition in zone.Layout)
             {
                 var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
@@ -159,6 +175,7 @@ namespace Placement
         
         public void PlaceBuilding(Building building)
         {
+            // changes the grid to reflect the new building
             foreach (var layoutPosition in building.Layout)
             {
                 var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);

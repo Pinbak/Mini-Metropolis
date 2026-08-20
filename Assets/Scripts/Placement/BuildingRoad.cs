@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Placement
 {
+    /// <summary>
+    ///     Building road state.
+    /// </summary>
     public class BuildingRoad : IPlacementState
     {
         private readonly PlacementManager _context;
@@ -19,17 +22,20 @@ namespace Placement
 
         public void EnterState()
         {
+            // reset positions
             _previousPosition = Vector2Int.zero;
         }
 
         public void ExitState()
         {
+            // the preview is only for this state, so when changing state, remove the preview
             _context.PlacementIndicator.RemoveMesh();
         }
         
         public void MouseDown(Vector3 position)
         {
             if (!_mouseDown) return;
+            // actually place the road
             CheckPlacingRoad(position);
         }
 
@@ -49,6 +55,9 @@ namespace Placement
         {
         }
 
+        /// <summary>
+        ///     Update the mouse preview mesh
+        /// </summary>
         public void MouseMove(Vector3 position)
         {
             if (_mouseDown) return;
@@ -56,6 +65,7 @@ namespace Placement
             if (_previousPosition == nodePosition) return;
             _previousPosition = nodePosition;
             
+            // get the position of the cursor on the grid to draw the preview there
             var gridPosition = new Vector3(
                 Mathf.RoundToInt(position.x), 0f, Mathf.RoundToInt(position.z)
             );
@@ -65,16 +75,22 @@ namespace Placement
         private void CheckPlacingRoad(Vector3 position)
         {
             _context.PlacementIndicator.DrawLineFromToPosition(position);
+            // if the distance of the new road is not the minimum length of the road, then a new road cannot be placed
+            // i.e. wait until the player moves the cursor further before placing
             var distance = Vector3.Distance(_startingPosition, position);
             if (!(distance > 1)) return;
             
             var direction = position - _startingPosition;
             direction.Normalize();
+            // get where the player was trying to click and drag to
             var targetPosition = _startingPosition + new Vector3Int(
                 Mathf.RoundToInt(direction.x), 0, Mathf.RoundToInt(direction.z));
 
             var gridTargetPosition = _context.GridManager.WorldToGrid(targetPosition);
-
+            
+            // if the player is clicking and dragging, and ends up with the cursor over a new position that is also valid,
+            // don't stop the road placement, keep going! This ensures that clicking and dragging works, rather than having
+            // to place each road segment individually
             foreach (var validNeighbourNode in _validNeighbourNodes)
             {
                 if (validNeighbourNode != (gridTargetPosition.x, gridTargetPosition.y)) continue;
@@ -83,8 +99,8 @@ namespace Placement
                 return;
             }
         }
-        
-        public void StartRoadPlacement(Vector3Int position)
+
+        private void StartRoadPlacement(Vector3Int position)
         {
             if (!_context.IsPositionInBound(position)) return;
             if (!_context.IsPositionFreeOrRoad(position)) return;
@@ -116,27 +132,32 @@ namespace Placement
             _context.GridManager.BuildRoadMesh(endGridPosition.x, endGridPosition.y);
 
             if (startNode.Neighbours.Count > 2)
-                _context.IntersectionManager.CreateIntersection(startNode);
+                _context.JunctionManager.CreateJunction(startNode);
             if (endNode.Neighbours.Count > 2)
-                _context.IntersectionManager.CreateIntersection(endNode);
+                _context.JunctionManager.CreateJunction(endNode);
         
-            // RemovePlanning();
-            StartRoadPlacement(_lastSuccessfulPosition);
+            StartRoadPlacement(_lastSuccessfulPosition); // immediately start again to allow for clicking and dragging
         }
         
         private void PlaceStartingNode(Vector3Int position)
         {
+            // record starting position
             _startingPosition = position;
             _lastSuccessfulPosition = position;
             _context.PlacementIndicator.UpdateStartPosition(position);
         }
 
+        /// <summary>
+        ///     Given a position, this method find all the positions that this road will not be able to connect with
+        ///     as they would cause an "illegal" move. This is defined as crossing roads in an X pattern.
+        /// </summary>
         private void RemoveIllegalPlacements(Vector3Int position)
         {
             var gridPosition = _context.GridManager.WorldToGrid(position);
             var diagonals = _context.GridManager.Grid.GetDiagonalCells(gridPosition.x, gridPosition.y);
             var illegalPlacements = new List<(int x, int y)>();
 
+            // go through the diagonal positions from this starting position
             foreach (var (dX, dY) in diagonals)
             {
                 var sharedNeighbours = _context.GridManager.Grid.GetSharedNeighbours(gridPosition.x, gridPosition.y, dX, dY);
@@ -152,6 +173,7 @@ namespace Placement
                 }
             }
 
+            // removes these from the valid neighbour nodes, so they cannot be placed during the click and drag motion
             foreach (var illegalPlacement in illegalPlacements)
             {
                 _validNeighbourNodes.Remove(illegalPlacement);

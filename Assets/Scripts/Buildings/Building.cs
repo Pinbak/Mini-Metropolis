@@ -5,6 +5,12 @@ using UnityEngine;
 
 namespace Buildings
 {
+    /// <summary>
+    ///     A building is something that can be placed directly by the player, or is grown from a <see cref="Zone"/>.
+    ///     This class manages the <see cref="Need"/>s, and the <see cref="Agent"/>s that belong to it.
+    ///     Used in prefabs to define initial properties, such as the <see cref="Cost"/>, <see cref="ParkingSpaces"/>, and
+    ///     what the building <see cref="supplies"/> and <see cref="demands"/>.
+    /// </summary>
     public class Building : MonoBehaviour
     {
         [field:SerializeField] public BuildingType Type { get; set; }
@@ -24,16 +30,22 @@ namespace Buildings
 
         [field:SerializeField] public List<Need> Supplies { get; private set; } = new();
         [field:SerializeField] public List<Need> Demands { get; private set; } = new();
-        
-        protected BuildingManager BuildingManager { get; private set; }
+
+        private BuildingManager BuildingManager { get; set; }
         private bool _isChanging;
 
         private void Awake()
         {
+            // gathers all the child objects that are parking spaces and layout positions
             ParkingSpaces = GetComponentsInChildren<ParkingSpace>();
             Layout = GetComponentsInChildren<LayoutPosition>();
         }
 
+        /// <summary>
+        ///     Used instead of a constructor, as it's a MonoBehaviour, so can't really have one. This method sets up the building,
+        ///     such as its needs and the agents that it needs to create as well.
+        /// </summary>
+        /// <param name="buildingManager"></param>
         public void Init(BuildingManager buildingManager)
         {
             var position = transform.position;
@@ -41,12 +53,13 @@ namespace Buildings
             var bottomLeft = buildingManager.GridManager.WorldToNode(position);
             
             var gridManager = buildingManager.GridManager;
-            BottomLeft = bottomLeft;
+            BottomLeft = bottomLeft; // the position is defined by the bottom left of the prefab, this is for consistency
             WorldPosition = gridManager.NodeToWorld(bottomLeft);
-            _agents = new Agent[supplies.Length];
+            _agents = new Agent[supplies.Length]; // start to set up the agents
             
             SetupNeeds();
-
+            
+            // if the building is supplying a need, the agents get created and managed here
             for (var i = 0; i < supplies.Length; i++)
             {
                 var agentPrefab = supplies[i];
@@ -60,19 +73,39 @@ namespace Buildings
 
         public void RemoveBuilding()
         {
+            // unsubscribe from need events
+            foreach (var need in Supplies)
+            {
+                need.GettingLow -= NeedGettingLow;
+                if (!IsGrowable) continue;
+                need.AboveThreshold -= UpgradeBuilding;
+                need.BelowThreshold -= DowngradeBuilding;
+            }
+            
+            foreach (var need in Demands)
+            {
+                need.GettingLow -= NeedGettingLow;
+                if (!IsGrowable) continue;
+                need.AboveThreshold -= UpgradeBuilding;
+                need.BelowThreshold -= DowngradeBuilding;
+            }
+            
+            // for all agents that are parked here or about to be, move them back to their primary location
             foreach (var parkingSpace in ParkingSpaces)
             {
                 parkingSpace.ParkedAgent?.TeleportToPrimary();
                 parkingSpace.IsBeingTakenAgent?.TeleportToPrimary();
             }
+            // all the agents that belong to this object are also teleported
             foreach (var agent in _agents)
                 agent.PathMover.TeleportToPrimary();
-            ToRemove = true;
+            ToRemove = true; // flagged to remove
         }
 
         private void Update()
         {
             if (ToRemove) return;
+            // update the needs simulation
             foreach (var supply in Supplies)
             {
                 supply.Update();
@@ -89,10 +122,12 @@ namespace Buildings
             var uniqueDemands = demands.ToHashSet();
             var uniqueSupplies = supplies.ToHashSet();
 
+            // go through the predefined supplies and add the unique ones to the Supplies list of needs
             foreach (var uniqueSupply in uniqueSupplies)
             {
                 var need = new Need();
                 need.Init(uniqueSupply);
+                // subscribe to the actions which are invoked based on the need's thresholds
                 need.GettingLow += NeedGettingLow;
                 if (IsGrowable)
                 {
@@ -102,14 +137,16 @@ namespace Buildings
                 Supplies.Add(need);
             }
             
+            // go through the predefined supplies and add the unique ones to the Supplies list of needs
             foreach (var uniqueDemand in uniqueDemands)
             {
                 var need = new Need();
                 need.Init(uniqueDemand);
+                // subscribe to the actions which are invoked based on the need's thresholds
                 need.GettingLow += NeedGettingLow;
                 if (IsGrowable)
                 {
-                    need.AboveThreshold += UpgradeBuilding; // todo needs to unsubscribe?
+                    need.AboveThreshold += UpgradeBuilding;
                     need.BelowThreshold += DowngradeBuilding;
                 }
                 Demands.Add(need);
@@ -117,8 +154,12 @@ namespace Buildings
             
         }
 
+        /// <summary>
+        ///     Get an agent from this building to move to another building
+        /// </summary>
         public void GoTo(Building building, AgentType need)
         {
+            // find available agents
             foreach (var agent in _agents)
             {
                 if (agent.AgentType == need)
@@ -132,9 +173,12 @@ namespace Buildings
             }
         }
 
+        /// <summary>
+        ///     Increments need on this building
+        /// </summary>
         public void IncrementNeed(Agent need, float amount)
         {
-            
+            // find the need and increment it
             foreach (var supply in Supplies)
             {
                 if (supply.Type != need.AgentType) continue;
@@ -156,12 +200,14 @@ namespace Buildings
         {
             if (DowngradesTo is null || _isChanging) return;
             _isChanging = true;
+            // change to the downgrade is there is one
             BuildingManager.ChangeBuilding(this, DowngradesTo);
         }
 
         private void UpgradeBuilding(Need need)
         {
             if (UpgradesTo is null || _isChanging) return;
+            // only if all the needs are at the threshold does the building upgrade
             if (Supplies.Any(supply => !supply.IsAboveThreshold())) return;
             if (Demands.Any(demand => !demand.IsAboveThreshold())) return;
             _isChanging = true;
@@ -170,9 +216,10 @@ namespace Buildings
 
         private void NeedGettingLow(Need need)
         {
+            // when a need is low the building registers its low need in the building manager, which will then pair it
+            // off with a relevant building, calling GoTo() when found
             foreach (var agent in _agents)
             {
-                
                 if (agent.AgentType == need.Type)
                 {
                     if (agent.AgentState is AtPrimary && !agent.InQueue)
@@ -182,7 +229,8 @@ namespace Buildings
                     }
                 }
             }
-
+            
+            // same as above for the demand needs
             foreach (var agent in demands)
             {
                 if (agent.AgentType == need.Type)
@@ -196,6 +244,9 @@ namespace Buildings
             }
         }
 
+        /// <summary>
+        ///     Find a free parking space on this building, return true if found one and the parking space as out
+        /// </summary>
         public bool GetFreeParkingSpace(out ParkingSpace freeParkingSpace)
         {
             freeParkingSpace = null;
@@ -210,6 +261,9 @@ namespace Buildings
             return false;
         }
 
+        /// <summary>
+        ///     Find a parking space that is reserved
+        /// </summary>
         public void GetReservedParkingSpace(out ParkingSpace reservedSpace)
         {
             reservedSpace = null;
@@ -217,24 +271,5 @@ namespace Buildings
                 if (parkingSpace.InQueue)
                     reservedSpace = parkingSpace;
         }
-        
-        // private void OnDrawGizmos()
-        // {
-        //     if (BottomLeft is null) return;
-        //     for (var x = 0; x < Width; x++)
-        //     for (var y = 0; y < Height; y++)
-        //     {
-        //         var gridPosition = new Vector2Int(BottomLeft.X + x, BottomLeft.Y + y);
-        //         var node = BuildingManager.GridManager.Grid[gridPosition.x, gridPosition.y];
-        //         var worldPosition = BuildingManager.GridManager.NodeToWorld(node);
-        //         Gizmos.color = Color.red;
-        //
-        //         if (node.Type is NodeType.Parking)
-        //             Gizmos.color = Color.blue;
-        //         
-        //         Gizmos.DrawSphere(new Vector3(worldPosition.x, worldPosition.y + 1f, worldPosition.z), .1f);
-        //     }
-        //     
-        // }
     }
 }

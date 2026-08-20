@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Buildings;
-using Intersections;
+using Junctions;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -45,7 +45,7 @@ namespace Agents
         private const float TargetTolerance = .01f;
         private readonly Agent _agent; // a reference to the object this is affecting
         private readonly GridManager _gridManager;
-        private readonly IntersectionManager _intersectionManager;
+        private readonly JunctionManager _junctionManager;
         private float _currentSpeed;
         private float _speedMultiplier = 1f; // used to stop the agent
         private float _acceleration = 1f;
@@ -54,14 +54,14 @@ namespace Agents
         private ParkingSpace _parkedAt;
 
         public PathMover(Building buildingInformation, GridManager gridManager,
-            IntersectionManager intersectionManager, Agent agent,
+            JunctionManager junctionManager, Agent agent,
             LayerMask agentLayer, ParkingSpace initialParking)
         {
             _pathGenerator = new PathGenerator(gridManager, this);
             _agent = agent;
             _agentLayer = agentLayer;
             _gridManager = gridManager;
-            _intersectionManager = intersectionManager;
+            _junctionManager = junctionManager;
             _buildingInformation = buildingInformation;
             ParkedAt = initialParking;
             CurrentPosition = gridManager.WorldToNode(initialParking.ParentPosition);
@@ -215,8 +215,8 @@ namespace Agents
                 }
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
                 _targetNodePosition = _gridManager.NodeToWorld(NextPosition);
-                if (_intersectionManager.IsIntersection(NextPosition))
-                    _intersectionManager.AddToIntersection(this, NextPosition);
+                if (_junctionManager.IsJunction(NextPosition))
+                    _junctionManager.AddToJunctionQueue(this, NextPosition);
                 // the road has been removed since setting out
                 if (NextPosition.Type is not NodeType.Road && NextPosition.Type is not NodeType.Parking)
                 {

@@ -1,19 +1,23 @@
 ﻿using System.Collections.Generic;
-using Intersections;
+using Junctions;
 using UnityEngine;
 
 namespace Meshes
 {
+    /// <summary>
+    ///     A class which can be inherited to give methods for generating triangles in different contexts. Used by
+    ///     the <see cref="NodeMesh"/> and <see cref="PlacementMesh"/> classes respectively.
+    /// </summary>
     public abstract class MeshGenerator
     {
-        public List<Triangle> Triangles { get; protected set; }
+        public List<Triangle> Triangles { get; protected set; } // these are what the mesh is made up of
         
-        protected bool IsEquilateral => _averagePosition == meshCentreInWorld; // if the junction is straight or has connections evenly spaced
+        protected bool IsEquilateral => _averagePosition == MeshCentreInWorld; // if the junction is straight or has connections evenly spaced
 
         private Vector3 _averagePosition; // the average position of all the triangles
         
-        protected readonly GridManager gridManager; // reference to the grid manager for spacial related information
-        protected Vector3 meshCentreInWorld;
+        protected readonly GridManager GridManager; // reference to the grid manager for spacial related information
+        protected Vector3 MeshCentreInWorld;
         
         protected const float StraightRoadLength = .5f;
         protected const float DiagonalRoadLength = .7071f;
@@ -29,10 +33,13 @@ namespace Meshes
 
         protected MeshGenerator(GridManager gridManager, float resolution)
         {
-            this.gridManager = gridManager;
+            GridManager = gridManager;
             _meshResolution = resolution;
         }
         
+        /// <summary>
+        ///     Given the current list of <see cref="Triangles"/>, fills any gaps. A gap is defined as a lack of contiguous triangles.
+        /// </summary>
         protected List<Triangle> FillTheRemainingGaps(bool useBezier)
         {
             var triangles = new List<Triangle>();
@@ -40,17 +47,19 @@ namespace Meshes
             for (var i = 0; i < numberOfTriangles; i++)
             {
                 var a = Triangles[i].A3;
-                var b = Triangles[(i + 1) % numberOfTriangles].A2;
+                var b = Triangles[(i + 1) % numberOfTriangles].A2; // wrap around
+                // if a triangle is overlapping itself, continue
                 if (a == b)
                     continue;
                 if (useBezier)
                 {
-                    var movedCentre = Vector3.Lerp((a + b) / 2, meshCentreInWorld, Curviness);
-                    triangles.AddRange(GenerateTrianglesFromBezierPoints(a, b, movedCentre, meshCentreInWorld));
+                    // move the centre slightly, as otherwise, the Bezier ends up looking strange
+                    var movedCentre = Vector3.Lerp((a + b) / 2, MeshCentreInWorld, Curviness);
+                    triangles.AddRange(GenerateTrianglesFromBezierPoints(a, b, movedCentre, MeshCentreInWorld));
                 }
                 else
                 {
-                    triangles.Add(new Triangle(meshCentreInWorld, a, b));
+                    triangles.Add(new Triangle(MeshCentreInWorld, a, b));
                 }
                 
             }
@@ -59,8 +68,11 @@ namespace Meshes
         }
         
         protected List<Triangle> CreateDeadEndCap(Vector3 neighbourPosition, bool isPointed = false)
-            => CreateCap(meshCentreInWorld, neighbourPosition, isPointed);
+            => CreateCap(MeshCentreInWorld, neighbourPosition, isPointed);
 
+        /// <summary>
+        ///     Create a rounded cap given two points
+        /// </summary>
         protected List<Triangle> CreateCap(Vector3 start, Vector3 end, bool isPointed)
         {
             var direction = end - start;
@@ -83,30 +95,34 @@ namespace Meshes
             
         }
         
-        protected List<Triangle> CreateSmoothCorners(IntersectionType intersectionType)
+        /// <summary>
+        ///     Create a smooth corner given a junction type, different corners are produced.
+        /// </summary>
+        protected List<Triangle> CreateSmoothCorners(JunctionType junctionType)
         {
-            var direction = _averagePosition - meshCentreInWorld;
+            var direction = _averagePosition - MeshCentreInWorld;
             direction.Normalize();
             direction *= -1;
             var cornerLength = ObtuseCornerLength;
             
-            if (intersectionType is IntersectionType.AcuteCorner)
+            // determine corner length given junction type
+            if (junctionType is JunctionType.AcuteCorner)
                 cornerLength = AcuteCornerLength;
-            if (intersectionType is IntersectionType.RightAngleCorner)
+            if (junctionType is JunctionType.RightAngleCorner)
                 cornerLength = RightAngleCornerLength;
-            if (intersectionType is IntersectionType.RightAngleDiagonalCorner or IntersectionType.ComplexAcuteCorner)
+            if (junctionType is JunctionType.RightAngleDiagonalCorner or JunctionType.ComplexAcuteCorner)
                 cornerLength = RightAngleCornerDiagonalLength;
-            if (intersectionType is IntersectionType.ComplexCorner)
+            if (junctionType is JunctionType.ComplexCorner)
                 cornerLength = ComplexCornerLength;
             
-            var cornerPosition = meshCentreInWorld + direction * cornerLength;
+            var cornerPosition = MeshCentreInWorld + direction * cornerLength;
             var angle = Vector3.SignedAngle(Vector3.right, direction, Vector3.up);
             
             // getting where this position is within the fan of triangles
             var insertIndex = 0;
             while(insertIndex < Triangles.Count)
             {
-                var triDirection = Triangles[insertIndex].Centre - meshCentreInWorld;
+                var triDirection = Triangles[insertIndex].Centre - MeshCentreInWorld;
                 var triAngle = Vector3.SignedAngle(Vector3.right, triDirection.normalized,
                     Vector3.up);
                 if (angle < triAngle)
@@ -120,10 +136,11 @@ namespace Meshes
             var prevTri = Triangles[previous];
             var nextTri = Triangles[next];
 
+            // try to use these to Bezier between the two triangles which make up a corner
             var a = prevTri.A3;
             var b = nextTri.A2;
 
-            return GenerateTrianglesFromBezierPoints(a, b, cornerPosition, meshCentreInWorld);
+            return GenerateTrianglesFromBezierPoints(a, b, cornerPosition, MeshCentreInWorld);
         }
 
         /// <summary>
@@ -169,8 +186,8 @@ namespace Meshes
         {
             Triangles.Sort((a, b) =>
             {
-                var aDir = a.Centre - meshCentreInWorld;
-                var bDir = b.Centre - meshCentreInWorld;
+                var aDir = a.Centre - MeshCentreInWorld;
+                var bDir = b.Centre - MeshCentreInWorld;
 
                 var angleA = Vector3.SignedAngle(Vector3.right, aDir.normalized, Vector3.up);
                 var angleB = Vector3.SignedAngle(Vector3.right, bDir.normalized, Vector3.up);

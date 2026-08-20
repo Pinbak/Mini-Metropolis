@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Buildings
 {
+    /// <summary>
+    ///     A parking space which is defined as a place where an agent car wait for an extended period of time.
+    /// </summary>
     public class ParkingSpace : MonoBehaviour
     {
         [Tooltip("Which tile this parking space is considered positioned on.")]

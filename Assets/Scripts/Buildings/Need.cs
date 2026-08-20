@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace Buildings
 {
+    /// <summary>
+    ///     A need is any value that goes down over time. This class is used to simulate that are invoke actions when
+    ///     certain thresholds are met.
+    /// </summary>
     [Serializable]
     public class Need
     {
@@ -37,9 +41,11 @@ namespace Buildings
 
         public void Update()
         {
+            // reduce need overtime
             Amount -= Time.deltaTime;
             retryPollTimer += Time.deltaTime;
 
+            // only invoke actions every x seconds, otherwise the action will be called every tick when the requirements are met
             if (!(retryPollTimer > retryTime)) return;
             
             retryPollTimer = 0f;

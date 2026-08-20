@@ -532,7 +532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlacementManager
   <GridManager>k__BackingField: {fileID: 1487683637}
-  <IntersectionManager>k__BackingField: {fileID: 1529207314}
+  <JunctionManager>k__BackingField: {fileID: 1529207314}
   <BuildingManager>k__BackingField: {fileID: 2009150915}
   <ZonePrefab>k__BackingField: {fileID: 5880385975944513002, guid: 00fc84f64b810424d903d0980b721dd1, type: 3}
   <ResidentialLowWealthPrefab>k__BackingField: {fileID: 7954161561114834557, guid: e52968b8fd081584185356fa1e0d61ba, type: 3}
@@ -3193,7 +3193,7 @@ GameObject:
   - component: {fileID: 1529207313}
   - component: {fileID: 1529207314}
   m_Layer: 0
-  m_Name: IntersectionManager
+  m_Name: JunctionManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3551,7 +3551,7 @@ MonoBehaviour:
     m_Bits: 128
   <BalanceText>k__BackingField: {fileID: 543544022}
   <GridManager>k__BackingField: {fileID: 1487683637}
-  <IntersectionManager>k__BackingField: {fileID: 1529207314}
+  <JunctionManager>k__BackingField: {fileID: 1529207314}
   <CarAcceleration>k__BackingField:
     serializedVersion: 2
     m_Curve:

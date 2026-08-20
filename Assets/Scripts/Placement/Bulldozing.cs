@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Placement
 {
+    /// <summary>
+    ///     The removing roads and buildings state.
+    /// </summary>
     public class Bulldozing : IPlacementState
     {
         private readonly PlacementManager _context;
@@ -19,9 +22,12 @@ namespace Placement
 
         public void MouseDown(Vector3 position)
         {
+            // get the grid position
             var gridPosition = _context.GridManager.WorldToGrid(position);
             if (!_context.IsPositionInBound(gridPosition)) return;
+            // get the valid node from this new grid position
             var node = _context.GridManager.Grid[gridPosition.x, gridPosition.y];
+            // remove roads and buildings
             if (node.Type is NodeType.Road) RemoveNode(node);
             else if (node.Type is NodeType.Building or NodeType.Parking) RemoveBuilding(node);
         }
@@ -50,6 +56,7 @@ namespace Placement
 
         private void RemoveNode(Node nodeToRemove)
         {
+            // keep track of what to remove and what to re-render
             var toRemove = new List<Node>{nodeToRemove};
             var toUpdate = new List<(int, int)> {(nodeToRemove.X, nodeToRemove.Y)};
             foreach (var neighbour in nodeToRemove.Neighbours)
@@ -61,23 +68,28 @@ namespace Placement
                     toUpdate.Add((neighbour.X, neighbour.Y));
                 }
             }
-
+            
+            // sometimes if a road is next to a single other road, both have to be deleted, as a single road piece
+            // cannot exist on its own
             foreach (var node in toRemove)
             {
                 foreach (var neighbour in node.Neighbours)
                 {
                     neighbour.Neighbours.Remove(node);
+                    // make sure to register this to re-render if it is on a different chunk
                     toUpdate.Add((neighbour.X, neighbour.Y));
                 
                     if (neighbour.Neighbours.Count < 3)
-                        _context.IntersectionManager.RemoveIntersection(neighbour.X, neighbour.Y);
+                        _context.JunctionManager.RemoveJunction(neighbour.X, neighbour.Y);
                 }
 
                 node.Neighbours = new List<Node>();
                 node.Type = NodeType.Empty;
-                _context.IntersectionManager.RemoveIntersection(node.X, node.Y);
+                // if the road was a junction, remove it
+                _context.JunctionManager.RemoveJunction(node.X, node.Y);
             }
-
+            
+            // regenerate all the chunks that reflect the removal of this road piece
             var chunksToRefresh = _context.GridManager.GetUniqueChunksFromPositions(toUpdate);
             foreach (var (chunkX, chunkY) in chunksToRefresh)
             {
@@ -87,6 +99,7 @@ namespace Placement
         
         public void RemoveBuilding(Building building)
         {
+            // get the grid cells this building occupies to remove them from the grid as well as removing the game object
             foreach (var layoutPosition in building.Layout)
             {
                 var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);
@@ -100,6 +113,7 @@ namespace Placement
 
         private void RemoveZone(Zone zone)
         {
+            // use the zones layouts to get all the positions that it occupies, this can then be used to update the grid
             foreach (var layoutPosition in zone.Layout)
             {
                 var gridPosition = _context.GridManager.WorldToGrid(layoutPosition.transform.position);

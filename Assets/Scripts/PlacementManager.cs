@@ -1,5 +1,5 @@
 ﻿using Buildings;
-using Intersections;
+using Junctions;
 using Placement;
 using UnityEngine;
 
@@ -10,7 +10,7 @@ public class PlacementManager : MonoBehaviour
 {
     // All the objects needed, a lot are needed for the mode
     [field:SerializeField] public GridManager GridManager { get; set; }
-    [field:SerializeField] public IntersectionManager IntersectionManager { get; set; }
+    [field:SerializeField] public JunctionManager JunctionManager { get; set; }
     [field:SerializeField] public BuildingManager BuildingManager { get; set; }
     
     [field:SerializeField] public Zone ZonePrefab { get; set; }

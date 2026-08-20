@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Placement
 {
+    /// <summary>
+    ///     The interface for the state pattern. Inheriting from this, gives access to the following methods.
+    /// </summary>
     public interface IPlacementState
     {
         void EnterState();
