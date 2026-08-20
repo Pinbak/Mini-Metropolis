@@ -31,15 +31,20 @@ namespace Agents
             _agent = agent;
         }
         
-        public void GeneratePath(Node modifiedStart, Node modifiedEnd, Node start, Node goal) // todo remove start and use current node also clear up meaning behind modified start/end
+        /// <summary>
+        ///     Generate a path from <see cref="start"/> to <see cref="goal"/>.
+        /// </summary>
+        public void GeneratePath(Node modifiedStart, Node modifiedEnd, Node start, Node goal)
         {
             PathGenerated = false;
             _pathfinding.GeneratePath(start, goal);
             var nodePath = _pathfinding.Path.ToList();
+            // insert the first and last positions, which are the parking spaces at each end of the journey
             nodePath.Insert(0, modifiedStart);
             nodePath.Add(modifiedEnd);
             NodePath = nodePath.ToArray();
             
+            // generate just the first steps of the path which the path mover will follow along
             if (_pathfinding.ValidPathExists)
             {
                 GenerateSteps(0);
@@ -47,19 +52,26 @@ namespace Agents
             }
         }
         
+        /// <summary>
+        ///     Generate steps given a current node from the <see cref="NodePath"/>. Generates next immediate steps, rather
+        ///     than the whole path in one go.
+        /// </summary>
         public void GenerateSteps(int currentNode)
         {
+            // beginning
             if (currentNode == 0)
             {
                 GenerateStartPath();
                 return;
             }
+            // end
             if (currentNode == NodePath.Length - 1)
             {
                 GenerateEndPath();
                 return;
             }
             
+            // if not beginning or end, take the next and last nodes and Bezier between them to create a smooth path
             Path = new List<Vector3>();
 
             Vector3 position =
@@ -73,8 +85,8 @@ namespace Agents
                 previousPosition = GetStartNode(); // second node from start
             if (currentNode == NodePath.Length - 2)
                 nextPosition = GetEndNode(); // penultimate
-                
-            // todo add the ability to swap road sides
+
+            // get the next road position
             Vector3 directionToNextPosition = nextPosition - position;
             directionToNextPosition.Normalize();
             var nextPerpendicular = Vector3.Cross(Vector3.up, directionToNextPosition);
@@ -82,14 +94,14 @@ namespace Agents
             var nextIsDiagonal = directionToNextPosition.x != 0 && directionToNextPosition.z != 0;
             var nextRoadLength = nextIsDiagonal ? PathDiagonalLength : PathStraightLength;
 
-            // todo just repeated from above
+            // same as above but for the previous position
             Vector3 directionToPreviousPosition = previousPosition - position;
             directionToPreviousPosition.Normalize();
             var previousPerpendicular = Vector3.Cross(Vector3.up, directionToPreviousPosition);
             var previousPoint = position - previousPerpendicular * ((PathWidth - PathInset) * .5f); // using negative as is opposite direction
             var previousIsDiagonal = directionToPreviousPosition.x != 0 && directionToPreviousPosition.z != 0;
             var previousRoadLength = previousIsDiagonal ? PathDiagonalLength : PathStraightLength;
-                
+            
             nextPoint = directionToNextPosition * (nextRoadLength) + nextPoint;
             previousPoint = directionToPreviousPosition * (previousRoadLength) + previousPoint;
             var movedPosition = position + nextPerpendicular * ((PathWidth - PathInset)  * .5f); // the centre of the node that is shifted to the correct lane

@@ -3,8 +3,13 @@ using UnityEngine;
 
 namespace Agents
 {
+    /// <summary>
+    ///     An agent is an entity that exists which implements a finite-state machine and pathfinding capabilities.
+    ///     Agents interact with one another through the <see cref="PathMover"/> control.
+    /// </summary>
     public class Agent : MonoBehaviour
     {
+        // Initial setup values used in the agent's prefab
         [field:SerializeField] public AgentType AgentType { get; set; }
         [field:SerializeField] public int Income { get; set; }
         [field:SerializeField] public float MovementSpeed { get; set; } = 1f;
@@ -24,7 +29,7 @@ namespace Agents
         public TravellingToSecondary TravellingToSecondary { get; private set; } = new();
         
         public Building PrimaryLocation { get; private set; }
-        public Building SecondaryLocation { get; protected set; }
+        public Building SecondaryLocation { get; private set; }
         [field:SerializeField] public PathMover PathMover { get; private set; } // the ability to move along a path
         public AnimationCurve CarAcceleration { get; private set; }
         
@@ -43,17 +48,27 @@ namespace Agents
                 buildingManager.AgentLayer, initialParkingSpace);
         }
 
+        /// <summary>
+        ///     Send this agent to a location
+        /// </summary>
         public void GoTo(Building location)
         {
             InQueue = false;
             SecondaryLocation = location;
         }
-
+        
+        /// <summary>
+        ///     If the agent has no <see cref="SecondaryLocation"/>, it is logically returning or at its
+        ///     <see cref="PrimaryLocation"/>.
+        /// </summary>
         public void Returning()
         {
             SecondaryLocation = null;
         }
 
+        /// <summary>
+        ///     Transition to another state.
+        /// </summary>
         public void ChangeState(IAgentState newState)
         {
             AgentState.ExitState(this);
@@ -63,9 +78,13 @@ namespace Agents
 
         private void Update()
         {
+            // depending on state, the agent's action differ
             AgentState.Update(this);
         }
         
+        /// <summary>
+        ///     Debug draw information about the agents current whereabouts and function.
+        /// </summary>
         private void OnDrawGizmos()
         {
             if (PathMover is null) return;

@@ -20,6 +20,7 @@ namespace Agents
 
         private Node[] ReconstructPath(Node start, Node current, Dictionary<Node, Node> cameFrom)
         {
+            // reverse engineer the cameFrom tree to get a path stored as an array of nodes to travel to
             var path = new List<Node>();
             while (current != start)
             {
@@ -56,12 +57,14 @@ namespace Agents
                 var currentNode = current.Key;
                 if (currentNode == goal)
                 {
+                    // once a path has been found, reverse engineer to make a usuable path and then return
                     return ReconstructPath(start, currentNode, cameFrom);
                 }
 
                 open.Remove(currentNode);
                 closed.Add(currentNode);
                 
+                // traverse the tree using A* to find suitable next nodes
                 foreach (var neighbour in currentNode.Neighbours)
                 {
                     if (closed.Contains(neighbour)) continue;
@@ -74,12 +77,14 @@ namespace Agents
                     
                 }
 
-                if (c > 500)
+                // failsafe to prevent a memory exception from the recursion. Note may shut down huge cities, so should be increased
+                if (c > 1000)
                 {
                     return new Node[]{};
                 }
             }
 
+            // if no path was found (which is totally valid, as the road network may be incomplete) this should be expected and not treated as an error
             return new Node[]{};
         }
     }

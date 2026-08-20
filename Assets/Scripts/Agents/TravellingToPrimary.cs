@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Agents
 {
+    /// <summary>
+    ///     The state used when an agent is currently travelling to its primary location (often home).
+    /// </summary>
     public class TravellingToPrimary : IAgentState
     {
         private bool _foundPath;
@@ -13,6 +16,8 @@ namespace Agents
             if (!_foundPath)
             {
                 _timeSpentRetrying += Time.deltaTime;
+                // every x seconds, retry going home, as there should be a valid space, but the road network may have been modified since.
+                // This should prevent an agent permanently getting stuck at its secondary location
                 if (_timeSpentRetrying > context.TimeToWaitUntilRetryingRoute)
                 {
                     _timeSpentRetrying = 0f;
@@ -21,6 +26,7 @@ namespace Agents
 
                 return;
             }
+            // move along the path that was generated
             context.PathMover.MoveAlongPath(context.MovementSpeed, context.CarAcceleration);
         }
 
@@ -30,6 +36,7 @@ namespace Agents
             if (!context.PrimaryLocation.GetFreeParkingSpace(out var parkingSpace)) return;
             context.PathMover.GeneratePath(parkingSpace);
             
+            // a space at the primary location is effectively guaranteed, but still have to check regardless
             if (context.PathMover.HasValidPath)
             {
                 context.PathMover.Arrived += Arrived;

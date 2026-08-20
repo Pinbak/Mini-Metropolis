@@ -8,6 +8,10 @@ using Vector3 = UnityEngine.Vector3;
 
 namespace Agents
 {
+    /// <summary>
+    ///     A path mover is the part of the agent responsible for moving along a path. It can handle path generation, and
+    ///     transforming itself to move along a path. It also handles junctions and road interactions with other agents.
+    /// </summary>
     [Serializable]
     public class PathMover
     {
@@ -53,6 +57,15 @@ namespace Agents
         private Building _buildingInformation; // the building that this car belongs to
         private ParkingSpace _parkedAt;
 
+        /// <summary>
+        ///     Create a new path mover
+        /// </summary>
+        /// <param name="buildingInformation">The building that this car belongs to</param>
+        /// <param name="gridManager">The global grid manager object</param>
+        /// <param name="junctionManager">The global junction manager object</param>
+        /// <param name="agent">The agent which this path mover will affect. This agent's transform will be modified</param>
+        /// <param name="agentLayer">The layer the agents are on for collision checking</param>
+        /// <param name="initialParking">Where the agent is currently parked</param>
         public PathMover(Building buildingInformation, GridManager gridManager,
             JunctionManager junctionManager, Agent agent,
             LayerMask agentLayer, ParkingSpace initialParking)
@@ -76,14 +89,21 @@ namespace Agents
             CurrentPosition = _gridManager.WorldToNode(worldPosition);
         }
 
+        /// <summary>
+        ///     Generate a path from current position to the parkingSpace.
+        /// </summary>
+        /// <param name="parkingSpace">The parking space to generate the path to. Note. uses current position as starting point</param>
         public void GeneratePath(ParkingSpace parkingSpace)
         {
             if (ParkedAt is null) return;
             Destination = parkingSpace;
+            // using the parking space information, the relevant positions can be gathered for generating the path and steps
             var startingPosition = _gridManager.WorldToNode(ParkedAt.RoadConnection);
             var parkingSpaceNode = _gridManager.WorldToNode(parkingSpace.RoadConnection);
             var actualPosition = _gridManager.WorldToNode(ParkedAt.ParentPosition);
             var actualGoal = _gridManager.WorldToNode(parkingSpace.ParentPosition);
+            
+            // actually generating a path
             GeneratePath(actualPosition, actualGoal, startingPosition, parkingSpaceNode);
         }
 
@@ -95,12 +115,15 @@ namespace Agents
             if (_pathGenerator.PathGenerated)
             {
                 ParkedAt = null;
-                Destination.Reserve(this); // todo not the best place, as when a road is removed, the space will never be freed, also blocks a space even when no path is found
+                Destination.Reserve(this);
                 _currentTargetPosition = _pathGenerator.Path[0];
                 HasValidPath = true;
             }
         }
 
+        /// <summary>
+        ///     Continue moving.
+        /// </summary>
         public void Go()
         {
             if (_agent is null) return;
@@ -108,45 +131,59 @@ namespace Agents
             _approachingJunction = false;
         }
 
+        /// <summary>
+        ///     Stop moving.
+        /// </summary>
         public void Stop()
         {
             _speedMultiplier = 0f;
             _approachingJunction = true;
         }
 
+        /// <summary>
+        ///     Updates the agent's transform to reflect a movement along the path that was generated with <see cref="GeneratePath"/>.
+        /// </summary>
+        /// <param name="movementSpeed">The speed to move at</param>
+        /// <param name="accelerationProfile">The acceleration and deceleration to use</param>
         public void MoveAlongPath(float movementSpeed, AnimationCurve accelerationProfile)
         {
             if (!HasValidPath) return;
-            if (ParkedAt is not null) return; // we're currently parked
+            if (ParkedAt is not null) return; // this agent is currently parked
 
             var currentPosition = WorldPosition;
             var distanceToNextStep = Vector3.Distance(currentPosition, _currentTargetPosition);
+            // if not at next step yet (using a tolerance as floating-point precision isn't accurate enough to use equality comparison)
             if (distanceToNextStep > TargetTolerance)
             {
                 var currentRotation = _agent.transform.rotation;
                 var rotationSpeed = movementSpeed * 10f;
                 var adjustedSpeed = movementSpeed;
                 var acceleration = _acceleration;
+                // if currently stopped, for example, at a junction, reduce speed
                 if (_speedMultiplier == 0f)
                 {
                     adjustedSpeed = movementSpeed * _speedMultiplier;
                 }
                 else
                 {
+                    // otherwise, raycast other agents to check if need to slow down before of another agent blocking the way
                     if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
                             _agentLayer))
                     {
+                        // if the agent is facing a similar direction
                         if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
                         {
                             Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
                                 hit.point, Color.blue);
+                            // adjust speed based on the raycasts distance
                             adjustedSpeed = movementSpeed * Mathf.Max(.1f, hit.distance - DistanceToAgentInFront);
                             // make acceleration/deceleration inversely proportional to distance
                             acceleration = accelerationProfile.Evaluate(hit.distance);
                         }
                     }
                 }
-
+                
+                // slow down when approaching a junction as well
                 if (_approachingJunction)
                 {
                     var distanceToJunction = Vector3.Distance(currentPosition, _targetNodePosition);
@@ -173,6 +210,9 @@ namespace Agents
             }
         }
 
+        /// <summary>
+        ///     Teleports the agent to its primary position, resetting any relevant properties.
+        /// </summary>
         public void TeleportToPrimary()
         {
             if (_agent.AgentState == _agent.AtPrimary) return; // if already at primary
@@ -192,43 +232,46 @@ namespace Agents
         {
             _currentNodePointer = 0;
             HasValidPath = false;
+            // park up
             ParkedAt = Destination;
             _agent.transform.rotation = Destination.transform.rotation;
-            Arrived?.Invoke(CurrentPosition);
+            Arrived?.Invoke(CurrentPosition); // used for changing state
         }
         
         /// <summary>
         ///     Gets the next position in the path to visit
         /// </summary>
-        private Vector3 GetNextPosition() // todo it's a bit of a mess
+        private Vector3 GetNextPosition()
         {
+            // increment step to get the next position to go to
             _currentPositionPointer++;
+            // if that was the final step in the node, get the first step of the next node
             if (_currentPositionPointer == Path.Count)
             {
                 _currentPositionPointer = 0;
                 CurrentPosition = _pathGenerator.NodePath[_currentNodePointer];
                 _currentNodePointer++;
+                // if this is the final node, then the agent has arrived
                 if (_currentNodePointer == _pathGenerator.NodePath.Length)
                 {
                     ArrivedAtLocation();
                     return Vector3.zero;
                 }
+                
+                // otherwise, the next steps can be gathered from the next node
                 NextPosition = _pathGenerator.NodePath[_currentNodePointer];
                 _targetNodePosition = _gridManager.NodeToWorld(NextPosition);
+                // if this new node puts the agent in a junction, it will need to register there, handing over control
+                // to the selected junction
                 if (_junctionManager.IsJunction(NextPosition))
                     _junctionManager.AddToJunctionQueue(this, NextPosition);
                 // the road has been removed since setting out
                 if (NextPosition.Type is not NodeType.Road && NextPosition.Type is not NodeType.Parking)
                 {
                     TeleportToPrimary();
-                    // if (!_attemptRecalculatePath)
-                    // {
-                    //     _attemptRecalculatePath = true;
-                    //     UpdateCurrentNodeFromWorldPosition(_agent.transform.position);
-                    //     GeneratePath(_destination);
-                    // }
                     return Vector3.zero;
                 }
+                // generate steps for the new node to follow
                 _pathGenerator.GenerateSteps(_currentNodePointer);
             }
             return _pathGenerator.Path[_currentPositionPointer];

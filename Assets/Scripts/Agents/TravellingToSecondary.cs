@@ -1,7 +1,9 @@
-using UnityEngine;
 
 namespace Agents
 {
+    /// <summary>
+    ///     The state used when an agent is currently travelling to its secondary location.
+    /// </summary>
     public class TravellingToSecondary : IAgentState
     {
         private bool _foundPath;
@@ -10,25 +12,15 @@ namespace Agents
         
         public void Update(Agent context)
         {
-            // if (!_foundPath)
-            // {
-            //     // todo not used but could be??
-            //     _timeSpentRetrying += Time.deltaTime;
-            //     if (_timeSpentRetrying > context.TimeToWaitUntilRetryingRoute)
-            //     {
-            //         _timeSpentRetrying = 0f;
-            //         AttemptMoveToSecondaryLocation(context);
-            //     }
-            //
-            //     return;
-            // }
             if (!_foundPath) return;
+            // every tick, move along path if found one
             context.PathMover.MoveAlongPath(context.MovementSpeed, context.CarAcceleration);
         }
 
         private void AttemptMoveToSecondaryLocation(Agent context)
         {
             _foundPath = false;
+            // find the destination
             context.SecondaryLocation.GetReservedParkingSpace(out var parkingSpace);
             context.PathMover.GeneratePath(parkingSpace);
             parkingSpace.Dequeue();
