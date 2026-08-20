@@ -79,6 +79,11 @@ public class PlacementManager : MonoBehaviour
     {
         Mode.MouseRelease();
     }
+    
+    public void HandleRightMouseClick()
+    {
+        Mode = _noBuilding;
+    }
 
     // The methods that are called when clicking the UI buttons
     public void ChangeModeToBulldozing() => ChangeMode(BulldozingState);
@@ -94,16 +99,10 @@ public class PlacementManager : MonoBehaviour
     private void ChangeModeToBuildingZone(Building building)
     {
         BuildingZoneState.ChangePlacementBuilding(building);
-        ChangeMode(BuildingZoneState, building);
+        ChangeMode(BuildingZoneState);
     }
 
-    private void ChangeMode(IPlacementState mode, Building building = null)
-    {
-        if (Mode == mode && BuildingZoneState.Places != building) // todo doesn't work
-            Mode = _noBuilding;
-        else
-            Mode = mode;
-    }
+    private void ChangeMode(IPlacementState mode) => Mode = mode;
     
     /// <summary>
     ///     Given a position, check if it is free or a road. It's necessary to check if a road is there, as roads can

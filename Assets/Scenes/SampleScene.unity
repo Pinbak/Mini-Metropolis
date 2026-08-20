@@ -1380,6 +1380,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
   leftMouseButton: {fileID: 8110675386255103649, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  rightMouseButton: {fileID: -6847649647862847311, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   keyboardR: {fileID: -8613918933582556176, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   keyboardW: {fileID: 826415927513775451, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   keyboardA: {fileID: 3460039820681962472, guid: 052faaac586de48259a63d0c4782560b, type: 3}

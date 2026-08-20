@@ -57,7 +57,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Needs.Buildings.Building
   <Type>k__BackingField: 4
-  <Cost>k__BackingField: 20
+  <Cost>k__BackingField: 5
   <UpgradesTo>k__BackingField: {fileID: 0}
   <DowngradesTo>k__BackingField: {fileID: 0}
   <IsGrowable>k__BackingField: 0
@@ -148,7 +148,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 66561f0c8880b184bb4d4eaae0f70fa9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.01
+      value: 0.015
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 66561f0c8880b184bb4d4eaae0f70fa9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -180,6 +180,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 66561f0c8880b184bb4d4eaae0f70fa9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 66561f0c8880b184bb4d4eaae0f70fa9, type: 3}
+      propertyPath: m_CastShadows
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 66561f0c8880b184bb4d4eaae0f70fa9, type: 3}

@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     {
         // subscribes the input manager to all the inputs needed for building
         inputManager.OnMouseDown += HandleMouseClick;
+        inputManager.OnRightMouseDown += HandleRightMouseClick;
         inputManager.OnMouseUp += HandleMouseRelease;
         inputManager.OnMouseHold += HandleMouseHeldDown;
         inputManager.KeyboardPress += HandleKeyboardPress;
@@ -37,6 +38,11 @@ public class GameManager : MonoBehaviour
     private void HandleMouseClick(Vector3 position)
     {
         placementManager.HandleMouseClick(position);
+    }
+
+    private void HandleRightMouseClick()
+    {
+        placementManager.HandleRightMouseClick();
     }
 
     private void HandleMouseRelease()

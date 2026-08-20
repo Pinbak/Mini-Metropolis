@@ -1006,6 +1006,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "RightMouse",
+                    "type": "Button",
+                    "id": "7f816d44-1215-4e0d-b672-953e0bf9cd41",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "KeyboardB",
                     "type": "Button",
                     "id": "8321d0ee-28e2-452c-86cd-6d325dbfdc20",
@@ -1069,6 +1078,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "LeftMouse",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cbdb5a93-6478-4ff7-b221-d63998ed297e",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightMouse",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
