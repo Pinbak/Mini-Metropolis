@@ -2,8 +2,10 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
+/// <summary>
+///     The class for collecting and rebroadcasting input.
+/// </summary>
 public class InputManager : MonoBehaviour
 {
     public Action<Vector3> OnMouseDown { get; set; }
@@ -22,7 +24,6 @@ public class InputManager : MonoBehaviour
     [SerializeField] private InputActionReference keyboardD;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private LayerMask ground;
-    private Vector2 _cameraMovementVector;
     private bool _isMouseBeingHeld;
     private EventSystem _eventSystem;
     private bool _pointerOverUI;
@@ -59,11 +60,6 @@ public class InputManager : MonoBehaviour
         var groundPosition = RaycastGround();
         if (groundPosition is null) return;
         MousePosition.Invoke((Vector3)groundPosition);
-    }
-
-    private void GetInputs()
-    {
-        _cameraMovementVector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
     }
     
     private void IsPointerHold()

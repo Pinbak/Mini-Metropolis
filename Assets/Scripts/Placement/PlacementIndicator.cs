@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Meshes;
 using UnityEngine;
 
-namespace Roads
+namespace Placement
 {
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class PlacementIndicator : MonoBehaviour

@@ -1,9 +1,11 @@
 ﻿using Buildings;
 using Intersections;
 using Placement;
-using Roads;
 using UnityEngine;
 
+/// <summary>
+///     The class for placing buildings and road <see cref="Mode"/> is the current mode.
+/// </summary>
 public class PlacementManager : MonoBehaviour
 {
     [field:SerializeField] public GridManager GridManager { get; set; }

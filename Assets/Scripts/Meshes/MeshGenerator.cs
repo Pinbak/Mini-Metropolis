@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Junctions;
+using Intersections;
 using UnityEngine;
 
 namespace Meshes
@@ -83,20 +83,20 @@ namespace Meshes
             
         }
         
-        protected List<Triangle> CreateSmoothCorners(JunctionType junctionType)
+        protected List<Triangle> CreateSmoothCorners(IntersectionType intersectionType)
         {
             var direction = _averagePosition - meshCentreInWorld;
             direction.Normalize();
             direction *= -1;
             var cornerLength = ObtuseCornerLength;
             
-            if (junctionType is JunctionType.AcuteCorner)
+            if (intersectionType is IntersectionType.AcuteCorner)
                 cornerLength = AcuteCornerLength;
-            if (junctionType is JunctionType.RightAngleCorner)
+            if (intersectionType is IntersectionType.RightAngleCorner)
                 cornerLength = RightAngleCornerLength;
-            if (junctionType is JunctionType.RightAngleDiagonalCorner or JunctionType.ComplexAcuteCorner)
+            if (intersectionType is IntersectionType.RightAngleDiagonalCorner or IntersectionType.ComplexAcuteCorner)
                 cornerLength = RightAngleCornerDiagonalLength;
-            if (junctionType is JunctionType.ComplexCorner)
+            if (intersectionType is IntersectionType.ComplexCorner)
                 cornerLength = ComplexCornerLength;
             
             var cornerPosition = meshCentreInWorld + direction * cornerLength;

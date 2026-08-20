@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Junctions;
 using UnityEngine;
 
-namespace Roads
+namespace Meshes
 {
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class Chunk : MonoBehaviour

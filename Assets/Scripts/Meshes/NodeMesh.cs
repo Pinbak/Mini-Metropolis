@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Meshes;
+using Intersections;
 using UnityEngine;
 
-namespace Junctions
+namespace Meshes
 {
     /// <summary>
     ///     The visual mesh part of node
@@ -13,7 +13,7 @@ namespace Junctions
         public int X => _node.X;
         public int Y => _node.Y;
 
-        public JunctionType Type { get; private set; }
+        public IntersectionType Type { get; private set; }
         private readonly Node _node;
         
         public NodeMesh(Node node, GridManager gridManager, float resolution = .2f) : base(gridManager, resolution)
@@ -45,18 +45,18 @@ namespace Junctions
             SortTriangles();
             var junctionType = GetJunctionType();
             Type = junctionType;
-            if (junctionType is JunctionType.RightAngleCorner or JunctionType.AcuteCorner or JunctionType.ObtuseCorner
-                or JunctionType.ComplexAcuteCorner or JunctionType.RightAngleDiagonalCorner or JunctionType.ComplexCorner)
+            if (junctionType is IntersectionType.RightAngleCorner or IntersectionType.AcuteCorner or IntersectionType.ObtuseCorner
+                or IntersectionType.ComplexAcuteCorner or IntersectionType.RightAngleDiagonalCorner or IntersectionType.ComplexCorner)
                 Triangles.AddRange(CreateSmoothCorners(Type));
             
             SortTriangles();
-            if (junctionType == JunctionType.DeadEnd)
+            if (junctionType == IntersectionType.DeadEnd)
                 // at this point, the node only has a single neighbour
                 Triangles.AddRange(CreateDeadEndCap(
                     gridManager.GridToWorld(new Vector2Int(_node.Neighbours[0].X, _node.Neighbours[0].Y))));
 
             SortTriangles();
-            Triangles.AddRange(junctionType is JunctionType.Straight or JunctionType.DeadEnd
+            Triangles.AddRange(junctionType is IntersectionType.Straight or IntersectionType.DeadEnd
                 ? FillTheRemainingGaps(false)
                 : FillTheRemainingGaps(true));
         }
@@ -65,19 +65,19 @@ namespace Junctions
         ///     Returns the type of node/junction that this is
         /// </summary>
         /// <remarks>Requires triangles count to be accurate</remarks>
-        private JunctionType GetJunctionType()
+        private IntersectionType GetJunctionType()
         {
             UpdateAveragePosition();
             return Triangles.Count switch
             {
-                1 => JunctionType.DeadEnd,
-                2 => IsEquilateral ? JunctionType.Straight : GetCornerType(),
+                1 => IntersectionType.DeadEnd,
+                2 => IsEquilateral ? IntersectionType.Straight : GetCornerType(),
                 3 or 4 => GetComplexType(),
-                _ => JunctionType.Complex
+                _ => IntersectionType.Complex
             };
         }
 
-        private JunctionType GetComplexType()
+        private IntersectionType GetComplexType()
         {
 
             var neighbourDirections = new List<Vector3>();
@@ -100,13 +100,13 @@ namespace Junctions
             var rightAngleCount = neighbourAngles.Count(a => a >= 0);
             
             if (rightAngleCount == neighbourAngles.Count)
-                return JunctionType.ComplexAcuteCorner;
+                return IntersectionType.ComplexAcuteCorner;
             else if (rightAngleCount == neighbourAngles.Count - 1)
-                return JunctionType.ComplexCorner;
-            return JunctionType.Complex;
+                return IntersectionType.ComplexCorner;
+            return IntersectionType.Complex;
         }
 
-        private JunctionType GetCornerType()
+        private IntersectionType GetCornerType()
         {
             var aPosition = new Vector2Int(_node.Neighbours[0].X, _node.Neighbours[0].Y);
             Vector3 aPositionInWorld = gridManager.GridToWorld(aPosition);
@@ -117,15 +117,15 @@ namespace Junctions
             var dot = Vector3.Dot(ac, bc);
 
             if (dot > 0)
-                return JunctionType.AcuteCorner;
+                return IntersectionType.AcuteCorner;
             if (dot < 0)
-                return JunctionType.ObtuseCorner;
+                return IntersectionType.ObtuseCorner;
 
             // if the distance is 1, it must be non-diagonal as the cell is 1x1 in size
             if (Mathf.Approximately(Vector3.Distance(meshCentreInWorld, aPositionInWorld), 1))
-                return JunctionType.RightAngleCorner;
+                return IntersectionType.RightAngleCorner;
             else
-                return JunctionType.RightAngleDiagonalCorner;
+                return IntersectionType.RightAngleDiagonalCorner;
 
         }
     }

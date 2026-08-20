@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+///     A triangle container. Contains all the properties that define a triangles vertices. Used by <see cref=""/>
+/// </summary>
 public class Triangle
 {
     public Vector3 A1 { get; }

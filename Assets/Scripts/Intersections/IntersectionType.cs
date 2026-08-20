@@ -1,6 +1,6 @@
-﻿namespace Junctions
+﻿namespace Intersections
 {
-    public enum JunctionType
+    public enum IntersectionType
     {
         DeadEnd,
         Straight,
