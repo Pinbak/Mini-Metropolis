@@ -16,6 +16,7 @@ namespace Agents
     public class PathMover
     {
         [field:SerializeField] public bool HasValidPath { get; private set; }
+        [field:SerializeField] public bool IsParking { get; set; }
         public IReadOnlyCollection<Vector3> Path => _pathGenerator.Path.AsReadOnly();
         public Node CurrentPosition { get; private set; } // the node that the agent is currently on
         public Node NextPosition { get; private set; } // the node that the agent is moving to
@@ -184,20 +185,24 @@ namespace Agents
                 }
                 else
                 {
-                    // otherwise, raycast other agents to check if need to slow down before of another agent blocking the way
-                    if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
-                            _agentLayer))
+                    // don't check for collisions if parking
+                    if (!IsParking)
                     {
-                        // if the agent is facing a similar direction
-                        if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
+                        // otherwise, raycast other agents to check if need to slow down before of another agent blocking the way
+                        if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
+                                _agentLayer))
                         {
-                            Debug.DrawLine(
-                                new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
-                                hit.point, Color.blue);
-                            // adjust speed based on the raycasts distance
-                            adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
-                            // make acceleration/deceleration inversely proportional to distance
-                            acceleration = accelerationProfile.Evaluate(hit.distance);
+                            // if the agent is facing a similar direction
+                            if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
+                            {
+                                Debug.DrawLine(
+                                    new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
+                                    hit.point, Color.blue);
+                                // adjust speed based on the raycasts distance
+                                adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
+                                // make acceleration/deceleration inversely proportional to distance
+                                acceleration = accelerationProfile.Evaluate(hit.distance);
+                            }
                         }
                     }
                 }
@@ -309,6 +314,8 @@ namespace Agents
                 // generate steps for the new node to follow
                 _pathGenerator.GenerateSteps(_currentNodePointer);
             }
+            // if the agent is parking, it gets temporary immunity from collisions
+            IsParking = _currentNodePointer == _pathGenerator.NodePath.Length - 2;
             return _pathGenerator.Path[_currentPositionPointer];
         }
     }
