@@ -123,7 +123,8 @@ namespace Agents
                 HasValidPath = true;
                 // flip the agent to begin moving forwards
                 _agent.transform.RotateAround(_agent.transform.position, _agent.transform.up, 180f);
-                Go();
+                _speedMultiplier = 1f;
+                MovingInJunction = false;
             }
         }
 
@@ -133,6 +134,7 @@ namespace Agents
         public void Go()
         {
             _speedMultiplier = 1f;
+            MovingInJunction = true;
         }
 
         /// <summary>
@@ -157,6 +159,7 @@ namespace Agents
             if (teleportHomeTimer > TeleportHomeRetryTime)
             {
                 TeleportToPrimaryAndRemoveFromJunction();
+                return;
             }
             if (Vector3.Distance(_lastPosition, _agent.transform.position) < .01f)
             {
@@ -184,19 +187,24 @@ namespace Agents
                 }
                 else
                 {
-                    // otherwise, raycast other agents to check if need to slow down before of another agent blocking the way
-                    if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
-                            _agentLayer))
+                    // disable collisions for moving in junctions, as they are almost always clear
+                    if (!MovingInJunction)
                     {
-                        // if the agent is facing a similar direction
-                        if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
+                        // otherwise, raycast other agents to check if need to slow down before of another agent blocking the way
+                        if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
+                                _agentLayer))
                         {
-                            Debug.DrawLine(new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
-                                hit.point, Color.blue);
-                            // adjust speed based on the raycasts distance
-                            adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
-                            // make acceleration/deceleration inversely proportional to distance
-                            acceleration = accelerationProfile.Evaluate(hit.distance);
+                            // if the agent is facing a similar direction
+                            if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
+                            {
+                                Debug.DrawLine(
+                                    new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
+                                    hit.point, Color.blue);
+                                // adjust speed based on the raycasts distance
+                                adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
+                                // make acceleration/deceleration inversely proportional to distance
+                                acceleration = accelerationProfile.Evaluate(hit.distance);
+                            }
                         }
                     }
                 }
@@ -227,7 +235,18 @@ namespace Agents
         private void TeleportToPrimary()
         {
             if (_agent.AgentState == _agent.AtPrimary) return; // if already at primary
-            if (!_agent.PrimaryLocation.GetFreeParkingSpace(out var parkingSpace)) return;
+            ParkingSpace parkingSpace;
+            
+            // if the agent is already travelling to primary, get that parking space to teleport to
+            if (_agent.AgentState == _agent.TravellingToPrimary)
+            {
+                parkingSpace = Destination;
+            }
+            // otherwise, get a new parking space
+            else
+            {
+                if (!_agent.PrimaryLocation.GetFreeParkingSpace(out parkingSpace)) return;    
+            }
             teleportHomeTimer = 0f;
             _currentNodePointer = 0;
             HasValidPath = false;

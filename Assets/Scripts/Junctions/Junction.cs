@@ -30,6 +30,7 @@ namespace Junctions
             {
                 if (_lastSent.NextPosition != _thisNode) // if the next position is no longer the junction
                 {
+                    _lastSent.MovingInJunction = false;
                     _lastSent = null;
                 }
             }
