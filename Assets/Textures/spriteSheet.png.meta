@@ -496,10 +496,10 @@ TextureImporter:
       name: residentialDemand
       rect:
         serializedVersion: 2
-        x: 881
-        y: 986
-        width: 14
-        height: 14
+        x: 880
+        y: 985
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 1, y: 1, z: 1, w: 1}
@@ -518,10 +518,10 @@ TextureImporter:
       name: industrialDemand
       rect:
         serializedVersion: 2
-        x: 898
-        y: 986
-        width: 14
-        height: 14
+        x: 897
+        y: 985
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 1, y: 1, z: 1, w: 1}
@@ -540,10 +540,10 @@ TextureImporter:
       name: commercialDemand
       rect:
         serializedVersion: 2
-        x: 915
-        y: 986
-        width: 14
-        height: 14
+        x: 914
+        y: 985
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 1, y: 1, z: 1, w: 1}
@@ -554,6 +554,28 @@ TextureImporter:
       bones: []
       spriteID: 98cc2cf9a4f2d7d4ba48f27d2b8940ed
       internalID: 260689290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: camera
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 795
+        width: 72
+        height: 51
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f2cf31bda50c97478cd2907c23299e5
+      internalID: -375865469
       vertices: []
       indices: 
       edges: []
@@ -581,6 +603,7 @@ TextureImporter:
       blueBackground: -1413304423
       bulldozeButton: 839604579
       button: -1541178745
+      camera: -375865469
       commercialButton: -1990113151
       commercialDemand: 260689290
       fireButton: 1275598855

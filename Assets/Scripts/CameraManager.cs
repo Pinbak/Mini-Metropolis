@@ -11,6 +11,7 @@ public class CameraManager : MonoBehaviour
     
     // the position to lerp to every tick
     private Vector3 _newPosition;
+    private bool _is3D;
     
     private void Start()
     {
@@ -42,6 +43,25 @@ public class CameraManager : MonoBehaviour
             case KeyboardKeys.D:
                 _newPosition += transform.right * (movementSpeed * Time.deltaTime);
                 break;
+        }
+    }
+
+    /// <summary>
+    ///     Convert to 3D isometric view and vice versa
+    /// </summary>
+    public void ToggleCameraView()
+    {
+        if (_is3D)
+        {
+            // turn to 2d
+            transform.rotation = Quaternion.Euler(90, 0, 0);
+            _is3D = false;
+        }
+        else
+        {
+            // turn to 3d
+            transform.rotation = Quaternion.Euler(45, -45, 0);
+            _is3D = true;
         }
     }
 }

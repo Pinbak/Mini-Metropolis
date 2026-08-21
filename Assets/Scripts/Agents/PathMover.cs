@@ -19,7 +19,6 @@ namespace Agents
         public IReadOnlyCollection<Vector3> Path => _pathGenerator.Path.AsReadOnly();
         public Node CurrentPosition { get; private set; } // the node that the agent is currently on
         public Node NextPosition { get; private set; } // the node that the agent is moving to
-        [field:SerializeField] public bool MovingInJunction { get; set; }
         public Vector3 WorldPosition => _agent.transform.position;
         public Action<Node> Arrived { get; set; } // invoked when the agent has arrived at its intended destination
         public ParkingSpace Destination { get; private set; }
@@ -124,7 +123,6 @@ namespace Agents
                 // flip the agent to begin moving forwards
                 _agent.transform.RotateAround(_agent.transform.position, _agent.transform.up, 180f);
                 _speedMultiplier = 1f;
-                MovingInJunction = false;
             }
         }
 
@@ -134,7 +132,6 @@ namespace Agents
         public void Go()
         {
             _speedMultiplier = 1f;
-            MovingInJunction = true;
         }
 
         /// <summary>
@@ -161,7 +158,7 @@ namespace Agents
                 TeleportToPrimaryAndRemoveFromJunction();
                 return;
             }
-            if (Vector3.Distance(_lastPosition, _agent.transform.position) < .01f)
+            if (Vector3.Distance(_lastPosition, _agent.transform.position) < .001f)
             {
                 teleportHomeTimer += Time.deltaTime;
             }
@@ -187,24 +184,20 @@ namespace Agents
                 }
                 else
                 {
-                    // disable collisions for moving in junctions, as they are almost always clear
-                    if (!MovingInJunction)
+                    // otherwise, raycast other agents to check if need to slow down before of another agent blocking the way
+                    if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
+                            _agentLayer))
                     {
-                        // otherwise, raycast other agents to check if need to slow down before of another agent blocking the way
-                        if (Physics.Raycast(currentPosition, _agent.transform.forward, out var hit, _detectionDistance,
-                                _agentLayer))
+                        // if the agent is facing a similar direction
+                        if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
                         {
-                            // if the agent is facing a similar direction
-                            if (Vector3.Dot(_agent.transform.forward, hit.transform.forward) > 0)
-                            {
-                                Debug.DrawLine(
-                                    new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
-                                    hit.point, Color.blue);
-                                // adjust speed based on the raycasts distance
-                                adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
-                                // make acceleration/deceleration inversely proportional to distance
-                                acceleration = accelerationProfile.Evaluate(hit.distance);
-                            }
+                            Debug.DrawLine(
+                                new Vector3(currentPosition.x, currentPosition.y + 0.1f, currentPosition.z),
+                                hit.point, Color.blue);
+                            // adjust speed based on the raycasts distance
+                            adjustedSpeed = movementSpeed * Mathf.Max(0f, hit.distance - DistanceToAgentInFront);
+                            // make acceleration/deceleration inversely proportional to distance
+                            acceleration = accelerationProfile.Evaluate(hit.distance);
                         }
                     }
                 }
