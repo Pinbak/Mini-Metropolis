@@ -52,14 +52,14 @@ MonoBehaviour:
   <RequestTime>k__BackingField: 100
   <TimeToSpendAtSecondary>k__BackingField: 10
   <TimeToWaitUntilRetryingRoute>k__BackingField: 10
-  <NeedIncrease>k__BackingField: 300
+  <NeedIncrease>k__BackingField: 500
   <UpgradeAmount>k__BackingField: 2000
   <DowngradeAmount>k__BackingField: 0
   <InQueue>k__BackingField: 0
   <PathMover>k__BackingField:
     <HasValidPath>k__BackingField: 0
-    <MovingInJunction>k__BackingField: 0
-    <Maneuvering>k__BackingField: 0
+    <IsParking>k__BackingField: 0
+    teleportHomeTimer: 0
 --- !u!65 &5619498843596990357
 BoxCollider:
   m_ObjectHideFlags: 0
