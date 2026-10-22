@@ -1,7 +1,7 @@
 ## Context
 
 This is my master's dissertation project. I made a simulation game where the player constructs a city, while virtual people go about their lives. 
-It was inspired by SimCity and Cities: Skylines, and integrates some of the modules I studies throughout my course, mainly:
+It was inspired by SimCity and Cities: Skylines, and integrates some of the modules I studied throughout my course, mainly:
 
 - Intelligent system techniques
 - Network science
